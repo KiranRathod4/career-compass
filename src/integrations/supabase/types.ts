@@ -14,7 +14,201 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      daily_tracker: {
+        Row: {
+          applications_count: number | null
+          aptitude_done: boolean | null
+          created_at: string
+          date: string
+          deep_work_hours: number | null
+          devops_done: boolean | null
+          dsa_done: boolean | null
+          id: string
+          linkedin_post: boolean | null
+          mock_done: boolean | null
+          mood: string | null
+          notes: string | null
+          productivity_score: number | null
+          qa_done: boolean | null
+          revision_done: boolean | null
+          sleep_time: string | null
+          sql_done: boolean | null
+          updated_at: string
+          user_id: string
+          wake_time: string | null
+        }
+        Insert: {
+          applications_count?: number | null
+          aptitude_done?: boolean | null
+          created_at?: string
+          date: string
+          deep_work_hours?: number | null
+          devops_done?: boolean | null
+          dsa_done?: boolean | null
+          id?: string
+          linkedin_post?: boolean | null
+          mock_done?: boolean | null
+          mood?: string | null
+          notes?: string | null
+          productivity_score?: number | null
+          qa_done?: boolean | null
+          revision_done?: boolean | null
+          sleep_time?: string | null
+          sql_done?: boolean | null
+          updated_at?: string
+          user_id: string
+          wake_time?: string | null
+        }
+        Update: {
+          applications_count?: number | null
+          aptitude_done?: boolean | null
+          created_at?: string
+          date?: string
+          deep_work_hours?: number | null
+          devops_done?: boolean | null
+          dsa_done?: boolean | null
+          id?: string
+          linkedin_post?: boolean | null
+          mock_done?: boolean | null
+          mood?: string | null
+          notes?: string | null
+          productivity_score?: number | null
+          qa_done?: boolean | null
+          revision_done?: boolean | null
+          sleep_time?: string | null
+          sql_done?: boolean | null
+          updated_at?: string
+          user_id?: string
+          wake_time?: string | null
+        }
+        Relationships: []
+      }
+      focus_sessions: {
+        Row: {
+          category: string | null
+          completed: boolean | null
+          created_at: string
+          duration_minutes: number
+          id: string
+          mode: string
+          started_at: string
+          task: string | null
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          completed?: boolean | null
+          created_at?: string
+          duration_minutes: number
+          id?: string
+          mode: string
+          started_at?: string
+          task?: string | null
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          completed?: boolean | null
+          created_at?: string
+          duration_minutes?: number
+          id?: string
+          mode?: string
+          started_at?: string
+          task?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          college_name: string | null
+          created_at: string
+          daily_application_target: number | null
+          daily_deep_work_target: number | null
+          daily_dsa_target: number | null
+          full_name: string | null
+          github_url: string | null
+          graduation_year: number | null
+          id: string
+          linkedin_url: string | null
+          notification_prefs: Json | null
+          placement_start_date: string | null
+          quick_links: Json | null
+          target_domains: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          college_name?: string | null
+          created_at?: string
+          daily_application_target?: number | null
+          daily_deep_work_target?: number | null
+          daily_dsa_target?: number | null
+          full_name?: string | null
+          github_url?: string | null
+          graduation_year?: number | null
+          id: string
+          linkedin_url?: string | null
+          notification_prefs?: Json | null
+          placement_start_date?: string | null
+          quick_links?: Json | null
+          target_domains?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          college_name?: string | null
+          created_at?: string
+          daily_application_target?: number | null
+          daily_deep_work_target?: number | null
+          daily_dsa_target?: number | null
+          full_name?: string | null
+          github_url?: string | null
+          graduation_year?: number | null
+          id?: string
+          linkedin_url?: string | null
+          notification_prefs?: Json | null
+          placement_start_date?: string | null
+          quick_links?: Json | null
+          target_domains?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      time_blocks: {
+        Row: {
+          category: string | null
+          created_at: string
+          date: string
+          end_time: string
+          id: string
+          start_time: string
+          status: string
+          task: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          date: string
+          end_time: string
+          id?: string
+          start_time: string
+          status?: string
+          task: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          date?: string
+          end_time?: string
+          id?: string
+          start_time?: string
+          status?: string
+          task?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
