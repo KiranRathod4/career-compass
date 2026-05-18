@@ -120,6 +120,6 @@ function SettingsPage() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return <label className="block"><span className="text-[11px] text-muted-foreground">{label}</span><div className="mt-0.5">{children}</div></label>;
 }
-function Input(p: any) {
-  return <input {...p} onChange={(e) => p.onChange?.(e.target.value)} className="w-full h-9 px-2.5 rounded-md border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />;
+function Input({ onChange, ...p }: { onChange?: (v: string) => void } & Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange">) {
+  return <input {...p} onChange={(e) => onChange?.(e.target.value)} className="w-full h-9 px-2.5 rounded-md border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />;
 }

@@ -16,28 +16,28 @@ const CHECKS: Array<[string, string]> = [
   ["revision_done","Revision"],["linkedin_post","LinkedIn"],
 ];
 
-const TEMPLATES: Record<string, { start: string; end: string; task: string; category: string }[]> = {
+const TEMPLATES: Record<string, { start_time: string; end_time: string; task: string; category: string }[]> = {
   "College Day": [
-    { start: "07:00", end: "08:00", task: "Morning DSA", category: "DSA" },
-    { start: "09:00", end: "16:00", task: "College", category: "Class" },
-    { start: "17:00", end: "18:30", task: "SQL practice", category: "SQL" },
-    { start: "19:00", end: "20:00", task: "Apply to 2 jobs", category: "Job Apps" },
+    { start_time: "07:00", end_time: "08:00", task: "Morning DSA", category: "DSA" },
+    { start_time: "09:00", end_time: "16:00", task: "College", category: "Class" },
+    { start_time: "17:00", end_time: "18:30", task: "SQL practice", category: "SQL" },
+    { start_time: "19:00", end_time: "20:00", task: "Apply to 2 jobs", category: "Job Apps" },
   ],
   "Full Prep Day": [
-    { start: "08:00", end: "10:00", task: "DSA — 3 problems", category: "DSA" },
-    { start: "10:15", end: "11:30", task: "Aptitude", category: "Aptitude" },
-    { start: "12:00", end: "13:00", task: "SQL", category: "SQL" },
-    { start: "14:00", end: "16:00", task: "DevOps lab", category: "DevOps" },
-    { start: "16:30", end: "18:00", task: "Project work", category: "Project" },
-    { start: "19:00", end: "20:00", task: "Apply to 3 jobs", category: "Job Apps" },
-    { start: "20:30", end: "22:00", task: "Revision", category: "Other" },
+    { start_time: "08:00", end_time: "10:00", task: "DSA — 3 problems", category: "DSA" },
+    { start_time: "10:15", end_time: "11:30", task: "Aptitude", category: "Aptitude" },
+    { start_time: "12:00", end_time: "13:00", task: "SQL", category: "SQL" },
+    { start_time: "14:00", end_time: "16:00", task: "DevOps lab", category: "DevOps" },
+    { start_time: "16:30", end_time: "18:00", task: "Project work", category: "Project" },
+    { start_time: "19:00", end_time: "20:00", task: "Apply to 3 jobs", category: "Job Apps" },
+    { start_time: "20:30", end_time: "22:00", task: "Revision", category: "Other" },
   ],
   "Interview Day": [
-    { start: "08:00", end: "09:00", task: "Light review", category: "Other" },
-    { start: "10:00", end: "12:00", task: "Interview", category: "Other" },
-    { start: "14:00", end: "15:00", task: "Reflect + notes", category: "Other" },
+    { start_time: "08:00", end_time: "09:00", task: "Light review", category: "Other" },
+    { start_time: "10:00", end_time: "12:00", task: "Interview", category: "Other" },
+    { start_time: "14:00", end_time: "15:00", task: "Reflect + notes", category: "Other" },
   ],
-  "Rest Day": [{ start: "10:00", end: "10:30", task: "Light DSA review", category: "DSA" }],
+  "Rest Day": [{ start_time: "10:00", end_time: "10:30", task: "Light DSA review", category: "DSA" }],
 };
 
 function PlannerPage() {
