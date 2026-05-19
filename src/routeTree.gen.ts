@@ -14,7 +14,11 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedTimerRouteImport } from './routes/_authenticated/timer'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedResourcesRouteImport } from './routes/_authenticated/resources'
 import { Route as AuthenticatedPlannerRouteImport } from './routes/_authenticated/planner'
+import { Route as AuthenticatedJobsRouteImport } from './routes/_authenticated/jobs'
+import { Route as AuthenticatedDsaRouteImport } from './routes/_authenticated/dsa'
+import { Route as AuthenticatedCompaniesRouteImport } from './routes/_authenticated/companies'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -40,22 +44,50 @@ const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedResourcesRoute = AuthenticatedResourcesRouteImport.update({
+  id: '/resources',
+  path: '/resources',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedPlannerRoute = AuthenticatedPlannerRouteImport.update({
   id: '/planner',
   path: '/planner',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedJobsRoute = AuthenticatedJobsRouteImport.update({
+  id: '/jobs',
+  path: '/jobs',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDsaRoute = AuthenticatedDsaRouteImport.update({
+  id: '/dsa',
+  path: '/dsa',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedCompaniesRoute = AuthenticatedCompaniesRouteImport.update({
+  id: '/companies',
+  path: '/companies',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
+  '/companies': typeof AuthenticatedCompaniesRoute
+  '/dsa': typeof AuthenticatedDsaRoute
+  '/jobs': typeof AuthenticatedJobsRoute
   '/planner': typeof AuthenticatedPlannerRoute
+  '/resources': typeof AuthenticatedResourcesRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/timer': typeof AuthenticatedTimerRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
+  '/companies': typeof AuthenticatedCompaniesRoute
+  '/dsa': typeof AuthenticatedDsaRoute
+  '/jobs': typeof AuthenticatedJobsRoute
   '/planner': typeof AuthenticatedPlannerRoute
+  '/resources': typeof AuthenticatedResourcesRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/timer': typeof AuthenticatedTimerRoute
   '/': typeof AuthenticatedIndexRoute
@@ -64,21 +96,47 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
+  '/_authenticated/companies': typeof AuthenticatedCompaniesRoute
+  '/_authenticated/dsa': typeof AuthenticatedDsaRoute
+  '/_authenticated/jobs': typeof AuthenticatedJobsRoute
   '/_authenticated/planner': typeof AuthenticatedPlannerRoute
+  '/_authenticated/resources': typeof AuthenticatedResourcesRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/timer': typeof AuthenticatedTimerRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/planner' | '/settings' | '/timer'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/companies'
+    | '/dsa'
+    | '/jobs'
+    | '/planner'
+    | '/resources'
+    | '/settings'
+    | '/timer'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/planner' | '/settings' | '/timer' | '/'
+  to:
+    | '/login'
+    | '/companies'
+    | '/dsa'
+    | '/jobs'
+    | '/planner'
+    | '/resources'
+    | '/settings'
+    | '/timer'
+    | '/'
   id:
     | '__root__'
     | '/_authenticated'
     | '/login'
+    | '/_authenticated/companies'
+    | '/_authenticated/dsa'
+    | '/_authenticated/jobs'
     | '/_authenticated/planner'
+    | '/_authenticated/resources'
     | '/_authenticated/settings'
     | '/_authenticated/timer'
     | '/_authenticated/'
@@ -126,6 +184,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/resources': {
+      id: '/_authenticated/resources'
+      path: '/resources'
+      fullPath: '/resources'
+      preLoaderRoute: typeof AuthenticatedResourcesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/planner': {
       id: '/_authenticated/planner'
       path: '/planner'
@@ -133,18 +198,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPlannerRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/jobs': {
+      id: '/_authenticated/jobs'
+      path: '/jobs'
+      fullPath: '/jobs'
+      preLoaderRoute: typeof AuthenticatedJobsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dsa': {
+      id: '/_authenticated/dsa'
+      path: '/dsa'
+      fullPath: '/dsa'
+      preLoaderRoute: typeof AuthenticatedDsaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/companies': {
+      id: '/_authenticated/companies'
+      path: '/companies'
+      fullPath: '/companies'
+      preLoaderRoute: typeof AuthenticatedCompaniesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedCompaniesRoute: typeof AuthenticatedCompaniesRoute
+  AuthenticatedDsaRoute: typeof AuthenticatedDsaRoute
+  AuthenticatedJobsRoute: typeof AuthenticatedJobsRoute
   AuthenticatedPlannerRoute: typeof AuthenticatedPlannerRoute
+  AuthenticatedResourcesRoute: typeof AuthenticatedResourcesRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedTimerRoute: typeof AuthenticatedTimerRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedCompaniesRoute: AuthenticatedCompaniesRoute,
+  AuthenticatedDsaRoute: AuthenticatedDsaRoute,
+  AuthenticatedJobsRoute: AuthenticatedJobsRoute,
   AuthenticatedPlannerRoute: AuthenticatedPlannerRoute,
+  AuthenticatedResourcesRoute: AuthenticatedResourcesRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedTimerRoute: AuthenticatedTimerRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
@@ -161,3 +255,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
