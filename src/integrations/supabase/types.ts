@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      companies: {
+        Row: {
+          created_at: string
+          ctc: string | null
+          id: string
+          last_contact: string | null
+          location: string | null
+          name: string
+          notes: string | null
+          priority: string
+          role_focus: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          ctc?: string | null
+          id?: string
+          last_contact?: string | null
+          location?: string | null
+          name: string
+          notes?: string | null
+          priority?: string
+          role_focus?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          ctc?: string | null
+          id?: string
+          last_contact?: string | null
+          location?: string | null
+          name?: string
+          notes?: string | null
+          priority?: string
+          role_focus?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       daily_tracker: {
         Row: {
           applications_count: number | null
@@ -83,6 +128,57 @@ export type Database = {
         }
         Relationships: []
       }
+      dsa_problems: {
+        Row: {
+          attempts: number
+          created_at: string
+          difficulty: string | null
+          id: string
+          last_revised_at: string | null
+          notes: string | null
+          platform: string | null
+          starred: boolean
+          status: string
+          title: string
+          topic: string | null
+          updated_at: string
+          url: string | null
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          difficulty?: string | null
+          id?: string
+          last_revised_at?: string | null
+          notes?: string | null
+          platform?: string | null
+          starred?: boolean
+          status?: string
+          title: string
+          topic?: string | null
+          updated_at?: string
+          url?: string | null
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          difficulty?: string | null
+          id?: string
+          last_revised_at?: string | null
+          notes?: string | null
+          platform?: string | null
+          starred?: boolean
+          status?: string
+          title?: string
+          topic?: string | null
+          updated_at?: string
+          url?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       focus_sessions: {
         Row: {
           category: string | null
@@ -115,6 +211,60 @@ export type Database = {
           mode?: string
           started_at?: string
           task?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      jobs: {
+        Row: {
+          applied_at: string | null
+          company: string
+          created_at: string
+          deadline: string | null
+          id: string
+          job_type: string | null
+          link: string | null
+          location: string | null
+          notes: string | null
+          role: string
+          salary: string | null
+          source: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          applied_at?: string | null
+          company: string
+          created_at?: string
+          deadline?: string | null
+          id?: string
+          job_type?: string | null
+          link?: string | null
+          location?: string | null
+          notes?: string | null
+          role: string
+          salary?: string | null
+          source?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          applied_at?: string | null
+          company?: string
+          created_at?: string
+          deadline?: string | null
+          id?: string
+          job_type?: string | null
+          link?: string | null
+          location?: string | null
+          notes?: string | null
+          role?: string
+          salary?: string | null
+          source?: string | null
+          status?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -170,6 +320,48 @@ export type Database = {
           quick_links?: Json | null
           target_domains?: string[] | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      resources: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          rating: number | null
+          resource_type: string | null
+          status: string
+          title: string
+          topic: string | null
+          updated_at: string
+          url: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          rating?: number | null
+          resource_type?: string | null
+          status?: string
+          title: string
+          topic?: string | null
+          updated_at?: string
+          url?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          rating?: number | null
+          resource_type?: string | null
+          status?: string
+          title?: string
+          topic?: string | null
+          updated_at?: string
+          url?: string | null
+          user_id?: string
         }
         Relationships: []
       }
