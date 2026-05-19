@@ -13,8 +13,25 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedTimerRouteImport } from './routes/_authenticated/timer'
+import { Route as AuthenticatedSqlRouteImport } from './routes/_authenticated/sql'
+import { Route as AuthenticatedSprintsRouteImport } from './routes/_authenticated/sprints'
+import { Route as AuthenticatedSkillsRouteImport } from './routes/_authenticated/skills'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedReviewRouteImport } from './routes/_authenticated/review'
+import { Route as AuthenticatedResumesRouteImport } from './routes/_authenticated/resumes'
+import { Route as AuthenticatedResourcesRouteImport } from './routes/_authenticated/resources'
+import { Route as AuthenticatedQaRouteImport } from './routes/_authenticated/qa'
+import { Route as AuthenticatedProjectsRouteImport } from './routes/_authenticated/projects'
 import { Route as AuthenticatedPlannerRouteImport } from './routes/_authenticated/planner'
+import { Route as AuthenticatedNetworkRouteImport } from './routes/_authenticated/network'
+import { Route as AuthenticatedLinkedinRouteImport } from './routes/_authenticated/linkedin'
+import { Route as AuthenticatedJobsRouteImport } from './routes/_authenticated/jobs'
+import { Route as AuthenticatedInterviewRouteImport } from './routes/_authenticated/interview'
+import { Route as AuthenticatedDsaRouteImport } from './routes/_authenticated/dsa'
+import { Route as AuthenticatedDevopsRouteImport } from './routes/_authenticated/devops'
+import { Route as AuthenticatedCompaniesRouteImport } from './routes/_authenticated/companies'
+import { Route as AuthenticatedAptitudeRouteImport } from './routes/_authenticated/aptitude'
+import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -35,9 +52,49 @@ const AuthenticatedTimerRoute = AuthenticatedTimerRouteImport.update({
   path: '/timer',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedSqlRoute = AuthenticatedSqlRouteImport.update({
+  id: '/sql',
+  path: '/sql',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedSprintsRoute = AuthenticatedSprintsRouteImport.update({
+  id: '/sprints',
+  path: '/sprints',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedSkillsRoute = AuthenticatedSkillsRouteImport.update({
+  id: '/skills',
+  path: '/skills',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedReviewRoute = AuthenticatedReviewRouteImport.update({
+  id: '/review',
+  path: '/review',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedResumesRoute = AuthenticatedResumesRouteImport.update({
+  id: '/resumes',
+  path: '/resumes',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedResourcesRoute = AuthenticatedResourcesRouteImport.update({
+  id: '/resources',
+  path: '/resources',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedQaRoute = AuthenticatedQaRouteImport.update({
+  id: '/qa',
+  path: '/qa',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedProjectsRoute = AuthenticatedProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedPlannerRoute = AuthenticatedPlannerRouteImport.update({
@@ -45,18 +102,97 @@ const AuthenticatedPlannerRoute = AuthenticatedPlannerRouteImport.update({
   path: '/planner',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedNetworkRoute = AuthenticatedNetworkRouteImport.update({
+  id: '/network',
+  path: '/network',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedLinkedinRoute = AuthenticatedLinkedinRouteImport.update({
+  id: '/linkedin',
+  path: '/linkedin',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedJobsRoute = AuthenticatedJobsRouteImport.update({
+  id: '/jobs',
+  path: '/jobs',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedInterviewRoute = AuthenticatedInterviewRouteImport.update({
+  id: '/interview',
+  path: '/interview',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDsaRoute = AuthenticatedDsaRouteImport.update({
+  id: '/dsa',
+  path: '/dsa',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDevopsRoute = AuthenticatedDevopsRouteImport.update({
+  id: '/devops',
+  path: '/devops',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedCompaniesRoute = AuthenticatedCompaniesRouteImport.update({
+  id: '/companies',
+  path: '/companies',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAptitudeRoute = AuthenticatedAptitudeRouteImport.update({
+  id: '/aptitude',
+  path: '/aptitude',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
+  '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/aptitude': typeof AuthenticatedAptitudeRoute
+  '/companies': typeof AuthenticatedCompaniesRoute
+  '/devops': typeof AuthenticatedDevopsRoute
+  '/dsa': typeof AuthenticatedDsaRoute
+  '/interview': typeof AuthenticatedInterviewRoute
+  '/jobs': typeof AuthenticatedJobsRoute
+  '/linkedin': typeof AuthenticatedLinkedinRoute
+  '/network': typeof AuthenticatedNetworkRoute
   '/planner': typeof AuthenticatedPlannerRoute
+  '/projects': typeof AuthenticatedProjectsRoute
+  '/qa': typeof AuthenticatedQaRoute
+  '/resources': typeof AuthenticatedResourcesRoute
+  '/resumes': typeof AuthenticatedResumesRoute
+  '/review': typeof AuthenticatedReviewRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/skills': typeof AuthenticatedSkillsRoute
+  '/sprints': typeof AuthenticatedSprintsRoute
+  '/sql': typeof AuthenticatedSqlRoute
   '/timer': typeof AuthenticatedTimerRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
+  '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/aptitude': typeof AuthenticatedAptitudeRoute
+  '/companies': typeof AuthenticatedCompaniesRoute
+  '/devops': typeof AuthenticatedDevopsRoute
+  '/dsa': typeof AuthenticatedDsaRoute
+  '/interview': typeof AuthenticatedInterviewRoute
+  '/jobs': typeof AuthenticatedJobsRoute
+  '/linkedin': typeof AuthenticatedLinkedinRoute
+  '/network': typeof AuthenticatedNetworkRoute
   '/planner': typeof AuthenticatedPlannerRoute
+  '/projects': typeof AuthenticatedProjectsRoute
+  '/qa': typeof AuthenticatedQaRoute
+  '/resources': typeof AuthenticatedResourcesRoute
+  '/resumes': typeof AuthenticatedResumesRoute
+  '/review': typeof AuthenticatedReviewRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/skills': typeof AuthenticatedSkillsRoute
+  '/sprints': typeof AuthenticatedSprintsRoute
+  '/sql': typeof AuthenticatedSqlRoute
   '/timer': typeof AuthenticatedTimerRoute
   '/': typeof AuthenticatedIndexRoute
 }
@@ -64,22 +200,100 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
+  '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
+  '/_authenticated/aptitude': typeof AuthenticatedAptitudeRoute
+  '/_authenticated/companies': typeof AuthenticatedCompaniesRoute
+  '/_authenticated/devops': typeof AuthenticatedDevopsRoute
+  '/_authenticated/dsa': typeof AuthenticatedDsaRoute
+  '/_authenticated/interview': typeof AuthenticatedInterviewRoute
+  '/_authenticated/jobs': typeof AuthenticatedJobsRoute
+  '/_authenticated/linkedin': typeof AuthenticatedLinkedinRoute
+  '/_authenticated/network': typeof AuthenticatedNetworkRoute
   '/_authenticated/planner': typeof AuthenticatedPlannerRoute
+  '/_authenticated/projects': typeof AuthenticatedProjectsRoute
+  '/_authenticated/qa': typeof AuthenticatedQaRoute
+  '/_authenticated/resources': typeof AuthenticatedResourcesRoute
+  '/_authenticated/resumes': typeof AuthenticatedResumesRoute
+  '/_authenticated/review': typeof AuthenticatedReviewRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/skills': typeof AuthenticatedSkillsRoute
+  '/_authenticated/sprints': typeof AuthenticatedSprintsRoute
+  '/_authenticated/sql': typeof AuthenticatedSqlRoute
   '/_authenticated/timer': typeof AuthenticatedTimerRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/planner' | '/settings' | '/timer'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/analytics'
+    | '/aptitude'
+    | '/companies'
+    | '/devops'
+    | '/dsa'
+    | '/interview'
+    | '/jobs'
+    | '/linkedin'
+    | '/network'
+    | '/planner'
+    | '/projects'
+    | '/qa'
+    | '/resources'
+    | '/resumes'
+    | '/review'
+    | '/settings'
+    | '/skills'
+    | '/sprints'
+    | '/sql'
+    | '/timer'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/planner' | '/settings' | '/timer' | '/'
+  to:
+    | '/login'
+    | '/analytics'
+    | '/aptitude'
+    | '/companies'
+    | '/devops'
+    | '/dsa'
+    | '/interview'
+    | '/jobs'
+    | '/linkedin'
+    | '/network'
+    | '/planner'
+    | '/projects'
+    | '/qa'
+    | '/resources'
+    | '/resumes'
+    | '/review'
+    | '/settings'
+    | '/skills'
+    | '/sprints'
+    | '/sql'
+    | '/timer'
+    | '/'
   id:
     | '__root__'
     | '/_authenticated'
     | '/login'
+    | '/_authenticated/analytics'
+    | '/_authenticated/aptitude'
+    | '/_authenticated/companies'
+    | '/_authenticated/devops'
+    | '/_authenticated/dsa'
+    | '/_authenticated/interview'
+    | '/_authenticated/jobs'
+    | '/_authenticated/linkedin'
+    | '/_authenticated/network'
     | '/_authenticated/planner'
+    | '/_authenticated/projects'
+    | '/_authenticated/qa'
+    | '/_authenticated/resources'
+    | '/_authenticated/resumes'
+    | '/_authenticated/review'
     | '/_authenticated/settings'
+    | '/_authenticated/skills'
+    | '/_authenticated/sprints'
+    | '/_authenticated/sql'
     | '/_authenticated/timer'
     | '/_authenticated/'
   fileRoutesById: FileRoutesById
@@ -119,11 +333,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTimerRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/sql': {
+      id: '/_authenticated/sql'
+      path: '/sql'
+      fullPath: '/sql'
+      preLoaderRoute: typeof AuthenticatedSqlRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/sprints': {
+      id: '/_authenticated/sprints'
+      path: '/sprints'
+      fullPath: '/sprints'
+      preLoaderRoute: typeof AuthenticatedSprintsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/skills': {
+      id: '/_authenticated/skills'
+      path: '/skills'
+      fullPath: '/skills'
+      preLoaderRoute: typeof AuthenticatedSkillsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/review': {
+      id: '/_authenticated/review'
+      path: '/review'
+      fullPath: '/review'
+      preLoaderRoute: typeof AuthenticatedReviewRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/resumes': {
+      id: '/_authenticated/resumes'
+      path: '/resumes'
+      fullPath: '/resumes'
+      preLoaderRoute: typeof AuthenticatedResumesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/resources': {
+      id: '/_authenticated/resources'
+      path: '/resources'
+      fullPath: '/resources'
+      preLoaderRoute: typeof AuthenticatedResourcesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/qa': {
+      id: '/_authenticated/qa'
+      path: '/qa'
+      fullPath: '/qa'
+      preLoaderRoute: typeof AuthenticatedQaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/projects': {
+      id: '/_authenticated/projects'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof AuthenticatedProjectsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/planner': {
@@ -133,19 +403,116 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPlannerRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/network': {
+      id: '/_authenticated/network'
+      path: '/network'
+      fullPath: '/network'
+      preLoaderRoute: typeof AuthenticatedNetworkRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/linkedin': {
+      id: '/_authenticated/linkedin'
+      path: '/linkedin'
+      fullPath: '/linkedin'
+      preLoaderRoute: typeof AuthenticatedLinkedinRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/jobs': {
+      id: '/_authenticated/jobs'
+      path: '/jobs'
+      fullPath: '/jobs'
+      preLoaderRoute: typeof AuthenticatedJobsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/interview': {
+      id: '/_authenticated/interview'
+      path: '/interview'
+      fullPath: '/interview'
+      preLoaderRoute: typeof AuthenticatedInterviewRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dsa': {
+      id: '/_authenticated/dsa'
+      path: '/dsa'
+      fullPath: '/dsa'
+      preLoaderRoute: typeof AuthenticatedDsaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/devops': {
+      id: '/_authenticated/devops'
+      path: '/devops'
+      fullPath: '/devops'
+      preLoaderRoute: typeof AuthenticatedDevopsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/companies': {
+      id: '/_authenticated/companies'
+      path: '/companies'
+      fullPath: '/companies'
+      preLoaderRoute: typeof AuthenticatedCompaniesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/aptitude': {
+      id: '/_authenticated/aptitude'
+      path: '/aptitude'
+      fullPath: '/aptitude'
+      preLoaderRoute: typeof AuthenticatedAptitudeRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/analytics': {
+      id: '/_authenticated/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AuthenticatedAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
+  AuthenticatedAptitudeRoute: typeof AuthenticatedAptitudeRoute
+  AuthenticatedCompaniesRoute: typeof AuthenticatedCompaniesRoute
+  AuthenticatedDevopsRoute: typeof AuthenticatedDevopsRoute
+  AuthenticatedDsaRoute: typeof AuthenticatedDsaRoute
+  AuthenticatedInterviewRoute: typeof AuthenticatedInterviewRoute
+  AuthenticatedJobsRoute: typeof AuthenticatedJobsRoute
+  AuthenticatedLinkedinRoute: typeof AuthenticatedLinkedinRoute
+  AuthenticatedNetworkRoute: typeof AuthenticatedNetworkRoute
   AuthenticatedPlannerRoute: typeof AuthenticatedPlannerRoute
+  AuthenticatedProjectsRoute: typeof AuthenticatedProjectsRoute
+  AuthenticatedQaRoute: typeof AuthenticatedQaRoute
+  AuthenticatedResourcesRoute: typeof AuthenticatedResourcesRoute
+  AuthenticatedResumesRoute: typeof AuthenticatedResumesRoute
+  AuthenticatedReviewRoute: typeof AuthenticatedReviewRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedSkillsRoute: typeof AuthenticatedSkillsRoute
+  AuthenticatedSprintsRoute: typeof AuthenticatedSprintsRoute
+  AuthenticatedSqlRoute: typeof AuthenticatedSqlRoute
   AuthenticatedTimerRoute: typeof AuthenticatedTimerRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
+  AuthenticatedAptitudeRoute: AuthenticatedAptitudeRoute,
+  AuthenticatedCompaniesRoute: AuthenticatedCompaniesRoute,
+  AuthenticatedDevopsRoute: AuthenticatedDevopsRoute,
+  AuthenticatedDsaRoute: AuthenticatedDsaRoute,
+  AuthenticatedInterviewRoute: AuthenticatedInterviewRoute,
+  AuthenticatedJobsRoute: AuthenticatedJobsRoute,
+  AuthenticatedLinkedinRoute: AuthenticatedLinkedinRoute,
+  AuthenticatedNetworkRoute: AuthenticatedNetworkRoute,
   AuthenticatedPlannerRoute: AuthenticatedPlannerRoute,
+  AuthenticatedProjectsRoute: AuthenticatedProjectsRoute,
+  AuthenticatedQaRoute: AuthenticatedQaRoute,
+  AuthenticatedResourcesRoute: AuthenticatedResourcesRoute,
+  AuthenticatedResumesRoute: AuthenticatedResumesRoute,
+  AuthenticatedReviewRoute: AuthenticatedReviewRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedSkillsRoute: AuthenticatedSkillsRoute,
+  AuthenticatedSprintsRoute: AuthenticatedSprintsRoute,
+  AuthenticatedSqlRoute: AuthenticatedSqlRoute,
   AuthenticatedTimerRoute: AuthenticatedTimerRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
