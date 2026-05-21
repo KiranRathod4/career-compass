@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      aptitude_log: {
+        Row: {
+          category: string
+          created_at: string
+          date: string
+          difficulty: string | null
+          id: string
+          notes: string | null
+          questions_attempted: number
+          questions_correct: number
+          time_minutes: number
+          topic: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          date?: string
+          difficulty?: string | null
+          id?: string
+          notes?: string | null
+          questions_attempted?: number
+          questions_correct?: number
+          time_minutes?: number
+          topic?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          date?: string
+          difficulty?: string | null
+          id?: string
+          notes?: string | null
+          questions_attempted?: number
+          questions_correct?: number
+          time_minutes?: number
+          topic?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       companies: {
         Row: {
           created_at: string
@@ -125,6 +170,48 @@ export type Database = {
           updated_at?: string
           user_id?: string
           wake_time?: string | null
+        }
+        Relationships: []
+      }
+      devops_items: {
+        Row: {
+          category: string | null
+          created_at: string
+          hours: number
+          id: string
+          notes: string | null
+          status: string
+          title: string
+          tool: string | null
+          updated_at: string
+          url: string | null
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          hours?: number
+          id?: string
+          notes?: string | null
+          status?: string
+          title: string
+          tool?: string | null
+          updated_at?: string
+          url?: string | null
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          hours?: number
+          id?: string
+          notes?: string | null
+          status?: string
+          title?: string
+          tool?: string | null
+          updated_at?: string
+          url?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -323,6 +410,51 @@ export type Database = {
         }
         Relationships: []
       }
+      qa_items: {
+        Row: {
+          category: string | null
+          created_at: string
+          hours: number
+          id: string
+          notes: string | null
+          status: string
+          test_type: string
+          title: string
+          tool: string | null
+          updated_at: string
+          url: string | null
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          hours?: number
+          id?: string
+          notes?: string | null
+          status?: string
+          test_type?: string
+          title: string
+          tool?: string | null
+          updated_at?: string
+          url?: string | null
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          hours?: number
+          id?: string
+          notes?: string | null
+          status?: string
+          test_type?: string
+          title?: string
+          tool?: string | null
+          updated_at?: string
+          url?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       resources: {
         Row: {
           created_at: string
@@ -356,6 +488,96 @@ export type Database = {
           notes?: string | null
           rating?: number | null
           resource_type?: string | null
+          status?: string
+          title?: string
+          topic?: string | null
+          updated_at?: string
+          url?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      skills: {
+        Row: {
+          category: string
+          created_at: string
+          current_level: number
+          id: string
+          name: string
+          notes: string | null
+          priority: string
+          target_level: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          current_level?: number
+          id?: string
+          name: string
+          notes?: string | null
+          priority?: string
+          target_level?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          current_level?: number
+          id?: string
+          name?: string
+          notes?: string | null
+          priority?: string
+          target_level?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      sql_problems: {
+        Row: {
+          attempts: number
+          created_at: string
+          difficulty: string | null
+          id: string
+          last_revised_at: string | null
+          notes: string | null
+          platform: string | null
+          starred: boolean
+          status: string
+          title: string
+          topic: string | null
+          updated_at: string
+          url: string | null
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          difficulty?: string | null
+          id?: string
+          last_revised_at?: string | null
+          notes?: string | null
+          platform?: string | null
+          starred?: boolean
+          status?: string
+          title: string
+          topic?: string | null
+          updated_at?: string
+          url?: string | null
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          difficulty?: string | null
+          id?: string
+          last_revised_at?: string | null
+          notes?: string | null
+          platform?: string | null
+          starred?: boolean
           status?: string
           title?: string
           topic?: string | null
