@@ -104,6 +104,54 @@ export type Database = {
         }
         Relationships: []
       }
+      contacts: {
+        Row: {
+          company: string | null
+          created_at: string
+          email: string | null
+          id: string
+          last_contact_at: string | null
+          linkedin_url: string | null
+          name: string
+          notes: string | null
+          relation: string
+          role: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          last_contact_at?: string | null
+          linkedin_url?: string | null
+          name: string
+          notes?: string | null
+          relation?: string
+          role?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          last_contact_at?: string | null
+          linkedin_url?: string | null
+          name?: string
+          notes?: string | null
+          relation?: string
+          role?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       daily_tracker: {
         Row: {
           applications_count: number | null
@@ -302,6 +350,48 @@ export type Database = {
         }
         Relationships: []
       }
+      interview_prep: {
+        Row: {
+          answer: string | null
+          category: string
+          company: string | null
+          confidence: number
+          created_at: string
+          id: string
+          last_practiced_at: string | null
+          question: string
+          starred: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answer?: string | null
+          category?: string
+          company?: string | null
+          confidence?: number
+          created_at?: string
+          id?: string
+          last_practiced_at?: string | null
+          question: string
+          starred?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answer?: string | null
+          category?: string
+          company?: string | null
+          confidence?: number
+          created_at?: string
+          id?: string
+          last_practiced_at?: string | null
+          question?: string
+          starred?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       jobs: {
         Row: {
           applied_at: string | null
@@ -352,6 +442,60 @@ export type Database = {
           source?: string | null
           status?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      linkedin_posts: {
+        Row: {
+          body: string | null
+          comments: number | null
+          created_at: string
+          hook: string | null
+          id: string
+          impressions: number | null
+          likes: number | null
+          post_type: string | null
+          posted_at: string | null
+          scheduled_for: string | null
+          status: string
+          topic: string
+          updated_at: string
+          url: string | null
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          comments?: number | null
+          created_at?: string
+          hook?: string | null
+          id?: string
+          impressions?: number | null
+          likes?: number | null
+          post_type?: string | null
+          posted_at?: string | null
+          scheduled_for?: string | null
+          status?: string
+          topic: string
+          updated_at?: string
+          url?: string | null
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          comments?: number | null
+          created_at?: string
+          hook?: string | null
+          id?: string
+          impressions?: number | null
+          likes?: number | null
+          post_type?: string | null
+          posted_at?: string | null
+          scheduled_for?: string | null
+          status?: string
+          topic?: string
+          updated_at?: string
+          url?: string | null
           user_id?: string
         }
         Relationships: []
@@ -407,6 +551,54 @@ export type Database = {
           quick_links?: Json | null
           target_domains?: string[] | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      projects: {
+        Row: {
+          created_at: string
+          demo_url: string | null
+          description: string | null
+          highlights: string | null
+          id: string
+          repo_url: string | null
+          shipped_at: string | null
+          started_at: string | null
+          status: string
+          tech_stack: string[] | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          demo_url?: string | null
+          description?: string | null
+          highlights?: string | null
+          id?: string
+          repo_url?: string | null
+          shipped_at?: string | null
+          started_at?: string | null
+          status?: string
+          tech_stack?: string[] | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          demo_url?: string | null
+          description?: string | null
+          highlights?: string | null
+          id?: string
+          repo_url?: string | null
+          shipped_at?: string | null
+          started_at?: string | null
+          status?: string
+          tech_stack?: string[] | null
+          title?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -494,6 +686,45 @@ export type Database = {
           updated_at?: string
           url?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      resumes: {
+        Row: {
+          created_at: string
+          file_url: string | null
+          id: string
+          is_active: boolean
+          name: string
+          notes: string | null
+          target_role: string | null
+          updated_at: string
+          user_id: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          notes?: string | null
+          target_role?: string | null
+          updated_at?: string
+          user_id: string
+          version?: number
+        }
+        Update: {
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          notes?: string | null
+          target_role?: string | null
+          updated_at?: string
+          user_id?: string
+          version?: number
         }
         Relationships: []
       }
