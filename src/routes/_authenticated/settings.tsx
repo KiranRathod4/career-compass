@@ -82,14 +82,28 @@ function SettingsPage() {
         <div className="mt-5">
           <div className="text-[11px] text-muted-foreground mb-2">Target Domains</div>
           <div className="flex gap-2 flex-wrap">
-            {DOMAINS.map((d) => {
+            {allDomains.map((d) => {
               const on = (form.target_domains ?? []).includes(d);
+              const isCustom = !DOMAINS.includes(d);
               return (
-                <button key={d} onClick={() => toggleDomain(d)}
-                  className={`px-3 h-8 rounded-full text-xs border transition ${on ? "bg-primary text-primary-foreground border-primary" : "border-border hover:bg-accent"}`}>{d}</button>
+                <span key={d} className={`inline-flex items-center gap-1 px-3 h-8 rounded-full text-xs border transition ${on ? "bg-primary text-primary-foreground border-primary" : "border-border hover:bg-accent"}`}>
+                  <button onClick={() => toggleDomain(d)}>{d}</button>
+                  {isCustom && (
+                    <button onClick={() => removeDomain(d)} className="opacity-70 hover:opacity-100" title="Remove">
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                  )}
+                </span>
               );
             })}
           </div>
+          <div className="flex gap-2 mt-3 max-w-md">
+            <Input value={newDomain} onChange={setNewDomain} placeholder="Add custom domain (e.g. AI/ML)" />
+            <button onClick={addCustomDomain} className="h-9 px-3 rounded-md bg-primary text-primary-foreground text-sm flex items-center gap-1 shrink-0"><Plus className="h-3.5 w-3.5" />Add</button>
+          </div>
+          {customDomains.length > 0 && (
+            <div className="text-[11px] text-muted-foreground mt-2">{customDomains.length} custom · click chip to toggle, trash to delete</div>
+          )}
         </div>
       </div>
 
