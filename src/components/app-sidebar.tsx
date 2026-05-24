@@ -2,10 +2,11 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Home, Timer, Calendar, Code2, Calculator, Database, Server, Beaker,
-  BookOpen, BarChart3, Briefcase, Building2, Users, FolderOpen,
-  Wrench, Mic, Megaphone, TrendingUp, RotateCcw, Settings, Target,
-  PanelLeftClose, PanelLeftOpen,
+  BookOpen, Radar as RadarIcon, BarChart3, Briefcase, Building2, Users, FolderOpen,
+  GitBranch, Mic, TrendingUp, RotateCcw, Settings, Target, Trophy, Users2,
+  PanelLeftClose, PanelLeftOpen, ArrowUpRight,
 } from "lucide-react";
+import { useXP } from "@/hooks/use-gamification";
 
 type Item = { label: string; to: string; icon: typeof Home };
 type Group = { label: string; items: Item[] };
@@ -16,54 +17,68 @@ const groups: Group[] = [
     { label: "Focus Timer", to: "/timer", icon: Timer },
     { label: "Daily Planner", to: "/planner", icon: Calendar },
   ]},
-  { label: "Preparation", items: [
+  { label: "Prepare", items: [
     { label: "DSA Tracker", to: "/dsa", icon: Code2 },
     { label: "Aptitude", to: "/aptitude", icon: Calculator },
-    { label: "SQL Tracker", to: "/sql", icon: Database },
+    { label: "SQL", to: "/sql", icon: Database },
     { label: "DevOps Hub", to: "/devops", icon: Server },
     { label: "QA Hub", to: "/qa", icon: Beaker },
-  ]},
-  { label: "Learning", items: [
-    { label: "Resource Hub", to: "/resources", icon: BookOpen },
-    { label: "Skill Matrix", to: "/skills", icon: BarChart3 },
   ]},
   { label: "Career", items: [
     { label: "Job Tracker", to: "/jobs", icon: Briefcase },
     { label: "Company Prep", to: "/companies", icon: Building2 },
-    { label: "Network", to: "/network", icon: Users },
     { label: "Resume Vault", to: "/resumes", icon: FolderOpen },
+    { label: "Network", to: "/network", icon: Users },
   ]},
-  { label: "Build", items: [
-    { label: "Projects", to: "/projects", icon: Wrench },
+  { label: "Grow", items: [
+    { label: "Resources", to: "/resources", icon: BookOpen },
+    { label: "Projects", to: "/projects", icon: GitBranch },
     { label: "Interview Prep", to: "/interview", icon: Mic },
-    { label: "LinkedIn Planner", to: "/linkedin", icon: Megaphone },
+    { label: "LinkedIn Plan", to: "/linkedin", icon: TrendingUp },
   ]},
-  { label: "Review", items: [
-    { label: "Analytics", to: "/analytics", icon: TrendingUp },
+  { label: "Insights", items: [
+    { label: "Skill Matrix", to: "/skills", icon: RadarIcon },
+    { label: "Analytics", to: "/analytics", icon: BarChart3 },
     { label: "Weekly Review", to: "/review", icon: RotateCcw },
     { label: "Sprints", to: "/sprints", icon: Target },
+  ]},
+  { label: "Rewards", items: [
+    { label: "Achievements", to: "/achievements", icon: Trophy },
+    { label: "Challenges", to: "/challenges", icon: Target },
+    { label: "My Pod", to: "/pod", icon: Users2 },
   ]},
 ];
 
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { data: level } = useXP();
 
   return (
     <aside
       className="hidden md:flex flex-col border-r border-sidebar-border bg-sidebar shrink-0 transition-[width] duration-200"
       style={{ width: collapsed ? 56 : 240 }}
     >
-      <div className="h-14 flex items-center px-4 border-b border-sidebar-border justify-between">
-        {!collapsed && (
-          <div className="flex items-center gap-2">
-            <div className="h-7 w-7 rounded-md bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold">P</div>
-            <span className="text-sm font-semibold">Placement OS</span>
+      <div className="px-4 pt-4 pb-3 border-b border-sidebar-border">
+        <div className="flex items-center justify-between">
+          {!collapsed && (
+            <div className="flex items-center gap-0.5">
+              <span className="text-[20px] font-extrabold tracking-tight text-primary leading-none">T</span>
+              <ArrowUpRight className="h-3 w-3 -ml-1 -mt-2 text-primary" strokeWidth={3} />
+              <span className="text-[20px] font-extrabold tracking-tight leading-none">aiyaar</span>
+            </div>
+          )}
+          <button onClick={() => setCollapsed((c) => !c)} className="h-7 w-7 rounded-md hover:bg-sidebar-accent flex items-center justify-center text-muted-foreground">
+            {collapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+          </button>
+        </div>
+        {!collapsed && level && (
+          <div className="mt-2 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[11px] font-medium">
+            <span>{level.name}</span>
+            <span className="text-primary/60">·</span>
+            <span>Lv. {level.level}</span>
           </div>
         )}
-        <button onClick={() => setCollapsed((c) => !c)} className="h-7 w-7 rounded-md hover:bg-sidebar-accent flex items-center justify-center text-muted-foreground">
-          {collapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
-        </button>
       </div>
 
       <nav className="flex-1 overflow-y-auto py-3 px-2">
@@ -76,7 +91,9 @@ export function AppSidebar() {
               return (
                 <Link key={item.to} to={item.to} title={collapsed ? item.label : undefined}
                   className={`flex items-center gap-2.5 px-2 h-8 rounded-md text-sm transition-colors ${
-                    active ? "bg-primary/10 text-primary font-medium" : "text-foreground/80 hover:bg-sidebar-accent"
+                    active
+                      ? "bg-primary/10 text-primary font-medium border-l-2 border-primary rounded-l-none pl-[6px]"
+                      : "text-foreground/80 hover:bg-sidebar-accent"
                   }`}>
                   <Icon className="h-4 w-4 shrink-0" />
                   {!collapsed && <span className="truncate">{item.label}</span>}
@@ -93,7 +110,7 @@ export function AppSidebar() {
             pathname === "/settings" ? "bg-primary/10 text-primary font-medium" : "text-foreground/80 hover:bg-sidebar-accent"
           }`}>
           <Settings className="h-4 w-4 shrink-0" />
-          {!collapsed && <span>Settings</span>}
+          {!collapsed && <span>Settings & Plan</span>}
         </Link>
       </div>
     </aside>
