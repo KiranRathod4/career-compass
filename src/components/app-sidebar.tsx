@@ -4,7 +4,7 @@ import {
   Home, Timer, Calendar, Code2, Calculator, Database, Server, Beaker,
   BookOpen, Radar as RadarIcon, BarChart3, Briefcase, Building2, Users, FolderOpen,
   GitBranch, Mic, TrendingUp, RotateCcw, Settings, Target, Trophy, Users2,
-  PanelLeftClose, PanelLeftOpen, ArrowUpRight,
+  PanelLeftClose, PanelLeftOpen, ArrowUpRight, Sparkles,
 } from "lucide-react";
 import { useXP } from "@/hooks/use-gamification";
 
@@ -46,6 +46,7 @@ const groups: Group[] = [
     { label: "Achievements", to: "/achievements", icon: Trophy },
     { label: "Challenges", to: "/challenges", icon: Target },
     { label: "My Pod", to: "/pod", icon: Users2 },
+    { label: "Pricing", to: "/pricing", icon: Sparkles },
   ]},
 ];
 
