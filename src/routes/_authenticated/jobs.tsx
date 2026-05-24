@@ -182,7 +182,7 @@ function JobsPage() {
                     <select value={r.status} onChange={(e) => {
                       const patch: any = { status: e.target.value };
                       if (e.target.value === "applied" && !r.applied_at) patch.applied_at = format(new Date(), "yyyy-MM-dd");
-                      update.mutate({ id: r.id, ...patch });
+                      update.mutate({ id: r.id, _prevStatus: r.status, ...patch });
                     }} className="text-[11px] px-2 h-6 rounded border-0 font-medium" style={{ color: STATUS_COLOR[r.status], background: `color-mix(in oklab, ${STATUS_COLOR[r.status]} 15%, transparent)` }}>
                       {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
                     </select>
