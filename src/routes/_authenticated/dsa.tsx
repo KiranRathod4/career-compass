@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { useReward, BadgeUnlockModal } from "@/hooks/use-reward";
 
 export const Route = createFileRoute("/_authenticated/dsa")({ component: DsaPage });
 
@@ -21,6 +22,7 @@ const STATUS_COLOR: Record<string, string> = { todo: "bg-muted text-muted-foregr
 function DsaPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const { reward, unlocked, closeUnlock } = useReward();
   const [q, setQ] = useState("");
   const [fTopic, setFTopic] = useState("");
   const [fDiff, setFDiff] = useState("");
@@ -28,6 +30,7 @@ function DsaPage() {
   const [sort, setSort] = useState<"created_at"|"difficulty"|"last_revised_at"|"attempts">("created_at");
   const [showAdd, setShowAdd] = useState(false);
   const [draft, setDraft] = useState({ title: "", url: "", platform: "LeetCode", topic: "Array", difficulty: "Medium" as typeof DIFFS[number] });
+
 
   const { data: rows = [] } = useQuery({
     queryKey: ["dsa", user!.id],
@@ -45,8 +48,18 @@ function DsaPage() {
   });
 
   const update = useMutation({
-    mutationFn: async ({ id, ...patch }: any) => { const { error } = await supabase.from("dsa_problems").update(patch).eq("id", id); if (error) throw error; },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["dsa"] }),
+    mutationFn: async ({ id, _prevStatus, _difficulty, ...patch }: any) => {
+      const { error } = await supabase.from("dsa_problems").update(patch).eq("id", id);
+      if (error) throw error;
+      return { newStatus: patch.status, prevStatus: _prevStatus, difficulty: _difficulty };
+    },
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ["dsa"] });
+      if (res?.newStatus === "solved" && res.prevStatus !== "solved") {
+        const xp = res.difficulty === "Hard" ? 50 : res.difficulty === "Medium" ? 30 : 15;
+        reward("dsa_solved", xp, { confetti: true, metadata: { difficulty: res.difficulty } });
+      }
+    },
   });
 
   const del = useMutation({
@@ -81,6 +94,7 @@ function DsaPage() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
+      <BadgeUnlockModal badge={unlocked} onClose={closeUnlock} />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-semibold">DSA Tracker</h1>
@@ -188,7 +202,7 @@ function DsaPage() {
                   <td className="px-3 py-2">{r.topic}</td>
                   <td className="px-3 py-2"><span className="text-xs font-medium" style={{ color: DIFF_COLOR[r.difficulty] }}>{r.difficulty}</span></td>
                   <td className="px-3 py-2">
-                    <select value={r.status} onChange={(e) => update.mutate({ id: r.id, status: e.target.value, last_revised_at: e.target.value === "solved" || e.target.value === "revise" ? format(new Date(), "yyyy-MM-dd") : r.last_revised_at })}
+                    <select value={r.status} onChange={(e) => update.mutate({ id: r.id, status: e.target.value, last_revised_at: e.target.value === "solved" || e.target.value === "revise" ? format(new Date(), "yyyy-MM-dd") : r.last_revised_at, _prevStatus: r.status, _difficulty: r.difficulty })}
                       className={`text-[11px] px-2 h-6 rounded border-0 ${STATUS_COLOR[r.status]}`}>
                       {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
                     </select>
