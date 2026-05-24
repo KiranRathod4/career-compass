@@ -11,7 +11,18 @@ export const Route = createFileRoute("/_authenticated/skills")({ component: Skil
 
 const CATEGORIES = ["technical", "language", "framework", "tool", "soft", "domain"];
 const PRIORITIES = ["low", "medium", "high"];
-const PRIORITY_COLOR: Record<string, string> = { low: "bg-muted text-muted-foreground", medium: "bg-info/15 text-info", high: "bg-destructive/15 text-destructive" };
+const PRIORITY_COLOR: Record<string, string> = {
+  low: "bg-muted text-muted-foreground",
+  medium: "bg-info/15 text-info",
+  high: "bg-destructive/15 text-destructive",
+};
+
+function strengthLabel(level: number) {
+  if (level >= 5) return { label: "Strong", cls: "bg-success/15 text-success" };
+  if (level <= 1) return { label: "Weak", cls: "bg-destructive/15 text-destructive" };
+  if (level <= 2) return { label: "Avg", cls: "bg-warning/15 text-warning" };
+  return null;
+}
 
 function SkillsPage() {
   const { user } = useAuth();
@@ -23,7 +34,7 @@ function SkillsPage() {
 
   const { data: rows = [] } = useQuery({
     queryKey: ["skills", user!.id],
-    queryFn: async () => ((await (supabase as any).from("skills").select("*").eq("user_id", user!.id).order("priority", { ascending: false })).data ?? []),
+    queryFn: async () => ((await (supabase as any).from("skills").select("*").eq("user_id", user!.id).order("created_at", { ascending: true })).data ?? []),
   });
 
   const add = useMutation({
@@ -55,7 +66,21 @@ function SkillsPage() {
     const total = rows.length;
     const mastered = rows.filter((r: any) => (r.current_level ?? 0) >= (r.target_level ?? 5)).length;
     const gap = rows.reduce((s: number, r: any) => s + Math.max(0, (r.target_level ?? 0) - (r.current_level ?? 0)), 0);
-    const radarData = rows.slice(0, 8).map((r: any) => ({ skill: r.name, current: r.current_level, target: r.target_level }));
+    // Aggregate by skill name (avg current/target) for radar so duplicates collapse
+    const map = new Map<string, { current: number[]; target: number[] }>();
+    for (const r of rows as any[]) {
+      const k = (r.name ?? "").trim();
+      if (!k) continue;
+      const e = map.get(k) ?? { current: [], target: [] };
+      e.current.push(r.current_level ?? 0);
+      e.target.push(r.target_level ?? 5);
+      map.set(k, e);
+    }
+    const radarData = Array.from(map.entries()).slice(0, 10).map(([skill, v]) => ({
+      skill,
+      current: +(v.current.reduce((a, b) => a + b, 0) / v.current.length).toFixed(2),
+      target: +(v.target.reduce((a, b) => a + b, 0) / v.target.length).toFixed(2),
+    }));
     return { total, mastered, gap, radarData };
   }, [rows]);
 
@@ -76,23 +101,63 @@ function SkillsPage() {
         <Stat label="Mastery %" value={stats.total ? `${Math.round((stats.mastered / stats.total) * 100)}%` : "—"} />
       </div>
 
-      {stats.radarData.length >= 3 && (
+      {/* Radar + Sliders side by side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="card-flat p-4">
-          <div className="section-label mb-3">Current vs Target (top 8)</div>
-          <div className="h-72">
-            <ResponsiveContainer>
-              <RadarChart data={stats.radarData}>
-                <PolarGrid stroke="var(--color-border)" />
-                <PolarAngleAxis dataKey="skill" tick={{ fontSize: 11 }} />
-                <PolarRadiusAxis domain={[0, 5]} tick={{ fontSize: 10 }} />
-                <Radar name="Target" dataKey="target" stroke="var(--color-muted-foreground)" fill="var(--color-muted-foreground)" fillOpacity={0.15} />
-                <Radar name="Current" dataKey="current" stroke="var(--color-primary)" fill="var(--color-primary)" fillOpacity={0.4} />
-                <Tooltip contentStyle={{ background: "var(--color-popover)", border: "1px solid var(--color-border)", borderRadius: 6, fontSize: 12 }} />
-              </RadarChart>
-            </ResponsiveContainer>
+          <div className="section-label mb-3">Radar</div>
+          {stats.radarData.length >= 3 ? (
+            <div className="h-[420px]">
+              <ResponsiveContainer>
+                <RadarChart data={stats.radarData} outerRadius="75%">
+                  <PolarGrid stroke="var(--color-border)" />
+                  <PolarAngleAxis dataKey="skill" tick={{ fontSize: 11, fill: "var(--color-muted-foreground)" }} />
+                  <PolarRadiusAxis domain={[0, 5]} tick={{ fontSize: 10 }} angle={90} />
+                  <Radar name="Target" dataKey="target" stroke="var(--color-muted-foreground)" fill="var(--color-muted-foreground)" fillOpacity={0.1} />
+                  <Radar name="Current" dataKey="current" stroke="var(--color-primary)" fill="var(--color-primary)" fillOpacity={0.45} />
+                  <Tooltip contentStyle={{ background: "var(--color-popover)", border: "1px solid var(--color-border)", borderRadius: 6, fontSize: 12 }} />
+                </RadarChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <div className="h-[420px] flex items-center justify-center text-sm text-muted-foreground">
+              Add at least 3 skills to see the radar.
+            </div>
+          )}
+        </div>
+
+        <div className="card-flat p-4">
+          <div className="section-label mb-3">Skills</div>
+          <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1">
+            {rows.length === 0 && (
+              <div className="text-sm text-muted-foreground py-10 text-center">No skills yet. Add one to get started.</div>
+            )}
+            {rows.map((r: any) => {
+              const strength = strengthLabel(r.current_level ?? 0);
+              return (
+                <div key={r.id} className="flex items-center gap-3 py-1.5">
+                  <div className="w-28 text-sm font-medium truncate" title={r.name}>{r.name}</div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={5}
+                    step={1}
+                    value={r.current_level ?? 0}
+                    onChange={(e) => update.mutate({ id: r.id, current_level: +e.target.value })}
+                    className="flex-1 accent-primary"
+                  />
+                  <div className="w-10 text-xs text-muted-foreground tabular-nums text-right">{r.current_level ?? 0}/5</div>
+                  {strength && (
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${strength.cls}`}>{strength.label}</span>
+                  )}
+                  <button onClick={() => del.mutate(r.id)} className="text-muted-foreground hover:text-destructive">
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              );
+            })}
           </div>
         </div>
-      )}
+      </div>
 
       {showAdd && (
         <div className="card-flat p-4 grid md:grid-cols-6 gap-2 items-end">
