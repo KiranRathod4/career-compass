@@ -45,8 +45,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Placement OS 2026" },
-      { name: "description", content: "Personal career preparation OS for placements and internships." },
+      { title: "Taiyaar — Taiyaar ho?" },
+      { name: "description", content: "AI-powered placement prep for Indian engineering students. Stop surviving placement season. Start owning it." },
     ],
     links: [{ rel: "stylesheet", href: appCss }],
   }),

@@ -22,6 +22,7 @@ import { Route as AuthenticatedResumesRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedResourcesRouteImport } from './routes/_authenticated/resources'
 import { Route as AuthenticatedQaRouteImport } from './routes/_authenticated/qa'
 import { Route as AuthenticatedProjectsRouteImport } from './routes/_authenticated/projects'
+import { Route as AuthenticatedPodRouteImport } from './routes/_authenticated/pod'
 import { Route as AuthenticatedPlannerRouteImport } from './routes/_authenticated/planner'
 import { Route as AuthenticatedNetworkRouteImport } from './routes/_authenticated/network'
 import { Route as AuthenticatedLinkedinRouteImport } from './routes/_authenticated/linkedin'
@@ -30,8 +31,10 @@ import { Route as AuthenticatedInterviewRouteImport } from './routes/_authentica
 import { Route as AuthenticatedDsaRouteImport } from './routes/_authenticated/dsa'
 import { Route as AuthenticatedDevopsRouteImport } from './routes/_authenticated/devops'
 import { Route as AuthenticatedCompaniesRouteImport } from './routes/_authenticated/companies'
+import { Route as AuthenticatedChallengesRouteImport } from './routes/_authenticated/challenges'
 import { Route as AuthenticatedAptitudeRouteImport } from './routes/_authenticated/aptitude'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
+import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -97,6 +100,11 @@ const AuthenticatedProjectsRoute = AuthenticatedProjectsRouteImport.update({
   path: '/projects',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedPodRoute = AuthenticatedPodRouteImport.update({
+  id: '/pod',
+  path: '/pod',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedPlannerRoute = AuthenticatedPlannerRouteImport.update({
   id: '/planner',
   path: '/planner',
@@ -137,6 +145,11 @@ const AuthenticatedCompaniesRoute = AuthenticatedCompaniesRouteImport.update({
   path: '/companies',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedChallengesRoute = AuthenticatedChallengesRouteImport.update({
+  id: '/challenges',
+  path: '/challenges',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedAptitudeRoute = AuthenticatedAptitudeRouteImport.update({
   id: '/aptitude',
   path: '/aptitude',
@@ -147,12 +160,20 @@ const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedAchievementsRoute =
+  AuthenticatedAchievementsRouteImport.update({
+    id: '/achievements',
+    path: '/achievements',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
+  '/achievements': typeof AuthenticatedAchievementsRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/aptitude': typeof AuthenticatedAptitudeRoute
+  '/challenges': typeof AuthenticatedChallengesRoute
   '/companies': typeof AuthenticatedCompaniesRoute
   '/devops': typeof AuthenticatedDevopsRoute
   '/dsa': typeof AuthenticatedDsaRoute
@@ -161,6 +182,7 @@ export interface FileRoutesByFullPath {
   '/linkedin': typeof AuthenticatedLinkedinRoute
   '/network': typeof AuthenticatedNetworkRoute
   '/planner': typeof AuthenticatedPlannerRoute
+  '/pod': typeof AuthenticatedPodRoute
   '/projects': typeof AuthenticatedProjectsRoute
   '/qa': typeof AuthenticatedQaRoute
   '/resources': typeof AuthenticatedResourcesRoute
@@ -174,8 +196,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
+  '/achievements': typeof AuthenticatedAchievementsRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/aptitude': typeof AuthenticatedAptitudeRoute
+  '/challenges': typeof AuthenticatedChallengesRoute
   '/companies': typeof AuthenticatedCompaniesRoute
   '/devops': typeof AuthenticatedDevopsRoute
   '/dsa': typeof AuthenticatedDsaRoute
@@ -184,6 +208,7 @@ export interface FileRoutesByTo {
   '/linkedin': typeof AuthenticatedLinkedinRoute
   '/network': typeof AuthenticatedNetworkRoute
   '/planner': typeof AuthenticatedPlannerRoute
+  '/pod': typeof AuthenticatedPodRoute
   '/projects': typeof AuthenticatedProjectsRoute
   '/qa': typeof AuthenticatedQaRoute
   '/resources': typeof AuthenticatedResourcesRoute
@@ -200,8 +225,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
+  '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
   '/_authenticated/aptitude': typeof AuthenticatedAptitudeRoute
+  '/_authenticated/challenges': typeof AuthenticatedChallengesRoute
   '/_authenticated/companies': typeof AuthenticatedCompaniesRoute
   '/_authenticated/devops': typeof AuthenticatedDevopsRoute
   '/_authenticated/dsa': typeof AuthenticatedDsaRoute
@@ -210,6 +237,7 @@ export interface FileRoutesById {
   '/_authenticated/linkedin': typeof AuthenticatedLinkedinRoute
   '/_authenticated/network': typeof AuthenticatedNetworkRoute
   '/_authenticated/planner': typeof AuthenticatedPlannerRoute
+  '/_authenticated/pod': typeof AuthenticatedPodRoute
   '/_authenticated/projects': typeof AuthenticatedProjectsRoute
   '/_authenticated/qa': typeof AuthenticatedQaRoute
   '/_authenticated/resources': typeof AuthenticatedResourcesRoute
@@ -227,8 +255,10 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/achievements'
     | '/analytics'
     | '/aptitude'
+    | '/challenges'
     | '/companies'
     | '/devops'
     | '/dsa'
@@ -237,6 +267,7 @@ export interface FileRouteTypes {
     | '/linkedin'
     | '/network'
     | '/planner'
+    | '/pod'
     | '/projects'
     | '/qa'
     | '/resources'
@@ -250,8 +281,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
+    | '/achievements'
     | '/analytics'
     | '/aptitude'
+    | '/challenges'
     | '/companies'
     | '/devops'
     | '/dsa'
@@ -260,6 +293,7 @@ export interface FileRouteTypes {
     | '/linkedin'
     | '/network'
     | '/planner'
+    | '/pod'
     | '/projects'
     | '/qa'
     | '/resources'
@@ -275,8 +309,10 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_authenticated'
     | '/login'
+    | '/_authenticated/achievements'
     | '/_authenticated/analytics'
     | '/_authenticated/aptitude'
+    | '/_authenticated/challenges'
     | '/_authenticated/companies'
     | '/_authenticated/devops'
     | '/_authenticated/dsa'
@@ -285,6 +321,7 @@ export interface FileRouteTypes {
     | '/_authenticated/linkedin'
     | '/_authenticated/network'
     | '/_authenticated/planner'
+    | '/_authenticated/pod'
     | '/_authenticated/projects'
     | '/_authenticated/qa'
     | '/_authenticated/resources'
@@ -396,6 +433,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProjectsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/pod': {
+      id: '/_authenticated/pod'
+      path: '/pod'
+      fullPath: '/pod'
+      preLoaderRoute: typeof AuthenticatedPodRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/planner': {
       id: '/_authenticated/planner'
       path: '/planner'
@@ -452,6 +496,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCompaniesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/challenges': {
+      id: '/_authenticated/challenges'
+      path: '/challenges'
+      fullPath: '/challenges'
+      preLoaderRoute: typeof AuthenticatedChallengesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/aptitude': {
       id: '/_authenticated/aptitude'
       path: '/aptitude'
@@ -466,12 +517,21 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAnalyticsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/achievements': {
+      id: '/_authenticated/achievements'
+      path: '/achievements'
+      fullPath: '/achievements'
+      preLoaderRoute: typeof AuthenticatedAchievementsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedAchievementsRoute: typeof AuthenticatedAchievementsRoute
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
   AuthenticatedAptitudeRoute: typeof AuthenticatedAptitudeRoute
+  AuthenticatedChallengesRoute: typeof AuthenticatedChallengesRoute
   AuthenticatedCompaniesRoute: typeof AuthenticatedCompaniesRoute
   AuthenticatedDevopsRoute: typeof AuthenticatedDevopsRoute
   AuthenticatedDsaRoute: typeof AuthenticatedDsaRoute
@@ -480,6 +540,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedLinkedinRoute: typeof AuthenticatedLinkedinRoute
   AuthenticatedNetworkRoute: typeof AuthenticatedNetworkRoute
   AuthenticatedPlannerRoute: typeof AuthenticatedPlannerRoute
+  AuthenticatedPodRoute: typeof AuthenticatedPodRoute
   AuthenticatedProjectsRoute: typeof AuthenticatedProjectsRoute
   AuthenticatedQaRoute: typeof AuthenticatedQaRoute
   AuthenticatedResourcesRoute: typeof AuthenticatedResourcesRoute
@@ -494,8 +555,10 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAchievementsRoute: AuthenticatedAchievementsRoute,
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
   AuthenticatedAptitudeRoute: AuthenticatedAptitudeRoute,
+  AuthenticatedChallengesRoute: AuthenticatedChallengesRoute,
   AuthenticatedCompaniesRoute: AuthenticatedCompaniesRoute,
   AuthenticatedDevopsRoute: AuthenticatedDevopsRoute,
   AuthenticatedDsaRoute: AuthenticatedDsaRoute,
@@ -504,6 +567,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedLinkedinRoute: AuthenticatedLinkedinRoute,
   AuthenticatedNetworkRoute: AuthenticatedNetworkRoute,
   AuthenticatedPlannerRoute: AuthenticatedPlannerRoute,
+  AuthenticatedPodRoute: AuthenticatedPodRoute,
   AuthenticatedProjectsRoute: AuthenticatedProjectsRoute,
   AuthenticatedQaRoute: AuthenticatedQaRoute,
   AuthenticatedResourcesRoute: AuthenticatedResourcesRoute,
@@ -528,3 +592,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
