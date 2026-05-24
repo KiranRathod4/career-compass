@@ -767,6 +767,48 @@ export type Database = {
         }
         Relationships: []
       }
+      sprints: {
+        Row: {
+          created_at: string
+          end_date: string
+          focus_areas: string[] | null
+          goals: string | null
+          id: string
+          name: string
+          outcomes: string | null
+          start_date: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          end_date: string
+          focus_areas?: string[] | null
+          goals?: string | null
+          id?: string
+          name: string
+          outcomes?: string | null
+          start_date: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string
+          focus_areas?: string[] | null
+          goals?: string | null
+          id?: string
+          name?: string
+          outcomes?: string | null
+          start_date?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       sql_problems: {
         Row: {
           attempts: number
@@ -851,6 +893,48 @@ export type Database = {
           status?: string
           task?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      weekly_reviews: {
+        Row: {
+          blockers: string | null
+          created_at: string
+          energy_rating: number
+          id: string
+          lessons: string | null
+          next_focus: string | null
+          productivity_rating: number
+          updated_at: string
+          user_id: string
+          week_start: string
+          wins: string | null
+        }
+        Insert: {
+          blockers?: string | null
+          created_at?: string
+          energy_rating?: number
+          id?: string
+          lessons?: string | null
+          next_focus?: string | null
+          productivity_rating?: number
+          updated_at?: string
+          user_id: string
+          week_start: string
+          wins?: string | null
+        }
+        Update: {
+          blockers?: string | null
+          created_at?: string
+          energy_rating?: number
+          id?: string
+          lessons?: string | null
+          next_focus?: string | null
+          productivity_rating?: number
+          updated_at?: string
+          user_id?: string
+          week_start?: string
+          wins?: string | null
         }
         Relationships: []
       }
