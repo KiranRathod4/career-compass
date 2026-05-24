@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { useReward, BadgeUnlockModal } from "@/hooks/use-reward";
 
 export const Route = createFileRoute("/_authenticated/jobs")({ component: JobsPage });
 
@@ -20,6 +21,7 @@ const STATUS_COLOR: Record<string, string> = {
 function JobsPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const { reward, unlocked, closeUnlock } = useReward();
   const [q, setQ] = useState("");
   const [fStatus, setFStatus] = useState("");
   const [fType, setFType] = useState("");
@@ -44,7 +46,21 @@ function JobsPage() {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["jobs"] }); setShowAdd(false); setDraft({ company: "", role: "", location: "", job_type: "Internship", source: "", link: "", applied_at: "", deadline: "", salary: "" }); toast.success("Job added"); },
     onError: (e: any) => toast.error(e.message),
   });
-  const update = useMutation({ mutationFn: async ({ id, ...p }: any) => { const { error } = await supabase.from("jobs").update(p).eq("id", id); if (error) throw error; }, onSuccess: () => qc.invalidateQueries({ queryKey: ["jobs"] }) });
+  const update = useMutation({
+    mutationFn: async ({ id, _prevStatus, ...p }: any) => {
+      const { error } = await supabase.from("jobs").update(p).eq("id", id);
+      if (error) throw error;
+      return { newStatus: p.status, prevStatus: _prevStatus };
+    },
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ["jobs"] });
+      if (!res?.newStatus) return;
+      const advanced = ["applied", "oa", "interview", "offer", "accepted"];
+      if (res.newStatus === "applied" && res.prevStatus !== "applied") reward("job_applied", 25, { confetti: true });
+      else if (res.newStatus === "interview" && !["interview","offer","accepted"].includes(res.prevStatus)) reward("job_interview", 100, { confetti: true });
+      else if (res.newStatus === "offer" && !["offer","accepted"].includes(res.prevStatus)) reward("job_offer", 500, { confetti: true });
+    },
+  });
   const del = useMutation({ mutationFn: async (id: string) => { await supabase.from("jobs").delete().eq("id", id); }, onSuccess: () => qc.invalidateQueries({ queryKey: ["jobs"] }) });
 
   const filtered = useMemo(() => {
@@ -67,6 +83,7 @@ function JobsPage() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
+      <BadgeUnlockModal badge={unlocked} onClose={closeUnlock} />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-semibold">Job Tracker</h1>
@@ -165,7 +182,7 @@ function JobsPage() {
                     <select value={r.status} onChange={(e) => {
                       const patch: any = { status: e.target.value };
                       if (e.target.value === "applied" && !r.applied_at) patch.applied_at = format(new Date(), "yyyy-MM-dd");
-                      update.mutate({ id: r.id, ...patch });
+                      update.mutate({ id: r.id, _prevStatus: r.status, ...patch });
                     }} className="text-[11px] px-2 h-6 rounded border-0 font-medium" style={{ color: STATUS_COLOR[r.status], background: `color-mix(in oklab, ${STATUS_COLOR[r.status]} 15%, transparent)` }}>
                       {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
                     </select>

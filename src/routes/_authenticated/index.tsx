@@ -3,8 +3,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { format, startOfWeek, addDays, differenceInDays, subDays } from "date-fns";
+import { format, startOfWeek, addDays, differenceInDays } from "date-fns";
 import { Flame, CheckCircle2, Briefcase, Code2, Clock, Plus } from "lucide-react";
+import { useReward, BadgeUnlockModal } from "@/hooks/use-reward";
 
 export const Route = createFileRoute("/_authenticated/")({
   component: Dashboard,
@@ -20,6 +21,7 @@ const CHECK_FIELDS = ["dsa_done","aptitude_done","sql_done","devops_done","qa_do
 function Dashboard() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const { reward, unlocked, closeUnlock } = useReward();
   const today = format(new Date(), "yyyy-MM-dd");
 
   const { data: profile } = useQuery({
@@ -60,8 +62,26 @@ function Dashboard() {
     mutationFn: async (patch: Record<string, any>) => {
       const { error } = await supabase.from("daily_tracker").upsert({ user_id: user!.id, date: today, ...todayEntry, ...patch }, { onConflict: "user_id,date" });
       if (error) throw error;
+      return patch;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["daily"] }); qc.invalidateQueries({ queryKey: ["daily-week"] }); },
+    onSuccess: (patch) => {
+      qc.invalidateQueries({ queryKey: ["daily"] });
+      qc.invalidateQueries({ queryKey: ["daily-week"] });
+      // Award XP only when toggling a check from false → true
+      const togglesOn: Record<string, number> = {
+        dsa_done: 20, aptitude_done: 15, sql_done: 15, devops_done: 15,
+        qa_done: 15, mock_done: 30, revision_done: 10, linkedin_post: 25,
+      };
+      for (const [k, xp] of Object.entries(togglesOn)) {
+        if (patch[k] === true && !(todayEntry as any)?.[k]) {
+          reward(k, xp, { confetti: false });
+          break;
+        }
+      }
+      if (typeof patch.applications_count === "number" && patch.applications_count > ((todayEntry as any)?.applications_count ?? 0)) {
+        reward("daily_apply_increment", 10, { confetti: false });
+      }
+    },
   });
 
   const toggleBlock = useMutation({
@@ -94,6 +114,7 @@ function Dashboard() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
+      <BadgeUnlockModal badge={unlocked} onClose={closeUnlock} />
       {/* Stat cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="Placement Countdown" value={daysToPlacement !== null ? `${daysToPlacement}` : "—"} sub={daysToPlacement !== null ? "days to go" : <Link to="/settings" className="text-primary hover:underline">Set target date</Link>} icon={Flame} />
