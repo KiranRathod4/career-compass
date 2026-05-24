@@ -50,6 +50,21 @@ function SettingsPage() {
     const cur = form.target_domains ?? [];
     setForm({ ...form, target_domains: cur.includes(d) ? cur.filter((x: string) => x !== d) : [...cur, d] });
   };
+  const removeDomain = (d: string) => {
+    const cur = form.target_domains ?? [];
+    setForm({ ...form, target_domains: cur.filter((x: string) => x !== d) });
+  };
+  const [newDomain, setNewDomain] = useState("");
+  const addCustomDomain = () => {
+    const v = newDomain.trim();
+    if (!v) return;
+    const cur: string[] = form.target_domains ?? [];
+    if (cur.some((x) => x.toLowerCase() === v.toLowerCase())) { toast.error("Already added"); return; }
+    setForm({ ...form, target_domains: [...cur, v] });
+    setNewDomain("");
+  };
+  const allDomains = Array.from(new Set([...(DOMAINS), ...((form.target_domains ?? []) as string[])]));
+  const customDomains = ((form.target_domains ?? []) as string[]).filter((d) => !DOMAINS.includes(d));
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
