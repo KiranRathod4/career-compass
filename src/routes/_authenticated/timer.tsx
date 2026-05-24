@@ -5,7 +5,8 @@ import { Play, Pause, RotateCcw } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, ReferenceLine, Tooltip } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { addDays, format, startOfDay, subDays } from "date-fns";
+import { format, subDays } from "date-fns";
+import { useReward, BadgeUnlockModal } from "@/hooks/use-reward";
 
 export const Route = createFileRoute("/_authenticated/timer")({ component: TimerPage });
 
@@ -21,6 +22,7 @@ const CATEGORIES = ["DSA","Aptitude","SQL","DevOps","QA","Job Applications","Pro
 function TimerPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const { reward, unlocked, closeUnlock } = useReward();
   const [mode, setMode] = useState(MODES[0]);
   const [remaining, setRemaining] = useState(MODES[0].min * 60);
   const [running, setRunning] = useState(false);
@@ -38,15 +40,22 @@ function TimerPage() {
 
   const saveSession = useMutation({
     mutationFn: async (completed: boolean) => {
-      if (!startRef.current) return;
+      if (!startRef.current) return null;
       const dur = Math.round((Date.now() - startRef.current.getTime()) / 60000);
-      if (dur < 1) return;
+      if (dur < 1) return null;
       await supabase.from("focus_sessions").insert({
         user_id: user!.id, started_at: startRef.current.toISOString(),
         duration_minutes: dur, mode: mode.id, task, category, completed,
       });
+      return { dur, completed };
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["sessions"] }),
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ["sessions"] });
+      if (res?.completed && res.dur >= 1) {
+        const xp = res.dur >= 45 ? 30 : res.dur >= 20 ? 20 : 10;
+        reward("focus_session", xp, { confetti: true, metadata: { minutes: res.dur, mode: mode.id } });
+      }
+    },
   });
 
   useEffect(() => {
@@ -92,6 +101,7 @@ function TimerPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      <BadgeUnlockModal badge={unlocked} onClose={closeUnlock} />
       <div className="card-flat p-8">
         <div className="flex gap-2 justify-center mb-6 flex-wrap">
           {MODES.map((m) => (
