@@ -860,6 +860,39 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          created_at: string
+          current_period_end: string | null
+          id: string
+          plan: string
+          razorpay_subscription_id: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          plan?: string
+          razorpay_subscription_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          plan?: string
+          razorpay_subscription_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       time_blocks: {
         Row: {
           category: string | null
@@ -893,6 +926,146 @@ export type Database = {
           status?: string
           task?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_badges: {
+        Row: {
+          badge_id: string
+          earned_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          badge_id: string
+          earned_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          badge_id?: string
+          earned_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_challenge_progress: {
+        Row: {
+          challenge_id: string
+          completed: boolean
+          completed_at: string | null
+          current_count: number
+          id: string
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          completed?: boolean
+          completed_at?: string | null
+          current_count?: number
+          id?: string
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          completed?: boolean
+          completed_at?: string | null
+          current_count?: number
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_challenge_progress_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "weekly_challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_streaks: {
+        Row: {
+          apply_current: number
+          apply_last_date: string | null
+          apply_longest: number
+          daily_current: number
+          daily_last_date: string | null
+          daily_longest: number
+          dsa_current: number
+          dsa_last_date: string | null
+          dsa_longest: number
+          freeze_used_this_month: number
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          apply_current?: number
+          apply_last_date?: string | null
+          apply_longest?: number
+          daily_current?: number
+          daily_last_date?: string | null
+          daily_longest?: number
+          dsa_current?: number
+          dsa_last_date?: string | null
+          dsa_longest?: number
+          freeze_used_this_month?: number
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          apply_current?: number
+          apply_last_date?: string | null
+          apply_longest?: number
+          daily_current?: number
+          daily_last_date?: string | null
+          daily_longest?: number
+          dsa_current?: number
+          dsa_last_date?: string | null
+          dsa_longest?: number
+          freeze_used_this_month?: number
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      weekly_challenges: {
+        Row: {
+          active: boolean
+          category: string | null
+          created_at: string
+          description: string | null
+          id: string
+          target_count: number
+          title: string
+          week_start_date: string
+          xp_reward: number
+        }
+        Insert: {
+          active?: boolean
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          target_count?: number
+          title: string
+          week_start_date: string
+          xp_reward?: number
+        }
+        Update: {
+          active?: boolean
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          target_count?: number
+          title?: string
+          week_start_date?: string
+          xp_reward?: number
         }
         Relationships: []
       }
@@ -938,12 +1111,40 @@ export type Database = {
         }
         Relationships: []
       }
+      xp_transactions: {
+        Row: {
+          action_type: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          user_id: string
+          xp_amount: number
+        }
+        Insert: {
+          action_type: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          user_id: string
+          xp_amount: number
+        }
+        Update: {
+          action_type?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+          xp_amount?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_level: { Args: { p_xp: number }; Returns: Json }
+      get_user_xp: { Args: { p_user_id: string }; Returns: number }
     }
     Enums: {
       [_ in never]: never
