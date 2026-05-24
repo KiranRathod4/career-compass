@@ -22,6 +22,7 @@ import { Route as AuthenticatedResumesRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedResourcesRouteImport } from './routes/_authenticated/resources'
 import { Route as AuthenticatedQaRouteImport } from './routes/_authenticated/qa'
 import { Route as AuthenticatedProjectsRouteImport } from './routes/_authenticated/projects'
+import { Route as AuthenticatedPricingRouteImport } from './routes/_authenticated/pricing'
 import { Route as AuthenticatedPodRouteImport } from './routes/_authenticated/pod'
 import { Route as AuthenticatedPlannerRouteImport } from './routes/_authenticated/planner'
 import { Route as AuthenticatedNetworkRouteImport } from './routes/_authenticated/network'
@@ -99,6 +100,11 @@ const AuthenticatedQaRoute = AuthenticatedQaRouteImport.update({
 const AuthenticatedProjectsRoute = AuthenticatedProjectsRouteImport.update({
   id: '/projects',
   path: '/projects',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPricingRoute = AuthenticatedPricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedPodRoute = AuthenticatedPodRouteImport.update({
@@ -190,6 +196,7 @@ export interface FileRoutesByFullPath {
   '/network': typeof AuthenticatedNetworkRoute
   '/planner': typeof AuthenticatedPlannerRoute
   '/pod': typeof AuthenticatedPodRoute
+  '/pricing': typeof AuthenticatedPricingRoute
   '/projects': typeof AuthenticatedProjectsRoute
   '/qa': typeof AuthenticatedQaRoute
   '/resources': typeof AuthenticatedResourcesRoute
@@ -217,6 +224,7 @@ export interface FileRoutesByTo {
   '/network': typeof AuthenticatedNetworkRoute
   '/planner': typeof AuthenticatedPlannerRoute
   '/pod': typeof AuthenticatedPodRoute
+  '/pricing': typeof AuthenticatedPricingRoute
   '/projects': typeof AuthenticatedProjectsRoute
   '/qa': typeof AuthenticatedQaRoute
   '/resources': typeof AuthenticatedResourcesRoute
@@ -247,6 +255,7 @@ export interface FileRoutesById {
   '/_authenticated/network': typeof AuthenticatedNetworkRoute
   '/_authenticated/planner': typeof AuthenticatedPlannerRoute
   '/_authenticated/pod': typeof AuthenticatedPodRoute
+  '/_authenticated/pricing': typeof AuthenticatedPricingRoute
   '/_authenticated/projects': typeof AuthenticatedProjectsRoute
   '/_authenticated/qa': typeof AuthenticatedQaRoute
   '/_authenticated/resources': typeof AuthenticatedResourcesRoute
@@ -278,6 +287,7 @@ export interface FileRouteTypes {
     | '/network'
     | '/planner'
     | '/pod'
+    | '/pricing'
     | '/projects'
     | '/qa'
     | '/resources'
@@ -305,6 +315,7 @@ export interface FileRouteTypes {
     | '/network'
     | '/planner'
     | '/pod'
+    | '/pricing'
     | '/projects'
     | '/qa'
     | '/resources'
@@ -334,6 +345,7 @@ export interface FileRouteTypes {
     | '/_authenticated/network'
     | '/_authenticated/planner'
     | '/_authenticated/pod'
+    | '/_authenticated/pricing'
     | '/_authenticated/projects'
     | '/_authenticated/qa'
     | '/_authenticated/resources'
@@ -445,6 +457,13 @@ declare module '@tanstack/react-router' {
       path: '/projects'
       fullPath: '/projects'
       preLoaderRoute: typeof AuthenticatedProjectsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/pricing': {
+      id: '/_authenticated/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof AuthenticatedPricingRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/pod': {
@@ -562,6 +581,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedNetworkRoute: typeof AuthenticatedNetworkRoute
   AuthenticatedPlannerRoute: typeof AuthenticatedPlannerRoute
   AuthenticatedPodRoute: typeof AuthenticatedPodRoute
+  AuthenticatedPricingRoute: typeof AuthenticatedPricingRoute
   AuthenticatedProjectsRoute: typeof AuthenticatedProjectsRoute
   AuthenticatedQaRoute: typeof AuthenticatedQaRoute
   AuthenticatedResourcesRoute: typeof AuthenticatedResourcesRoute
@@ -589,6 +609,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedNetworkRoute: AuthenticatedNetworkRoute,
   AuthenticatedPlannerRoute: AuthenticatedPlannerRoute,
   AuthenticatedPodRoute: AuthenticatedPodRoute,
+  AuthenticatedPricingRoute: AuthenticatedPricingRoute,
   AuthenticatedProjectsRoute: AuthenticatedProjectsRoute,
   AuthenticatedQaRoute: AuthenticatedQaRoute,
   AuthenticatedResourcesRoute: AuthenticatedResourcesRoute,
