@@ -195,6 +195,86 @@ function PlannerPage() {
           </div>
         </div>
       </div>
+
+      <AIPanels date={date} entry={entry} blocks={blocks} monthEntries={monthEntries} onBlocksAdded={() => qc.invalidateQueries({ queryKey: ["blocks"] })} />
+    </div>
+  );
+}
+
+function AIPanels({ date, entry, blocks, monthEntries, onBlocksAdded }: any) {
+  const { user } = useAuth();
+  const plan = useServerFn(aiDailyPlan);
+  const overload = useServerFn(aiOverload);
+  const [planning, setPlanning] = useState(false);
+  const [planResult, setPlanResult] = useState<any>(null);
+  const [overloading, setOverloading] = useState(false);
+  const [overloadResult, setOverloadResult] = useState<any>(null);
+
+  const runPlan = async () => {
+    setPlanning(true);
+    try {
+      const ctx = `Date: ${date}\nWake: ${entry?.wake_time || "—"}, Sleep: ${entry?.sleep_time || "—"}\nMood: ${entry?.mood || "—"}, Productivity goal: ${entry?.productivity_score || "—"}\nExisting blocks: ${blocks.map((b: any) => `${b.start_time?.slice(0,5)}-${b.end_time?.slice(0,5)} ${b.task} (${b.category})`).join("; ") || "none"}\nNotes: ${entry?.notes || ""}\nGenerate 5-7 time blocks covering DSA, job apps, and at least one break.`;
+      const r = await plan({ data: { context: ctx } });
+      setPlanResult(r);
+    } catch (e: any) { toast.error(e.message); }
+    setPlanning(false);
+  };
+
+  const insertBlocks = async () => {
+    if (!planResult?.blocks) return;
+    for (const b of planResult.blocks) {
+      await supabase.from("time_blocks").insert({ user_id: user!.id, date, start_time: b.start_time, end_time: b.end_time, task: b.task, category: b.category });
+    }
+    toast.success("Plan added to your blocks");
+    setPlanResult(null);
+    onBlocksAdded();
+  };
+
+  const runOverload = async () => {
+    setOverloading(true);
+    try {
+      const summary = monthEntries.slice(0, 14).map((e: any) => `${e.date}: mood=${e.mood || "?"}, prod=${e.productivity_score ?? "?"}, deep=${e.deep_work_hours ?? 0}h, sleep=${e.sleep_time || "?"}, wake=${e.wake_time || "?"}, apps=${e.applications_count ?? 0}`).join("\n");
+      const r = await overload({ data: { context: `Last 14 days:\n${summary}` } });
+      setOverloadResult(r);
+    } catch (e: any) { toast.error(e.message); }
+    setOverloading(false);
+  };
+
+  const riskTone = overloadResult?.risk === "high" ? "destructive" : overloadResult?.risk === "medium" ? "warning" : "success";
+
+  return (
+    <div className="grid md:grid-cols-2 gap-4">
+      <AICard title="AI Daily Planner" description="Smart blocks tailored to today's mood and existing schedule." onRun={runPlan} loading={planning} cta="Plan my day">
+        {planResult && (
+          <div className="space-y-2">
+            <p className="text-sm">{planResult.summary}</p>
+            <div className="space-y-1">
+              {planResult.blocks?.map((b: any, i: number) => (
+                <div key={i} className="flex items-center gap-2 text-xs p-2 rounded border border-border">
+                  <span className="font-mono text-muted-foreground w-20">{b.start_time}–{b.end_time}</span>
+                  <span className="flex-1">{b.task}</span>
+                  <span className="text-[10px] px-1.5 h-5 rounded bg-muted inline-flex items-center">{b.category}</span>
+                </div>
+              ))}
+            </div>
+            <button onClick={insertBlocks} className="h-8 px-3 rounded-md bg-primary text-primary-foreground text-xs font-medium">Add to my blocks</button>
+          </div>
+        )}
+      </AICard>
+
+      <AICard title="Overload Detector" description="Spot burnout before it hits. Uses last 14 days." onRun={runOverload} loading={overloading} cta="Check me">
+        {overloadResult && (
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className={`h-4 w-4 text-${riskTone}`} />
+              <span className="text-sm font-medium capitalize">{overloadResult.risk} risk</span>
+            </div>
+            <ScoreBar value={overloadResult.score} label="Overload score" tone={riskTone as any} />
+            <ul className="text-xs text-muted-foreground list-disc pl-4 space-y-0.5">{overloadResult.signals?.map((s: string, i: number) => <li key={i}>{s}</li>)}</ul>
+            <p className="text-sm">{overloadResult.advice}</p>
+          </div>
+        )}
+      </AICard>
     </div>
   );
 }
