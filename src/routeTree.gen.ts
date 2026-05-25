@@ -25,6 +25,7 @@ import { Route as AuthenticatedProjectsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedPricingRouteImport } from './routes/_authenticated/pricing'
 import { Route as AuthenticatedPodRouteImport } from './routes/_authenticated/pod'
 import { Route as AuthenticatedPlannerRouteImport } from './routes/_authenticated/planner'
+import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedNetworkRouteImport } from './routes/_authenticated/network'
 import { Route as AuthenticatedLinkedinRouteImport } from './routes/_authenticated/linkedin'
 import { Route as AuthenticatedJobsRouteImport } from './routes/_authenticated/jobs'
@@ -117,6 +118,11 @@ const AuthenticatedPlannerRoute = AuthenticatedPlannerRouteImport.update({
   path: '/planner',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedNetworkRoute = AuthenticatedNetworkRouteImport.update({
   id: '/network',
   path: '/network',
@@ -194,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/jobs': typeof AuthenticatedJobsRoute
   '/linkedin': typeof AuthenticatedLinkedinRoute
   '/network': typeof AuthenticatedNetworkRoute
+  '/onboarding': typeof AuthenticatedOnboardingRoute
   '/planner': typeof AuthenticatedPlannerRoute
   '/pod': typeof AuthenticatedPodRoute
   '/pricing': typeof AuthenticatedPricingRoute
@@ -222,6 +229,7 @@ export interface FileRoutesByTo {
   '/jobs': typeof AuthenticatedJobsRoute
   '/linkedin': typeof AuthenticatedLinkedinRoute
   '/network': typeof AuthenticatedNetworkRoute
+  '/onboarding': typeof AuthenticatedOnboardingRoute
   '/planner': typeof AuthenticatedPlannerRoute
   '/pod': typeof AuthenticatedPodRoute
   '/pricing': typeof AuthenticatedPricingRoute
@@ -253,6 +261,7 @@ export interface FileRoutesById {
   '/_authenticated/jobs': typeof AuthenticatedJobsRoute
   '/_authenticated/linkedin': typeof AuthenticatedLinkedinRoute
   '/_authenticated/network': typeof AuthenticatedNetworkRoute
+  '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/planner': typeof AuthenticatedPlannerRoute
   '/_authenticated/pod': typeof AuthenticatedPodRoute
   '/_authenticated/pricing': typeof AuthenticatedPricingRoute
@@ -285,6 +294,7 @@ export interface FileRouteTypes {
     | '/jobs'
     | '/linkedin'
     | '/network'
+    | '/onboarding'
     | '/planner'
     | '/pod'
     | '/pricing'
@@ -313,6 +323,7 @@ export interface FileRouteTypes {
     | '/jobs'
     | '/linkedin'
     | '/network'
+    | '/onboarding'
     | '/planner'
     | '/pod'
     | '/pricing'
@@ -343,6 +354,7 @@ export interface FileRouteTypes {
     | '/_authenticated/jobs'
     | '/_authenticated/linkedin'
     | '/_authenticated/network'
+    | '/_authenticated/onboarding'
     | '/_authenticated/planner'
     | '/_authenticated/pod'
     | '/_authenticated/pricing'
@@ -480,6 +492,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPlannerRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/onboarding': {
+      id: '/_authenticated/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/network': {
       id: '/_authenticated/network'
       path: '/network'
@@ -579,6 +598,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedJobsRoute: typeof AuthenticatedJobsRoute
   AuthenticatedLinkedinRoute: typeof AuthenticatedLinkedinRoute
   AuthenticatedNetworkRoute: typeof AuthenticatedNetworkRoute
+  AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedPlannerRoute: typeof AuthenticatedPlannerRoute
   AuthenticatedPodRoute: typeof AuthenticatedPodRoute
   AuthenticatedPricingRoute: typeof AuthenticatedPricingRoute
@@ -607,6 +627,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedJobsRoute: AuthenticatedJobsRoute,
   AuthenticatedLinkedinRoute: AuthenticatedLinkedinRoute,
   AuthenticatedNetworkRoute: AuthenticatedNetworkRoute,
+  AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedPlannerRoute: AuthenticatedPlannerRoute,
   AuthenticatedPodRoute: AuthenticatedPodRoute,
   AuthenticatedPricingRoute: AuthenticatedPricingRoute,
