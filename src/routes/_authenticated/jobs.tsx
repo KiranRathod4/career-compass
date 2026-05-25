@@ -206,6 +206,37 @@ function JobsPage() {
   );
 }
 
+function ProbabilityPanel({ rows, totals }: { rows: any[]; totals: any }) {
+  const run = useServerFn(aiProbability);
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<any>(null);
+  const handle = async () => {
+    setLoading(true);
+    try {
+      const top = rows.slice(0, 30).map((r: any) => `${r.company} — ${r.role} [${r.status}]${r.job_type ? ` (${r.job_type})` : ""}`).join("\n");
+      const ctx = `Pipeline totals: ${totals.total} jobs, ${totals.applied} applied, ${totals.interviews} interviews, ${totals.offers} offers.\nRecent roles:\n${top}`;
+      setResult(await run({ data: { context: ctx } }));
+    } catch (e: any) { toast.error(e.message); }
+    setLoading(false);
+  };
+  const tone = !result ? "primary" : result.probability >= 60 ? "success" : result.probability >= 30 ? "warning" : "destructive";
+  return (
+    <AICard title="Placement Probability" description="AI estimate based on your current pipeline." onRun={handle} loading={loading} cta="Estimate">
+      {result && (
+        <div className="space-y-3">
+          <ScoreBar value={result.probability} label={`${result.probability}% chance · ${result.confidence} confidence`} tone={tone as any} />
+          <div className="grid md:grid-cols-3 gap-3 text-xs">
+            <div><div className="section-label mb-1">Strengths</div><ul className="list-disc pl-4 space-y-0.5 text-success">{result.strengths?.map((s: string, i: number) => <li key={i} className="text-foreground">{s}</li>)}</ul></div>
+            <div><div className="section-label mb-1">Gaps</div><ul className="list-disc pl-4 space-y-0.5">{result.gaps?.map((s: string, i: number) => <li key={i}>{s}</li>)}</ul></div>
+            <div><div className="section-label mb-1">Next actions</div><ol className="list-decimal pl-4 space-y-0.5">{result.next_actions?.map((s: string, i: number) => <li key={i}>{s}</li>)}</ol></div>
+          </div>
+        </div>
+      )}
+    </AICard>
+  );
+}
+
+
 const inp = "mt-0.5 h-9 px-2 w-full rounded border border-border bg-background text-sm";
 function Stat({ label, value, accent }: { label: string; value: any; accent?: string }) { return <div className="card-flat p-4"><div className="section-label">{label}</div><div className={`mt-2 text-2xl font-semibold ${accent ?? ""}`}>{value}</div></div>; }
 function F({ label, children }: { label: string; children: React.ReactNode }) { return <label className="block"><span className="text-[11px] text-muted-foreground">{label}</span>{children}</label>; }
