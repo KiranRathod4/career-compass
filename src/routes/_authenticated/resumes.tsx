@@ -1,10 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Plus, Trash2, ExternalLink, FileText, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
+import { aiResumeReview } from "@/lib/ai.functions";
+import { AICard, ScoreBar } from "@/components/ai-insight-card";
 
 export const Route = createFileRoute("/_authenticated/resumes")({ component: ResumesPage });
 
@@ -91,7 +94,64 @@ function ResumesPage() {
         ))}
         {rows.length === 0 && <div className="md:col-span-2 lg:col-span-3 card-flat p-10 text-center text-sm text-muted-foreground">No resumes yet. Add your first version.</div>}
       </div>
+
+      <ResumeReviewPanel />
     </div>
+  );
+}
+
+function ResumeReviewPanel() {
+  const run = useServerFn(aiResumeReview);
+  const [text, setText] = useState("");
+  const [target, setTarget] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<any>(null);
+
+  const handle = async () => {
+    if (text.trim().length < 50) { toast.error("Paste at least your full resume text"); return; }
+    setLoading(true);
+    try { setResult(await run({ data: { resume: text, targetRole: target } })); }
+    catch (e: any) { toast.error(e.message); }
+    setLoading(false);
+  };
+
+  return (
+    <AICard title="AI Resume Review" description="Paste your resume text — get an ATS score and bullet rewrites." onRun={handle} loading={loading} cta="Review">
+      <div className="space-y-3">
+        <div className="grid md:grid-cols-3 gap-2">
+          <input value={target} onChange={(e) => setTarget(e.target.value)} placeholder="Target role (e.g. SDE Intern)" className={`${inp} md:col-span-1`} />
+          <textarea value={text} onChange={(e) => setText(e.target.value)} placeholder="Paste resume text here…" className={`${inp} md:col-span-2 min-h-[120px] py-2`} />
+        </div>
+        {result && (
+          <div className="space-y-3">
+            <div className="grid md:grid-cols-2 gap-3">
+              <ScoreBar value={result.score} label="Overall score" tone={result.score >= 70 ? "success" : result.score >= 40 ? "warning" : "destructive"} />
+              <ScoreBar value={result.ats_score} label="ATS friendliness" tone={result.ats_score >= 70 ? "success" : "warning"} />
+            </div>
+            <div className="grid md:grid-cols-2 gap-3 text-xs">
+              <div><div className="section-label mb-1">Strengths</div><ul className="list-disc pl-4 space-y-0.5">{result.strengths?.map((s: string, i: number) => <li key={i}>{s}</li>)}</ul></div>
+              <div><div className="section-label mb-1">Weaknesses</div><ul className="list-disc pl-4 space-y-0.5">{result.weaknesses?.map((s: string, i: number) => <li key={i}>{s}</li>)}</ul></div>
+            </div>
+            {result.missing_keywords?.length > 0 && (
+              <div><div className="section-label mb-1">Missing keywords</div><div className="flex flex-wrap gap-1">{result.missing_keywords.map((k: string, i: number) => <span key={i} className="text-[11px] px-2 h-5 rounded-full bg-warning/10 text-warning inline-flex items-center">{k}</span>)}</div></div>
+            )}
+            {result.bullet_rewrites?.length > 0 && (
+              <div>
+                <div className="section-label mb-1">Bullet rewrites</div>
+                <div className="space-y-2">
+                  {result.bullet_rewrites.map((b: any, i: number) => (
+                    <div key={i} className="p-2 rounded border border-border text-xs space-y-1">
+                      <div className="text-muted-foreground line-through">{b.before}</div>
+                      <div className="text-success">→ {b.after}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </AICard>
   );
 }
 
