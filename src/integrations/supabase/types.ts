@@ -513,6 +513,7 @@ export type Database = {
           id: string
           linkedin_url: string | null
           notification_prefs: Json | null
+          onboarded_at: string | null
           placement_start_date: string | null
           quick_links: Json | null
           target_domains: string[] | null
@@ -530,6 +531,7 @@ export type Database = {
           id: string
           linkedin_url?: string | null
           notification_prefs?: Json | null
+          onboarded_at?: string | null
           placement_start_date?: string | null
           quick_links?: Json | null
           target_domains?: string[] | null
@@ -547,6 +549,7 @@ export type Database = {
           id?: string
           linkedin_url?: string | null
           notification_prefs?: Json | null
+          onboarded_at?: string | null
           placement_start_date?: string | null
           quick_links?: Json | null
           target_domains?: string[] | null
