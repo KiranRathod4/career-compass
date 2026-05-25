@@ -104,6 +104,8 @@ function JobsPage() {
         <Stat label="Offers" value={totals.offers} accent="text-success" />
       </div>
 
+      <ProbabilityPanel rows={rows} totals={totals} />
+
       <div className="grid md:grid-cols-3 gap-4">
         <div className="card-flat p-4 md:col-span-1">
           <div className="section-label mb-3">Pipeline</div>
