@@ -59,6 +59,78 @@ export type Database = {
         }
         Relationships: []
       }
+      arena_leaderboard: {
+        Row: {
+          duel_wins: number
+          id: string
+          math_sprint_best: number
+          memory_best: number
+          puzzle_score: number
+          total_arena_xp: number
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          duel_wins?: number
+          id?: string
+          math_sprint_best?: number
+          memory_best?: number
+          puzzle_score?: number
+          total_arena_xp?: number
+          user_id: string
+          week_start: string
+        }
+        Update: {
+          duel_wins?: number
+          id?: string
+          math_sprint_best?: number
+          memory_best?: number
+          puzzle_score?: number
+          total_arena_xp?: number
+          user_id?: string
+          week_start?: string
+        }
+        Relationships: []
+      }
+      arena_questions: {
+        Row: {
+          category: string
+          correct_answer: string
+          created_at: string
+          difficulty: string
+          explanation: string | null
+          id: string
+          options: Json | null
+          question: string
+          topic: string | null
+          type: string
+        }
+        Insert: {
+          category: string
+          correct_answer: string
+          created_at?: string
+          difficulty?: string
+          explanation?: string | null
+          id?: string
+          options?: Json | null
+          question: string
+          topic?: string | null
+          type: string
+        }
+        Update: {
+          category?: string
+          correct_answer?: string
+          created_at?: string
+          difficulty?: string
+          explanation?: string | null
+          id?: string
+          options?: Json | null
+          question?: string
+          topic?: string | null
+          type?: string
+        }
+        Relationships: []
+      }
       companies: {
         Row: {
           created_at: string
@@ -151,6 +223,183 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      custom_track_questions: {
+        Row: {
+          created_at: string
+          difficulty: string
+          id: string
+          my_answer: string | null
+          question: string
+          reviewed: boolean
+          track_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          difficulty?: string
+          id?: string
+          my_answer?: string | null
+          question: string
+          reviewed?: boolean
+          track_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          difficulty?: string
+          id?: string
+          my_answer?: string | null
+          question?: string
+          reviewed?: boolean
+          track_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_track_questions_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "custom_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      custom_track_topics: {
+        Row: {
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          resource_url: string | null
+          section_name: string
+          sort_order: number
+          status: string
+          topic_name: string
+          track_id: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          resource_url?: string | null
+          section_name?: string
+          sort_order?: number
+          status?: string
+          topic_name: string
+          track_id: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          resource_url?: string | null
+          section_name?: string
+          sort_order?: number
+          status?: string
+          topic_name?: string
+          track_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_track_topics_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "custom_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      custom_tracks: {
+        Row: {
+          color: string
+          completion_pct: number
+          created_at: string
+          icon: string
+          id: string
+          name: string
+          notes: string | null
+          skill_level: string
+          target_type: string | null
+          updated_at: string
+          user_id: string
+          why_this_track: string | null
+        }
+        Insert: {
+          color?: string
+          completion_pct?: number
+          created_at?: string
+          icon?: string
+          id?: string
+          name: string
+          notes?: string | null
+          skill_level?: string
+          target_type?: string | null
+          updated_at?: string
+          user_id: string
+          why_this_track?: string | null
+        }
+        Update: {
+          color?: string
+          completion_pct?: number
+          created_at?: string
+          icon?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          skill_level?: string
+          target_type?: string | null
+          updated_at?: string
+          user_id?: string
+          why_this_track?: string | null
+        }
+        Relationships: []
+      }
+      daily_puzzle_attempts: {
+        Row: {
+          answered_at: string
+          correct: boolean | null
+          id: string
+          puzzle_date: string
+          question_id: string | null
+          time_taken_sec: number | null
+          user_id: string
+        }
+        Insert: {
+          answered_at?: string
+          correct?: boolean | null
+          id?: string
+          puzzle_date?: string
+          question_id?: string | null
+          time_taken_sec?: number | null
+          user_id: string
+        }
+        Update: {
+          answered_at?: string
+          correct?: boolean | null
+          id?: string
+          puzzle_date?: string
+          question_id?: string | null
+          time_taken_sec?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_puzzle_attempts_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "arena_questions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       daily_tracker: {
         Row: {
@@ -263,6 +512,87 @@ export type Database = {
         }
         Relationships: []
       }
+      distraction_logs: {
+        Row: {
+          duration_minutes: number
+          id: string
+          log_date: string
+          logged_at: string
+          notes: string | null
+          reasons: string[]
+          user_id: string
+        }
+        Insert: {
+          duration_minutes?: number
+          id?: string
+          log_date?: string
+          logged_at?: string
+          notes?: string | null
+          reasons?: string[]
+          user_id: string
+        }
+        Update: {
+          duration_minutes?: number
+          id?: string
+          log_date?: string
+          logged_at?: string
+          notes?: string | null
+          reasons?: string[]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      documents: {
+        Row: {
+          created_at: string
+          doc_type: string
+          id: string
+          mime_type: string | null
+          name: string
+          notes: string | null
+          size_bytes: number | null
+          status: string
+          storage_path: string
+          target_company: string | null
+          target_role: string | null
+          updated_at: string
+          user_id: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          doc_type?: string
+          id?: string
+          mime_type?: string | null
+          name: string
+          notes?: string | null
+          size_bytes?: number | null
+          status?: string
+          storage_path: string
+          target_company?: string | null
+          target_role?: string | null
+          updated_at?: string
+          user_id: string
+          version?: number
+        }
+        Update: {
+          created_at?: string
+          doc_type?: string
+          id?: string
+          mime_type?: string | null
+          name?: string
+          notes?: string | null
+          size_bytes?: number | null
+          status?: string
+          storage_path?: string
+          target_company?: string | null
+          target_role?: string | null
+          updated_at?: string
+          user_id?: string
+          version?: number
+        }
+        Relationships: []
+      }
       dsa_problems: {
         Row: {
           attempts: number
@@ -311,6 +641,63 @@ export type Database = {
           updated_at?: string
           url?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      duels: {
+        Row: {
+          challenger_answers: Json
+          challenger_id: string
+          challenger_score: number
+          created_at: string
+          difficulty: string | null
+          ended_at: string | null
+          id: string
+          invite_code: string
+          opponent_answers: Json
+          opponent_id: string | null
+          opponent_score: number
+          questions: Json | null
+          started_at: string | null
+          status: string
+          topic: string | null
+          winner_id: string | null
+        }
+        Insert: {
+          challenger_answers?: Json
+          challenger_id: string
+          challenger_score?: number
+          created_at?: string
+          difficulty?: string | null
+          ended_at?: string | null
+          id?: string
+          invite_code: string
+          opponent_answers?: Json
+          opponent_id?: string | null
+          opponent_score?: number
+          questions?: Json | null
+          started_at?: string | null
+          status?: string
+          topic?: string | null
+          winner_id?: string | null
+        }
+        Update: {
+          challenger_answers?: Json
+          challenger_id?: string
+          challenger_score?: number
+          created_at?: string
+          difficulty?: string | null
+          ended_at?: string | null
+          id?: string
+          invite_code?: string
+          opponent_answers?: Json
+          opponent_id?: string | null
+          opponent_score?: number
+          questions?: Json | null
+          started_at?: string | null
+          status?: string
+          topic?: string | null
+          winner_id?: string | null
         }
         Relationships: []
       }
@@ -446,6 +833,39 @@ export type Database = {
         }
         Relationships: []
       }
+      level_rewards: {
+        Row: {
+          active: boolean
+          claimed_at: string
+          created_at: string
+          elite_until: string
+          id: string
+          level_reached: number
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          claimed_at?: string
+          created_at?: string
+          elite_until: string
+          id?: string
+          level_reached: number
+          reason?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          claimed_at?: string
+          created_at?: string
+          elite_until?: string
+          id?: string
+          level_reached?: number
+          reason?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       linkedin_posts: {
         Row: {
           body: string | null
@@ -500,6 +920,54 @@ export type Database = {
         }
         Relationships: []
       }
+      placement_events: {
+        Row: {
+          company: string | null
+          created_at: string
+          event_date: string
+          event_name: string
+          event_time: string | null
+          event_type: string
+          id: string
+          notes: string | null
+          registration_deadline: string | null
+          registration_url: string | null
+          reminder_set: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          event_date: string
+          event_name: string
+          event_time?: string | null
+          event_type?: string
+          id?: string
+          notes?: string | null
+          registration_deadline?: string | null
+          registration_url?: string | null
+          reminder_set?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          event_date?: string
+          event_name?: string
+          event_time?: string | null
+          event_type?: string
+          id?: string
+          notes?: string | null
+          registration_deadline?: string | null
+          registration_url?: string | null
+          reminder_set?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           college_name: string | null
@@ -511,13 +979,16 @@ export type Database = {
           github_url: string | null
           graduation_year: number | null
           id: string
+          leaderboard_opt_in: boolean | null
           linkedin_url: string | null
           notification_prefs: Json | null
           onboarded_at: string | null
           placement_start_date: string | null
           quick_links: Json | null
+          study_windows: Json | null
           target_domains: string[] | null
           updated_at: string
+          username: string | null
         }
         Insert: {
           college_name?: string | null
@@ -529,13 +1000,16 @@ export type Database = {
           github_url?: string | null
           graduation_year?: number | null
           id: string
+          leaderboard_opt_in?: boolean | null
           linkedin_url?: string | null
           notification_prefs?: Json | null
           onboarded_at?: string | null
           placement_start_date?: string | null
           quick_links?: Json | null
+          study_windows?: Json | null
           target_domains?: string[] | null
           updated_at?: string
+          username?: string | null
         }
         Update: {
           college_name?: string | null
@@ -547,13 +1021,16 @@ export type Database = {
           github_url?: string | null
           graduation_year?: number | null
           id?: string
+          leaderboard_opt_in?: boolean | null
           linkedin_url?: string | null
           notification_prefs?: Json | null
           onboarded_at?: string | null
           placement_start_date?: string | null
           quick_links?: Json | null
+          study_windows?: Json | null
           target_domains?: string[] | null
           updated_at?: string
+          username?: string | null
         }
         Relationships: []
       }
@@ -863,6 +1340,48 @@ export type Database = {
         }
         Relationships: []
       }
+      study_leaderboard: {
+        Row: {
+          apps_count: number
+          college_name: string | null
+          consistency_score: number
+          dsa_count: number
+          focus_sessions: number
+          id: string
+          mock_tests: number
+          opt_in: boolean
+          tracker_completion_pct: number
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          apps_count?: number
+          college_name?: string | null
+          consistency_score?: number
+          dsa_count?: number
+          focus_sessions?: number
+          id?: string
+          mock_tests?: number
+          opt_in?: boolean
+          tracker_completion_pct?: number
+          user_id: string
+          week_start: string
+        }
+        Update: {
+          apps_count?: number
+          college_name?: string | null
+          consistency_score?: number
+          dsa_count?: number
+          focus_sessions?: number
+          id?: string
+          mock_tests?: number
+          opt_in?: boolean
+          tracker_completion_pct?: number
+          user_id?: string
+          week_start?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           created_at: string
@@ -893,6 +1412,42 @@ export type Database = {
           status?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      system_events: {
+        Row: {
+          company: string | null
+          created_at: string
+          event_name: string
+          event_type: string | null
+          id: string
+          notes: string | null
+          source: string | null
+          typical_month: number | null
+          typical_window: string | null
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          event_name: string
+          event_type?: string | null
+          id?: string
+          notes?: string | null
+          source?: string | null
+          typical_month?: number | null
+          typical_window?: string | null
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          event_name?: string
+          event_type?: string | null
+          id?: string
+          notes?: string | null
+          source?: string | null
+          typical_month?: number | null
+          typical_window?: string | null
         }
         Relationships: []
       }
