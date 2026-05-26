@@ -20,6 +20,7 @@ import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedReviewRouteImport } from './routes/_authenticated/review'
 import { Route as AuthenticatedResumesRouteImport } from './routes/_authenticated/resumes'
 import { Route as AuthenticatedResourcesRouteImport } from './routes/_authenticated/resources'
+import { Route as AuthenticatedRankingsRouteImport } from './routes/_authenticated/rankings'
 import { Route as AuthenticatedQaRouteImport } from './routes/_authenticated/qa'
 import { Route as AuthenticatedProjectsRouteImport } from './routes/_authenticated/projects'
 import { Route as AuthenticatedPricingRouteImport } from './routes/_authenticated/pricing'
@@ -34,6 +35,8 @@ import { Route as AuthenticatedDsaRouteImport } from './routes/_authenticated/ds
 import { Route as AuthenticatedDevopsRouteImport } from './routes/_authenticated/devops'
 import { Route as AuthenticatedCompaniesRouteImport } from './routes/_authenticated/companies'
 import { Route as AuthenticatedChallengesRouteImport } from './routes/_authenticated/challenges'
+import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
+import { Route as AuthenticatedArenaRouteImport } from './routes/_authenticated/arena'
 import { Route as AuthenticatedAptitudeRouteImport } from './routes/_authenticated/aptitude'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
@@ -91,6 +94,11 @@ const AuthenticatedResumesRoute = AuthenticatedResumesRouteImport.update({
 const AuthenticatedResourcesRoute = AuthenticatedResourcesRouteImport.update({
   id: '/resources',
   path: '/resources',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedRankingsRoute = AuthenticatedRankingsRouteImport.update({
+  id: '/rankings',
+  path: '/rankings',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedQaRoute = AuthenticatedQaRouteImport.update({
@@ -163,6 +171,16 @@ const AuthenticatedChallengesRoute = AuthenticatedChallengesRouteImport.update({
   path: '/challenges',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedCalendarRoute = AuthenticatedCalendarRouteImport.update({
+  id: '/calendar',
+  path: '/calendar',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedArenaRoute = AuthenticatedArenaRouteImport.update({
+  id: '/arena',
+  path: '/arena',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedAptitudeRoute = AuthenticatedAptitudeRouteImport.update({
   id: '/aptitude',
   path: '/aptitude',
@@ -192,6 +210,8 @@ export interface FileRoutesByFullPath {
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/aptitude': typeof AuthenticatedAptitudeRoute
+  '/arena': typeof AuthenticatedArenaRoute
+  '/calendar': typeof AuthenticatedCalendarRoute
   '/challenges': typeof AuthenticatedChallengesRoute
   '/companies': typeof AuthenticatedCompaniesRoute
   '/devops': typeof AuthenticatedDevopsRoute
@@ -206,6 +226,7 @@ export interface FileRoutesByFullPath {
   '/pricing': typeof AuthenticatedPricingRoute
   '/projects': typeof AuthenticatedProjectsRoute
   '/qa': typeof AuthenticatedQaRoute
+  '/rankings': typeof AuthenticatedRankingsRoute
   '/resources': typeof AuthenticatedResourcesRoute
   '/resumes': typeof AuthenticatedResumesRoute
   '/review': typeof AuthenticatedReviewRoute
@@ -221,6 +242,8 @@ export interface FileRoutesByTo {
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/aptitude': typeof AuthenticatedAptitudeRoute
+  '/arena': typeof AuthenticatedArenaRoute
+  '/calendar': typeof AuthenticatedCalendarRoute
   '/challenges': typeof AuthenticatedChallengesRoute
   '/companies': typeof AuthenticatedCompaniesRoute
   '/devops': typeof AuthenticatedDevopsRoute
@@ -235,6 +258,7 @@ export interface FileRoutesByTo {
   '/pricing': typeof AuthenticatedPricingRoute
   '/projects': typeof AuthenticatedProjectsRoute
   '/qa': typeof AuthenticatedQaRoute
+  '/rankings': typeof AuthenticatedRankingsRoute
   '/resources': typeof AuthenticatedResourcesRoute
   '/resumes': typeof AuthenticatedResumesRoute
   '/review': typeof AuthenticatedReviewRoute
@@ -253,6 +277,8 @@ export interface FileRoutesById {
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
   '/_authenticated/aptitude': typeof AuthenticatedAptitudeRoute
+  '/_authenticated/arena': typeof AuthenticatedArenaRoute
+  '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
   '/_authenticated/challenges': typeof AuthenticatedChallengesRoute
   '/_authenticated/companies': typeof AuthenticatedCompaniesRoute
   '/_authenticated/devops': typeof AuthenticatedDevopsRoute
@@ -267,6 +293,7 @@ export interface FileRoutesById {
   '/_authenticated/pricing': typeof AuthenticatedPricingRoute
   '/_authenticated/projects': typeof AuthenticatedProjectsRoute
   '/_authenticated/qa': typeof AuthenticatedQaRoute
+  '/_authenticated/rankings': typeof AuthenticatedRankingsRoute
   '/_authenticated/resources': typeof AuthenticatedResourcesRoute
   '/_authenticated/resumes': typeof AuthenticatedResumesRoute
   '/_authenticated/review': typeof AuthenticatedReviewRoute
@@ -286,6 +313,8 @@ export interface FileRouteTypes {
     | '/achievements'
     | '/analytics'
     | '/aptitude'
+    | '/arena'
+    | '/calendar'
     | '/challenges'
     | '/companies'
     | '/devops'
@@ -300,6 +329,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/projects'
     | '/qa'
+    | '/rankings'
     | '/resources'
     | '/resumes'
     | '/review'
@@ -315,6 +345,8 @@ export interface FileRouteTypes {
     | '/achievements'
     | '/analytics'
     | '/aptitude'
+    | '/arena'
+    | '/calendar'
     | '/challenges'
     | '/companies'
     | '/devops'
@@ -329,6 +361,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/projects'
     | '/qa'
+    | '/rankings'
     | '/resources'
     | '/resumes'
     | '/review'
@@ -346,6 +379,8 @@ export interface FileRouteTypes {
     | '/_authenticated/achievements'
     | '/_authenticated/analytics'
     | '/_authenticated/aptitude'
+    | '/_authenticated/arena'
+    | '/_authenticated/calendar'
     | '/_authenticated/challenges'
     | '/_authenticated/companies'
     | '/_authenticated/devops'
@@ -360,6 +395,7 @@ export interface FileRouteTypes {
     | '/_authenticated/pricing'
     | '/_authenticated/projects'
     | '/_authenticated/qa'
+    | '/_authenticated/rankings'
     | '/_authenticated/resources'
     | '/_authenticated/resumes'
     | '/_authenticated/review'
@@ -455,6 +491,13 @@ declare module '@tanstack/react-router' {
       path: '/resources'
       fullPath: '/resources'
       preLoaderRoute: typeof AuthenticatedResourcesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/rankings': {
+      id: '/_authenticated/rankings'
+      path: '/rankings'
+      fullPath: '/rankings'
+      preLoaderRoute: typeof AuthenticatedRankingsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/qa': {
@@ -555,6 +598,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedChallengesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/calendar': {
+      id: '/_authenticated/calendar'
+      path: '/calendar'
+      fullPath: '/calendar'
+      preLoaderRoute: typeof AuthenticatedCalendarRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/arena': {
+      id: '/_authenticated/arena'
+      path: '/arena'
+      fullPath: '/arena'
+      preLoaderRoute: typeof AuthenticatedArenaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/aptitude': {
       id: '/_authenticated/aptitude'
       path: '/aptitude'
@@ -590,6 +647,8 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAchievementsRoute: typeof AuthenticatedAchievementsRoute
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
   AuthenticatedAptitudeRoute: typeof AuthenticatedAptitudeRoute
+  AuthenticatedArenaRoute: typeof AuthenticatedArenaRoute
+  AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
   AuthenticatedChallengesRoute: typeof AuthenticatedChallengesRoute
   AuthenticatedCompaniesRoute: typeof AuthenticatedCompaniesRoute
   AuthenticatedDevopsRoute: typeof AuthenticatedDevopsRoute
@@ -604,6 +663,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedPricingRoute: typeof AuthenticatedPricingRoute
   AuthenticatedProjectsRoute: typeof AuthenticatedProjectsRoute
   AuthenticatedQaRoute: typeof AuthenticatedQaRoute
+  AuthenticatedRankingsRoute: typeof AuthenticatedRankingsRoute
   AuthenticatedResourcesRoute: typeof AuthenticatedResourcesRoute
   AuthenticatedResumesRoute: typeof AuthenticatedResumesRoute
   AuthenticatedReviewRoute: typeof AuthenticatedReviewRoute
@@ -619,6 +679,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAchievementsRoute: AuthenticatedAchievementsRoute,
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
   AuthenticatedAptitudeRoute: AuthenticatedAptitudeRoute,
+  AuthenticatedArenaRoute: AuthenticatedArenaRoute,
+  AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
   AuthenticatedChallengesRoute: AuthenticatedChallengesRoute,
   AuthenticatedCompaniesRoute: AuthenticatedCompaniesRoute,
   AuthenticatedDevopsRoute: AuthenticatedDevopsRoute,
@@ -633,6 +695,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedPricingRoute: AuthenticatedPricingRoute,
   AuthenticatedProjectsRoute: AuthenticatedProjectsRoute,
   AuthenticatedQaRoute: AuthenticatedQaRoute,
+  AuthenticatedRankingsRoute: AuthenticatedRankingsRoute,
   AuthenticatedResourcesRoute: AuthenticatedResourcesRoute,
   AuthenticatedResumesRoute: AuthenticatedResumesRoute,
   AuthenticatedReviewRoute: AuthenticatedReviewRoute,
