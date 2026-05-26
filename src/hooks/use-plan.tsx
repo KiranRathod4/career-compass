@@ -9,19 +9,25 @@ export function usePlan() {
   return useQuery({
     queryKey: ["plan", user?.id],
     enabled: !!user,
-    queryFn: async (): Promise<{ plan: PlanTier; active: boolean; periodEnd: string | null }> => {
-      const { data } = await supabase
-        .from("subscriptions")
-        .select("plan, status, current_period_end")
-        .eq("user_id", user!.id)
-        .maybeSingle();
-      if (!data) return { plan: "free", active: false, periodEnd: null };
-      const active = data.status === "active" &&
-        (!data.current_period_end || new Date(data.current_period_end) > new Date());
+    queryFn: async (): Promise<{ plan: PlanTier; active: boolean; periodEnd: string | null; source: "subscription" | "reward" | "free"; rewardEnd: string | null }> => {
+      const [subRes, rewardRes] = await Promise.all([
+        supabase.from("subscriptions").select("plan, status, current_period_end").eq("user_id", user!.id).maybeSingle(),
+        (supabase as any).from("level_rewards").select("elite_until").eq("user_id", user!.id).eq("active", true).gte("elite_until", new Date().toISOString()).order("elite_until", { ascending: false }).limit(1).maybeSingle(),
+      ]);
+      const sub = subRes.data;
+      const subActive = sub?.status === "active" && (!sub.current_period_end || new Date(sub.current_period_end) > new Date());
+      const subPlan: PlanTier = subActive ? (sub!.plan as PlanTier) : "free";
+
+      const reward = rewardRes.data as { elite_until: string } | null;
+      if (reward && TIER_RANK[subPlan] < TIER_RANK.elite) {
+        return { plan: "elite", active: true, periodEnd: sub?.current_period_end ?? null, source: "reward", rewardEnd: reward.elite_until };
+      }
       return {
-        plan: (active ? (data.plan as PlanTier) : "free"),
-        active,
-        periodEnd: data.current_period_end,
+        plan: subPlan,
+        active: subActive,
+        periodEnd: sub?.current_period_end ?? null,
+        source: subActive ? "subscription" : "free",
+        rewardEnd: reward?.elite_until ?? null,
       };
     },
   });

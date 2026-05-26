@@ -145,10 +145,19 @@ function Dashboard() {
             )}
           </Section>
 
-          <Section title="Upcoming Interviews">
-            <EmptyHint icon={Briefcase} text="Job Tracker is coming in the next phase — once added, scheduled interviews will appear here." />
+          <Section title="Upcoming Interviews" action={<Link to="/jobs" className="text-xs text-primary hover:underline">Job tracker</Link>}>
+            <UpcomingInterviews userId={user!.id} />
+          </Section>
+
+          <Section title="Upcoming Events" action={<Link to="/calendar" className="text-xs text-primary hover:underline">Calendar</Link>}>
+            <UpcomingEvents userId={user!.id} />
+          </Section>
+
+          <Section title="Weekly Challenges" action={<Link to="/challenges" className="text-xs text-primary hover:underline">All</Link>}>
+            <ActiveChallenges userId={user!.id} />
           </Section>
         </div>
+
 
         <div className="space-y-4">
           <Section title="Mood & Energy">
@@ -248,3 +257,89 @@ function QuickButton({ label, onClick }: { label: string; onClick: () => void })
     </button>
   );
 }
+
+function UpcomingInterviews({ userId }: { userId: string }) {
+  const today = format(new Date(), "yyyy-MM-dd");
+  const in14 = format(addDays(new Date(), 14), "yyyy-MM-dd");
+  const { data = [] } = useQuery({
+    queryKey: ["upcoming-interviews", userId],
+    queryFn: async () => (await supabase.from("jobs").select("id,company,role,deadline,status").eq("user_id", userId).gte("deadline", today).lte("deadline", in14).in("status", ["applied", "interview", "oa"]).order("deadline")).data ?? [],
+  });
+  if (data.length === 0) return <EmptyHint icon={Briefcase} text="Koi interview schedule nahi. Job tracker mein date add karo." actionTo="/jobs" actionLabel="Open Job Tracker" />;
+  return (
+    <div className="space-y-2">
+      {data.map((j: any) => {
+        const days = differenceInDays(new Date(j.deadline), new Date());
+        const tone: any = days <= 2 ? "destructive" : days <= 5 ? "warning" : "neutral";
+        const lbl = days === 0 ? "Aaj hai!" : days === 1 ? "Kal hai!" : `${days}d`;
+        return (
+          <div key={j.id} className="flex items-center gap-3 px-3 py-2 rounded-md border border-border text-sm">
+            <span className="flex-1 truncate"><b>{j.company}</b> · <span className="text-muted-foreground">{j.role}</span></span>
+            <span className="text-xs text-muted-foreground">{j.deadline}</span>
+            <Pill tone={tone}>{lbl}</Pill>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function UpcomingEvents({ userId }: { userId: string }) {
+  const today = format(new Date(), "yyyy-MM-dd");
+  const { data = [] } = useQuery({
+    queryKey: ["upcoming-events", userId],
+    queryFn: async () => (await (supabase as any).from("placement_events").select("*").eq("user_id", userId).gte("event_date", today).order("event_date").limit(5)).data ?? [],
+  });
+  if (data.length === 0) return <EmptyHint icon={Clock} text="Koi event nahi. Calendar pe add karo." actionTo="/calendar" actionLabel="Open Calendar" />;
+  return (
+    <div className="space-y-2">
+      {data.map((e: any) => {
+        const days = differenceInDays(new Date(e.event_date), new Date());
+        return (
+          <div key={e.id} className="flex items-center gap-3 px-3 py-2 rounded-md border border-border text-sm">
+            <span className="flex-1 truncate"><b>{e.event_name}</b>{e.company && <span className="text-muted-foreground"> · {e.company}</span>}</span>
+            <Pill tone="info">{e.event_type}</Pill>
+            <span className="text-xs text-muted-foreground">{days === 0 ? "Aaj" : `${days}d`}</span>
+            {e.registration_url && <a href={e.registration_url} target="_blank" rel="noreferrer" className="text-xs text-primary hover:underline">Register</a>}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function ActiveChallenges({ userId }: { userId: string }) {
+  const weekStart = format(startOfWeek(new Date(), { weekStartsOn: 1 }), "yyyy-MM-dd");
+  const { data = [] } = useQuery({
+    queryKey: ["active-challenges", userId, weekStart],
+    queryFn: async () => {
+      const { data: challenges } = await (supabase as any).from("weekly_challenges").select("*").eq("active", true).eq("week_start_date", weekStart).limit(2);
+      if (!challenges?.length) return [];
+      const ids = challenges.map((c: any) => c.id);
+      const { data: progress } = await (supabase as any).from("user_challenge_progress").select("*").eq("user_id", userId).in("challenge_id", ids);
+      return challenges.map((c: any) => {
+        const p = progress?.find((x: any) => x.challenge_id === c.id);
+        return { ...c, current: p?.current_count ?? 0, completed: p?.completed ?? false };
+      });
+    },
+  });
+  if (data.length === 0) return <EmptyHint icon={CheckCircle2} text="Is hafte koi challenge nahi. Wapas check karo." />;
+  return (
+    <div className="space-y-3">
+      {data.map((c: any) => {
+        const pct = Math.min(100, Math.round((c.current / c.target_count) * 100));
+        return (
+          <div key={c.id} className="space-y-1.5">
+            <div className="flex items-center justify-between text-sm">
+              <span className="font-medium truncate">{c.title}</span>
+              <span className="text-xs text-muted-foreground">{c.current}/{c.target_count}</span>
+            </div>
+            <div className="h-1.5 rounded-full bg-muted overflow-hidden"><div className="h-full bg-primary" style={{ width: `${pct}%` }} /></div>
+            {c.completed && <div className="text-[11px] text-success">+{c.xp_reward} XP unlocked ✓</div>}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+

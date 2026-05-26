@@ -117,6 +117,30 @@ function SettingsPage() {
       </div>
 
       <div className="card-flat p-6">
+        <div className="section-label mb-4">Public Portfolio</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <Field label="Username (for taiyaar.co.in/u/&lt;name&gt;)">
+            <Input value={form.username ?? ""} onChange={(v) => setForm({ ...form, username: v.toLowerCase().replace(/[^a-z0-9_-]/g, "") })} placeholder="e.g. rahul-cse" />
+          </Field>
+          <Field label="Show on public leaderboard?">
+            <div className="flex items-center gap-2 h-9">
+              <button onClick={() => setForm({ ...form, leaderboard_opt_in: !form.leaderboard_opt_in })}
+                className={`h-6 w-10 rounded-full transition relative ${form.leaderboard_opt_in ? "bg-primary" : "bg-muted"}`}>
+                <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-background transition-all ${form.leaderboard_opt_in ? "left-[18px]" : "left-0.5"}`} />
+              </button>
+              <span className="text-xs text-muted-foreground">{form.leaderboard_opt_in ? "Haan, dikhao" : "Private hai"}</span>
+            </div>
+          </Field>
+        </div>
+      </div>
+
+      <div className="card-flat p-6">
+        <div className="section-label mb-4">Study Windows (Arena Break-Time Enforcer)</div>
+        <StudyWindowsEditor windows={form.study_windows ?? []} onChange={(w) => setForm({ ...form, study_windows: w })} />
+      </div>
+
+
+      <div className="card-flat p-6">
         <div className="section-label mb-4">Quick Links</div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
           {links.map((l, i) => (
