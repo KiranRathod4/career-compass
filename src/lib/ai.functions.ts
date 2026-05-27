@@ -172,3 +172,53 @@ export const aiResumeReview = createServerFn({ method: "POST" })
       tool,
     );
   });
+
+/* ---------------- Custom Track Roadmap ---------------- */
+export const aiTrackRoadmap = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { trackName: string; skillLevel: string; targetType?: string; why?: string }) => d)
+  .handler(async ({ data }) => {
+    const tool = {
+      type: "function",
+      function: {
+        name: "track_roadmap",
+        description: "Generate a structured learning roadmap with sections and topics.",
+        parameters: {
+          type: "object",
+          properties: {
+            summary: { type: "string", description: "1-2 line Hinglish encouragement about the track." },
+            sections: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  section_name: { type: "string" },
+                  topics: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        topic_name: { type: "string" },
+                        notes: { type: "string", description: "1-line what to learn / why" },
+                        resource_url: { type: "string", description: "Optional best free resource link" },
+                      },
+                      required: ["topic_name"],
+                    },
+                  },
+                },
+                required: ["section_name", "topics"],
+              },
+            },
+          },
+          required: ["summary", "sections"],
+        },
+      },
+    };
+    return await callAI(
+      [
+        { role: "system", content: "You generate practical, no-fluff learning roadmaps for Indian engineering students. Keep sections to 4-7 and 5-10 topics per section. Prefer free resources (YouTube, official docs, NeetCode, GfG)." },
+        { role: "user", content: `Track: ${data.trackName}\nLevel: ${data.skillLevel}\nTarget: ${data.targetType || "general placement"}\nWhy: ${data.why || "skill upgrade"}` },
+      ],
+      tool,
+    );
+  });
