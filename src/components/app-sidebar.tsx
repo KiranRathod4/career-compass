@@ -24,6 +24,7 @@ const groups: Group[] = [
     { label: "SQL", to: "/sql", icon: Database },
     { label: "DevOps Hub", to: "/devops", icon: Server },
     { label: "QA Hub", to: "/qa", icon: Beaker },
+    { label: "Custom Tracks", to: "/tracks", icon: BookOpen },
   ]},
   { label: "Career", items: [
     { label: "Job Tracker", to: "/jobs", icon: Briefcase },
