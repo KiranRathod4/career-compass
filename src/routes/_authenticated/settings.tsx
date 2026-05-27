@@ -176,3 +176,38 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 function Input({ onChange, ...p }: { onChange?: (v: string) => void } & Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange">) {
   return <input {...p} onChange={(e) => onChange?.(e.target.value)} className="w-full h-9 px-2.5 rounded-md border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring" />;
 }
+
+type StudyWindow = { day: string; start: string; end: string };
+const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+function StudyWindowsEditor({ windows, onChange }: { windows: StudyWindow[]; onChange: (w: StudyWindow[]) => void }) {
+  const add = () => onChange([...(windows ?? []), { day: "Mon", start: "09:00", end: "12:00" }]);
+  const update = (i: number, patch: Partial<StudyWindow>) =>
+    onChange(windows.map((w, x) => (x === i ? { ...w, ...patch } : w)));
+  const remove = (i: number) => onChange(windows.filter((_, x) => x !== i));
+
+  return (
+    <div className="space-y-2">
+      {(windows ?? []).length === 0 && (
+        <div className="text-xs text-muted-foreground">Koi study window set nahi hai. Add karo taaki break-time pe Arena unlock ho.</div>
+      )}
+      {(windows ?? []).map((w, i) => (
+        <div key={i} className="flex items-center gap-2">
+          <select value={w.day} onChange={(e) => update(i, { day: e.target.value })}
+            className="h-9 px-2 rounded-md border border-border bg-background text-sm">
+            {DAYS.map((d) => <option key={d} value={d}>{d}</option>)}
+          </select>
+          <Input type="time" value={w.start} onChange={(v) => update(i, { start: v })} />
+          <span className="text-xs text-muted-foreground">to</span>
+          <Input type="time" value={w.end} onChange={(v) => update(i, { end: v })} />
+          <button onClick={() => remove(i)} className="text-muted-foreground hover:text-destructive">
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      ))}
+      <button onClick={add} className="h-8 px-3 rounded-md border border-border text-xs flex items-center gap-1 hover:bg-accent">
+        <Plus className="h-3 w-3" /> Add window
+      </button>
+    </div>
+  );
+}
