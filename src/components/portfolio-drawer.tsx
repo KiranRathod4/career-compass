@@ -88,10 +88,11 @@ export function PortfolioDrawer({ open, onClose }: { open: boolean; onClose: () 
                 <Link to="/settings" onClick={onClose} className="inline-flex items-center justify-center h-9 px-3 rounded-md bg-primary text-primary-foreground text-xs font-medium">Go to Settings</Link>
               </>
             )}
-          </div>
+              try {
+                await (snapshot as any)({});
+                toast.success("Leaderboard updated");
+              } catch (e: any) {
 
-          <button
-            onClick={async () => {
               setSnapshotting(true);
               try {
                 await snapshot({ data: undefined as any });

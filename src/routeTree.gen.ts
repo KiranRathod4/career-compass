@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as UUsernameRouteImport } from './routes/u.$username'
 import { Route as AuthenticatedTracksRouteImport } from './routes/_authenticated/tracks'
 import { Route as AuthenticatedTimerRouteImport } from './routes/_authenticated/timer'
 import { Route as AuthenticatedSqlRouteImport } from './routes/_authenticated/sql'
@@ -56,6 +57,11 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedRoute,
+} as any)
+const UUsernameRoute = UUsernameRouteImport.update({
+  id: '/u/$username',
+  path: '/u/$username',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedTracksRoute = AuthenticatedTracksRouteImport.update({
   id: '/tracks',
@@ -242,6 +248,7 @@ export interface FileRoutesByFullPath {
   '/sql': typeof AuthenticatedSqlRoute
   '/timer': typeof AuthenticatedTimerRoute
   '/tracks': typeof AuthenticatedTracksRoute
+  '/u/$username': typeof UUsernameRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -275,6 +282,7 @@ export interface FileRoutesByTo {
   '/sql': typeof AuthenticatedSqlRoute
   '/timer': typeof AuthenticatedTimerRoute
   '/tracks': typeof AuthenticatedTracksRoute
+  '/u/$username': typeof UUsernameRoute
   '/': typeof AuthenticatedIndexRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
 }
@@ -311,6 +319,7 @@ export interface FileRoutesById {
   '/_authenticated/sql': typeof AuthenticatedSqlRoute
   '/_authenticated/timer': typeof AuthenticatedTimerRoute
   '/_authenticated/tracks': typeof AuthenticatedTracksRoute
+  '/u/$username': typeof UUsernameRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
 }
@@ -348,6 +357,7 @@ export interface FileRouteTypes {
     | '/sql'
     | '/timer'
     | '/tracks'
+    | '/u/$username'
     | '/api/public/razorpay-webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -381,6 +391,7 @@ export interface FileRouteTypes {
     | '/sql'
     | '/timer'
     | '/tracks'
+    | '/u/$username'
     | '/'
     | '/api/public/razorpay-webhook'
   id:
@@ -416,6 +427,7 @@ export interface FileRouteTypes {
     | '/_authenticated/sql'
     | '/_authenticated/timer'
     | '/_authenticated/tracks'
+    | '/u/$username'
     | '/_authenticated/'
     | '/api/public/razorpay-webhook'
   fileRoutesById: FileRoutesById
@@ -423,6 +435,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
+  UUsernameRoute: typeof UUsernameRoute
   ApiPublicRazorpayWebhookRoute: typeof ApiPublicRazorpayWebhookRoute
 }
 
@@ -448,6 +461,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/u/$username': {
+      id: '/u/$username'
+      path: '/u/$username'
+      fullPath: '/u/$username'
+      preLoaderRoute: typeof UUsernameRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/tracks': {
       id: '/_authenticated/tracks'
@@ -735,6 +755,7 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
+  UUsernameRoute: UUsernameRoute,
   ApiPublicRazorpayWebhookRoute: ApiPublicRazorpayWebhookRoute,
 }
 export const routeTree = rootRouteImport
