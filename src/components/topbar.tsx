@@ -1,4 +1,5 @@
 import { Moon, Sun, LogOut, Sparkles, Gift } from "lucide-react";
+import { useState } from "react";
 import { useTheme } from "@/hooks/use-theme";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouterState, Link } from "@tanstack/react-router";
@@ -7,7 +8,9 @@ import { usePlan } from "@/hooks/use-plan";
 import { useLevelUpDetector } from "@/hooks/use-level-up";
 import { DistractionButton } from "./distraction-button";
 import { LevelRewardModal } from "./level-reward-modal";
+import { PortfolioDrawer } from "./portfolio-drawer";
 import { formatDistanceToNowStrict } from "date-fns";
+
 
 const titles: Record<string, string> = {
   "/": "Dashboard", "/timer": "Focus Timer", "/planner": "Daily Planner",
