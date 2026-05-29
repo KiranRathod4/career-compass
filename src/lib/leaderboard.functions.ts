@@ -57,18 +57,18 @@ export const snapshotLeaderboards = createServerFn({ method: "POST" })
     const arenaXP = (xp ?? []).filter((x: any) => x.action_type?.startsWith("arena_")).reduce((s: number, x: any) => s + (x.xp_amount || 0), 0);
     const puzzleScore = (xp ?? []).filter((x: any) => x.action_type === "arena_puzzle").reduce((s: number, x: any) => s + (x.xp_amount || 0), 0);
     const mathBest = Math.max(0, ...(xp ?? []).filter((x: any) => x.action_type === "arena_math").map((x: any) => x.metadata?.score ?? 0));
-    const memoryBest = Math.max(0, ...(xp ?? []).filter((x: any) => x.action_type === "arena_memory").map((x: any) => x.metadata?.level ?? 0));
+    const arenaRow = {
+      user_id: userId,
+      week_start: ws,
+      total_arena_xp: arenaXP,
+      puzzle_score: puzzleScore,
+      math_sprint_best: mathBest,
+      memory_best: memoryBest,
+    };
+    const { data: existingArena } = await supabase.from("arena_leaderboard").select("id").eq("user_id", userId).eq("week_start", ws).maybeSingle();
+    if (existingArena) await supabase.from("arena_leaderboard").update(arenaRow).eq("id", existingArena.id);
+    else await supabase.from("arena_leaderboard").insert(arenaRow);
 
-    await supabase.from("arena_leaderboard").upsert(
-      {
-        user_id: userId,
-        week_start: ws,
-        total_arena_xp: arenaXP,
-        puzzle_score: puzzleScore,
-        math_sprint_best: mathBest,
-        memory_best: memoryBest,
-      },
-      { onConflict: "user_id,week_start" }
     );
 
     return { ok: true, consistency, dsaCount, appsCount };
