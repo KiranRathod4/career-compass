@@ -64,8 +64,10 @@ export function Topbar() {
         <button onClick={signOut} className="h-8 w-8 rounded-md hover:bg-accent flex items-center justify-center text-muted-foreground" title="Sign out">
           <LogOut className="h-4 w-4" />
         </button>
-        <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-semibold">{initial}</div>
+        <button onClick={() => setDrawerOpen(true)} className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-semibold hover:opacity-90" title="My portfolio">{initial}</button>
       </div>
+      <PortfolioDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
     </header>
   );
+
 }
