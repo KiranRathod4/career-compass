@@ -31,7 +31,9 @@ export function Topbar() {
   const title = titles[pathname] ?? "Taiyaar";
   const initial = (user?.user_metadata?.full_name || user?.email || "?")[0]?.toUpperCase();
   const { data: level } = useXP();
-  const { data: plan } = usePlan();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+
   const { unlock, dismiss } = useLevelUpDetector();
 
   return (
