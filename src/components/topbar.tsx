@@ -1,4 +1,5 @@
 import { Moon, Sun, LogOut, Sparkles, Gift } from "lucide-react";
+import { useState } from "react";
 import { useTheme } from "@/hooks/use-theme";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouterState, Link } from "@tanstack/react-router";
@@ -7,7 +8,9 @@ import { usePlan } from "@/hooks/use-plan";
 import { useLevelUpDetector } from "@/hooks/use-level-up";
 import { DistractionButton } from "./distraction-button";
 import { LevelRewardModal } from "./level-reward-modal";
+import { PortfolioDrawer } from "./portfolio-drawer";
 import { formatDistanceToNowStrict } from "date-fns";
+
 
 const titles: Record<string, string> = {
   "/": "Dashboard", "/timer": "Focus Timer", "/planner": "Daily Planner",
@@ -29,6 +32,8 @@ export function Topbar() {
   const initial = (user?.user_metadata?.full_name || user?.email || "?")[0]?.toUpperCase();
   const { data: level } = useXP();
   const { data: plan } = usePlan();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
   const { unlock, dismiss } = useLevelUpDetector();
 
   return (
@@ -59,8 +64,10 @@ export function Topbar() {
         <button onClick={signOut} className="h-8 w-8 rounded-md hover:bg-accent flex items-center justify-center text-muted-foreground" title="Sign out">
           <LogOut className="h-4 w-4" />
         </button>
-        <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-semibold">{initial}</div>
+        <button onClick={() => setDrawerOpen(true)} className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-semibold hover:opacity-90" title="My portfolio">{initial}</button>
       </div>
+      <PortfolioDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
     </header>
   );
+
 }
