@@ -36,21 +36,22 @@ export const snapshotLeaderboards = createServerFn({ method: "POST" })
 
     const optIn = profile?.leaderboard_opt_in === true;
 
-    await supabase.from("study_leaderboard").upsert(
-      {
-        user_id: userId,
-        week_start: ws,
-        college_name: profile?.college_name ?? null,
-        opt_in: optIn,
-        dsa_count: dsaCount,
-        apps_count: appsCount,
-        focus_sessions: focusCount,
-        mock_tests: mockCount,
-        tracker_completion_pct: trackerPct,
-        consistency_score: consistency,
-      },
-      { onConflict: "user_id,week_start" }
-    );
+    const studyRow = {
+      user_id: userId,
+      week_start: ws,
+      college_name: profile?.college_name ?? null,
+      opt_in: optIn,
+      dsa_count: dsaCount,
+      apps_count: appsCount,
+      focus_sessions: focusCount,
+      mock_tests: mockCount,
+      tracker_completion_pct: trackerPct,
+      consistency_score: consistency,
+    };
+    const { data: existingStudy } = await supabase.from("study_leaderboard").select("id").eq("user_id", userId).eq("week_start", ws).maybeSingle();
+    if (existingStudy) await supabase.from("study_leaderboard").update(studyRow).eq("id", existingStudy.id);
+    else await supabase.from("study_leaderboard").insert(studyRow);
+
 
     // Arena snapshot
     const arenaXP = (xp ?? []).filter((x: any) => x.action_type?.startsWith("arena_")).reduce((s: number, x: any) => s + (x.xp_amount || 0), 0);
