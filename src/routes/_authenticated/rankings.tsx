@@ -92,7 +92,7 @@ function RankingsPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-4">
-      <div className="card-flat p-5">
+      <div className="card-flat p-5 flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-3">
           <Trophy className="h-6 w-6 text-primary" />
           <div>
@@ -100,6 +100,10 @@ function RankingsPage() {
             <p className="text-xs text-muted-foreground">Hafte ki rankings — Monday ko reset hoti hain.</p>
           </div>
         </div>
+        <Button size="sm" variant="outline" onClick={refresh} disabled={refreshing}>
+          <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${refreshing ? "animate-spin" : ""}`} />
+          {refreshing ? "Refreshing…" : "Refresh my rank"}
+        </Button>
       </div>
 
       <div className="flex gap-2">
