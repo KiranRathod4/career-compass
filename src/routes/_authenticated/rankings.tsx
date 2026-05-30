@@ -17,6 +17,8 @@ type Tab = "study" | "arena";
 function RankingsPage() {
   const { user } = useAuth();
   const [tab, setTab] = useState<Tab>("study");
+  const snapshot = useServerFn(snapshotLeaderboards);
+  const [refreshing, setRefreshing] = useState(false);
 
   const { data: profile } = useQuery({
     queryKey: ["profile-rank", user?.id],
@@ -29,6 +31,20 @@ function RankingsPage() {
 
   const optedIn = (profile as any)?.leaderboard_opt_in === true;
   const weekStart = getWeekStart();
+
+  // Auto-snapshot on first visit when opted in
+  useEffect(() => {
+    if (!optedIn) return;
+    snapshot().catch(() => {});
+  }, [optedIn]);
+
+  const refresh = async () => {
+    setRefreshing(true);
+    try { await snapshot(); toast.success("Rank refreshed"); }
+    catch (e: any) { toast.error(e?.message ?? "Failed"); }
+    finally { setRefreshing(false); }
+  };
+
 
   const { data: study } = useQuery({
     queryKey: ["study-leaderboard", weekStart],
