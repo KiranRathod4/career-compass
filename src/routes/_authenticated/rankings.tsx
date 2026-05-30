@@ -1,11 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { Trophy, Medal, Flame, Lock } from "lucide-react";
+import { Trophy, Medal, Flame, Lock, RefreshCw } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { snapshotLeaderboards } from "@/lib/leaderboard.functions";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/rankings")({ component: RankingsPage });
 
