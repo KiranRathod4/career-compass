@@ -1,11 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { Trophy, Medal, Flame, Lock } from "lucide-react";
+import { Trophy, Medal, Flame, Lock, RefreshCw } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { snapshotLeaderboards } from "@/lib/leaderboard.functions";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/rankings")({ component: RankingsPage });
 
@@ -14,6 +17,8 @@ type Tab = "study" | "arena";
 function RankingsPage() {
   const { user } = useAuth();
   const [tab, setTab] = useState<Tab>("study");
+  const snapshot = useServerFn(snapshotLeaderboards);
+  const [refreshing, setRefreshing] = useState(false);
 
   const { data: profile } = useQuery({
     queryKey: ["profile-rank", user?.id],
@@ -26,6 +31,20 @@ function RankingsPage() {
 
   const optedIn = (profile as any)?.leaderboard_opt_in === true;
   const weekStart = getWeekStart();
+
+  // Auto-snapshot on first visit when opted in
+  useEffect(() => {
+    if (!optedIn) return;
+    snapshot().catch(() => {});
+  }, [optedIn]);
+
+  const refresh = async () => {
+    setRefreshing(true);
+    try { await snapshot(); toast.success("Rank refreshed"); }
+    catch (e: any) { toast.error(e?.message ?? "Failed"); }
+    finally { setRefreshing(false); }
+  };
+
 
   const { data: study } = useQuery({
     queryKey: ["study-leaderboard", weekStart],
@@ -73,7 +92,7 @@ function RankingsPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-4">
-      <div className="card-flat p-5">
+      <div className="card-flat p-5 flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-3">
           <Trophy className="h-6 w-6 text-primary" />
           <div>
@@ -81,6 +100,10 @@ function RankingsPage() {
             <p className="text-xs text-muted-foreground">Hafte ki rankings — Monday ko reset hoti hain.</p>
           </div>
         </div>
+        <Button size="sm" variant="outline" onClick={refresh} disabled={refreshing}>
+          <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${refreshing ? "animate-spin" : ""}`} />
+          {refreshing ? "Refreshing…" : "Refresh my rank"}
+        </Button>
       </div>
 
       <div className="flex gap-2">

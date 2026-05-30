@@ -158,13 +158,17 @@ function SettingsPage() {
       </div>
 
       <div className="flex justify-end">
-        <button onClick={() => save.mutate({
+        <button disabled={save.isPending} onClick={() => save.mutate({
           full_name: form.full_name, college_name: form.college_name, graduation_year: form.graduation_year,
           target_domains: form.target_domains, placement_start_date: form.placement_start_date || null,
           linkedin_url: form.linkedin_url, github_url: form.github_url,
           daily_dsa_target: form.daily_dsa_target, daily_application_target: form.daily_application_target,
           daily_deep_work_target: form.daily_deep_work_target, quick_links: form.quick_links,
-        })} className="h-10 px-6 rounded-md bg-primary text-primary-foreground text-sm font-medium">Save changes</button>
+          username: form.username || null, leaderboard_opt_in: !!form.leaderboard_opt_in,
+          study_windows: form.study_windows ?? [],
+        })} className="h-10 px-6 rounded-md bg-primary text-primary-foreground text-sm font-medium disabled:opacity-60">
+          {save.isPending ? "Saving…" : "Save changes"}
+        </button>
       </div>
     </div>
   );
