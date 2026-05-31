@@ -37,13 +37,13 @@ export const BADGES: BadgeDef[] = [
   { id: "focus_10h", name: "Deep Diver", emoji: "🌊", description: "10 hours of focus time", category: "focus", check: (s) => s.focusMinutes >= 600 },
   { id: "focus_50h", name: "Iron Focus", emoji: "🧠", description: "50 hours of deep work", category: "focus", check: (s) => s.focusMinutes >= 3000 },
 
-  { id: "streak_3", name: "3-Day Streak", emoji: "🔥", description: "3 din lagatar consistency", category: "streak", check: (s) => s.dailyStreak >= 3 },
-  { id: "streak_7", name: "Week Warrior", emoji: "🔥", description: "7-day streak — fire on!", category: "streak", check: (s) => s.dailyStreak >= 7 },
-  { id: "streak_30", name: "Monthly Beast", emoji: "👑", description: "30 din lagatar — taiyaar ho!", category: "streak", check: (s) => s.dailyStreak >= 30 },
+  { id: "streak_3", name: "3-Day Streak", emoji: "🔥", description: "3 days of consistency", category: "streak", check: (s) => s.dailyStreak >= 3 },
+  { id: "streak_7", name: "Week Warrior", emoji: "🔥", description: "7-day streak — keep it going", category: "streak", check: (s) => s.dailyStreak >= 7 },
+  { id: "streak_30", name: "Monthly Beast", emoji: "👑", description: "30 days straight — taiyaar", category: "streak", check: (s) => s.dailyStreak >= 30 },
 
   { id: "xp_1k", name: "1K Club", emoji: "⭐", description: "1,000 XP earned", category: "consistency", check: (s) => s.totalXp >= 1000 },
   { id: "xp_5k", name: "5K Hero", emoji: "🌟", description: "5,000 XP earned", category: "consistency", check: (s) => s.totalXp >= 5000 },
-  { id: "xp_10k", name: "Legend", emoji: "💎", description: "10,000 XP — interview ready!", category: "consistency", check: (s) => s.totalXp >= 10000 },
+  { id: "xp_10k", name: "Legend", emoji: "💎", description: "10,000 XP — interview ready", category: "consistency", check: (s) => s.totalXp >= 10000 },
 ];
 
 export const BADGE_MAP = Object.fromEntries(BADGES.map((b) => [b.id, b]));
