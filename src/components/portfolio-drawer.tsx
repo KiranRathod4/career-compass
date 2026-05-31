@@ -80,7 +80,7 @@ export function PortfolioDrawer({ open, onClose }: { open: boolean; onClose: () 
                   <button onClick={() => { navigator.clipboard.writeText(portfolioUrl!); toast.success("Link copied"); }} className="flex-1 h-9 rounded-md border border-border text-xs font-medium inline-flex items-center justify-center gap-1.5"><Copy className="h-3.5 w-3.5" />Copy</button>
                   <a href={portfolioUrl!} target="_blank" rel="noreferrer" className="flex-1 h-9 rounded-md bg-primary text-primary-foreground text-xs font-medium inline-flex items-center justify-center gap-1.5"><ExternalLink className="h-3.5 w-3.5" />Open</a>
                 </div>
-                <p className="text-[11px] text-muted-foreground">Apni mehnat duniya ko dikhao. Share karo.</p>
+                <p className="text-[11px] text-muted-foreground">Show the world your work. Share the link.</p>
               </>
             ) : (
               <>

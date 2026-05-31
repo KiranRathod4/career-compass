@@ -193,7 +193,7 @@ function StudyWindowsEditor({ windows, onChange }: { windows: StudyWindow[]; onC
   return (
     <div className="space-y-2">
       {(windows ?? []).length === 0 && (
-        <div className="text-xs text-muted-foreground">Koi study window set nahi hai. Add karo taaki break-time pe Arena unlock ho.</div>
+        <div className="text-xs text-muted-foreground">No study windows set. Add one so the Arena unlocks during break time.</div>
       )}
       {(windows ?? []).map((w, i) => (
         <div key={i} className="flex items-center gap-2">

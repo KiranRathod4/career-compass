@@ -79,10 +79,10 @@ function RankingsPage() {
     return (
       <div className="max-w-2xl mx-auto card-flat p-10 text-center">
         <Lock className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
-        <h1 className="text-xl font-semibold">Rankings locked hain</h1>
-        <p className="text-sm text-muted-foreground mt-2 mb-4">Leaderboard pe aane ke liye Settings mein opt-in karo. Tumhara naam aur college dikhega.</p>
+        <h1 className="text-xl font-semibold">Rankings are locked</h1>
+        <p className="text-sm text-muted-foreground mt-2 mb-4">Opt in from Settings to appear on the leaderboard. Your name and college will be shown.</p>
         <Button asChild>
-          <Link to="/settings">Settings kholo</Link>
+          <Link to="/settings">Open Settings</Link>
         </Button>
       </div>
     );
@@ -97,7 +97,7 @@ function RankingsPage() {
           <Trophy className="h-6 w-6 text-primary" />
           <div>
             <h1 className="text-xl font-semibold">Taiyaar Rankings</h1>
-            <p className="text-xs text-muted-foreground">Hafte ki rankings — Monday ko reset hoti hain.</p>
+            <p className="text-xs text-muted-foreground">Weekly rankings — reset every Monday.</p>
           </div>
         </div>
         <Button size="sm" variant="outline" onClick={refresh} disabled={refreshing}>
@@ -114,7 +114,7 @@ function RankingsPage() {
       <div className="card-flat overflow-hidden">
         {rows.length === 0 ? (
           <div className="p-8 text-center text-sm text-muted-foreground">
-            Is hafte abhi koi data nahi. Tum pehle ho — kuch karo, top par aao! 🚀
+            No data yet this week. Be the first — log activity to claim the top spot.
           </div>
         ) : (
           <table className="w-full text-sm">
@@ -151,7 +151,7 @@ function RankingsPage() {
                        <span className="text-muted-foreground">{i + 1}</span>}
                     </td>
                     <td className="p-3">
-                      <div>{isMe ? "Tum" : `User ${r.user_id.slice(0, 6)}`}</div>
+                      <div>{isMe ? "You" : `User ${r.user_id.slice(0, 6)}`}</div>
                       {r.college_name && <div className="text-xs text-muted-foreground">{r.college_name}</div>}
                     </td>
                     {tab === "study" ? (
@@ -177,7 +177,7 @@ function RankingsPage() {
         )}
       </div>
 
-      <p className="text-xs text-muted-foreground text-center">Rankings opt-in based hain. Apna data hide karne ke liye Settings mein toggle band karo.</p>
+      <p className="text-xs text-muted-foreground text-center">Rankings are opt-in. Turn the toggle off in Settings to hide your data.</p>
     </div>
   );
 }

@@ -130,7 +130,7 @@ function CalendarPage() {
           <div className="card-flat p-4">
             <div className="section-label mb-2">{new Date(selected).toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "short" })}</div>
             {selectedItems.length === 0 ? (
-              <div className="text-xs text-muted-foreground">Is din kuch nahi hai. Chill karo ya add karo.</div>
+              <div className="text-xs text-muted-foreground">Nothing on this day. Rest up or add something.</div>
             ) : (
               <div className="space-y-2">
                 {selectedItems.map((it: any, i: number) => (

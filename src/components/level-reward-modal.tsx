@@ -15,15 +15,15 @@ export function LevelRewardModal({ unlock, onClose }: { unlock: { level: number;
         {unlock && (
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Level {unlock.level} reach kar liya! 🎉 Mehnat rang laayi.
+              You hit Level {unlock.level}. Mehnat paid off.
             </p>
             <div className="rounded-lg border-2 border-warning/40 bg-warning/5 p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Gift className="h-4 w-4 text-warning" />
-                <span className="font-semibold text-sm">Reward Mila!</span>
+                <span className="font-semibold text-sm">Reward unlocked</span>
               </div>
               <p className="text-sm">
-                Level {unlock.level} reach karne pe <b>{unlock.days} din</b> ke liye Elite features unlock ho gaye hain.
+                Hitting Level {unlock.level} unlocks Elite features for <b>{unlock.days} days</b>.
               </p>
               <div className="mt-3 space-y-1.5 text-xs">
                 <div className="flex items-center gap-2"><Zap className="h-3.5 w-3.5 text-primary" /> AI Daily Planner & Overload Detector</div>
@@ -32,9 +32,9 @@ export function LevelRewardModal({ unlock, onClose }: { unlock: { level: number;
               </div>
             </div>
             <div className="flex justify-end gap-2">
-              <button onClick={onClose} className="h-9 px-3 rounded-md border border-border text-sm">Baad mein</button>
+              <button onClick={onClose} className="h-9 px-3 rounded-md border border-border text-sm">Later</button>
               <Link to="/pricing" onClick={onClose} className="h-9 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium inline-flex items-center">
-                Explore karo →
+                Explore →
               </Link>
             </div>
           </div>

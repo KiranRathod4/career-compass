@@ -108,8 +108,8 @@ export function MathSprint({ onBack }: { onBack: () => void }) {
           <Stat label="Best Streak" value={bestStreak} color="text-amber-400" />
         </div>
         <div className="flex gap-2 mt-8">
-          <button onClick={start} className="h-11 px-6 rounded-xl bg-[#f59e0b] text-black font-bold text-sm inline-flex items-center gap-2"><RotateCcw className="h-4 w-4" />Dobara khelo</button>
-          <button onClick={onBack} className="h-11 px-6 rounded-xl border border-zinc-700 text-sm font-medium">Arena pe wapas</button>
+          <button onClick={start} className="h-11 px-6 rounded-xl bg-[#f59e0b] text-black font-bold text-sm inline-flex items-center gap-2"><RotateCcw className="h-4 w-4" />Play again</button>
+          <button onClick={onBack} className="h-11 px-6 rounded-xl border border-zinc-700 text-sm font-medium">Back to Arena</button>
         </div>
       </div>
     );

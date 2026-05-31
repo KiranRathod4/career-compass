@@ -65,8 +65,8 @@ export function ArenaHome({ onPick }: { onPick: (g: GameKey) => void }) {
       <div className="flex items-center gap-3 overflow-x-auto pb-2">
         <AvatarPill label="YOU" initial={initial} ring online />
         {[1, 2, 3, 4].map((i) => <AvatarPill key={i} label={`pod${i}`} initial={`P${i}`} online={i < 3} dim />)}
-        <button onClick={() => { navigator.clipboard.writeText(window.location.origin); toast.success("Link copied — dost ko bhejo!"); }} className="shrink-0 h-12 w-12 rounded-full border border-dashed border-[#7c3aed]/60 flex items-center justify-center text-[#7c3aed] hover:bg-[#7c3aed]/10"><UserPlus className="h-4 w-4" /></button>
-        <span className="text-xs text-zinc-500 shrink-0">Dost bulao →</span>
+        <button onClick={() => { navigator.clipboard.writeText(window.location.origin); toast.success("Link copied — share with a friend"); }} className="shrink-0 h-12 w-12 rounded-full border border-dashed border-[#7c3aed]/60 flex items-center justify-center text-[#7c3aed] hover:bg-[#7c3aed]/10"><UserPlus className="h-4 w-4" /></button>
+        <span className="text-xs text-zinc-500 shrink-0">Invite a friend →</span>
       </div>
 
       {/* Daily challenge bar */}
@@ -93,9 +93,9 @@ export function ArenaHome({ onPick }: { onPick: (g: GameKey) => void }) {
       {/* Game cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <GameCard title="DAILY PUZZLES" subtitle="3 questions per day" accent="#7c3aed" onClick={() => onPick("puzzles")} icon={<IconDailyPuzzles />} />
-        <GameCard title="MATH SPRINT" subtitle="60s, kitne kar sakte ho?" accent="#f59e0b" onClick={() => onPick("math")} icon={<IconMathSprint />} />
+        <GameCard title="MATH SPRINT" subtitle="60s, how many can you solve?" accent="#f59e0b" onClick={() => onPick("math")} icon={<IconMathSprint />} />
         <GameCard title="WORD UNSCRAMBLE" subtitle="Tech vocab" accent="#0d9488" onClick={() => onPick("unscramble")} icon={<IconUnscramble />} />
-        <GameCard title="MEMORY" subtitle="Sequence yaad rakho" accent="#db2777" onClick={() => onPick("memory")} icon={<IconMemory />} />
+        <GameCard title="MEMORY" subtitle="Remember the sequence" accent="#db2777" onClick={() => onPick("memory")} icon={<IconMemory />} />
       </div>
 
       <GameCard
@@ -136,7 +136,7 @@ export function ArenaHome({ onPick }: { onPick: (g: GameKey) => void }) {
       {/* Leaderboard */}
       <div className="arena-card p-5">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-[11px] font-bold uppercase tracking-widest text-zinc-400 flex items-center gap-1.5"><Trophy className="h-3.5 w-3.5 text-[#f59e0b]" /> Is hafte ka leaderboard</h3>
+          <h3 className="text-[11px] font-bold uppercase tracking-widest text-zinc-400 flex items-center gap-1.5"><Trophy className="h-3.5 w-3.5 text-[#f59e0b]" /> This week's leaderboard</h3>
         </div>
         <div className="space-y-1.5">
           {(leaderboard ?? []).map((row: any, i: number) => {
@@ -149,7 +149,7 @@ export function ArenaHome({ onPick }: { onPick: (g: GameKey) => void }) {
                 <div className="h-7 w-7 rounded-full bg-[#7c3aed]/30 flex items-center justify-center text-[11px] font-semibold">{(p?.full_name?.[0] || p?.username?.[0] || "?").toUpperCase()}</div>
                 <div className="flex-1 text-sm">
                   {p?.full_name || p?.username || "Player"}
-                  {isYou && <span className="ml-2 text-[10px] px-1.5 py-0.5 rounded bg-[#7c3aed]/20 text-[#a78bfa]">Tum</span>}
+                  {isYou && <span className="ml-2 text-[10px] px-1.5 py-0.5 rounded bg-[#7c3aed]/20 text-[#a78bfa]">You</span>}
                 </div>
                 <div className="arena-mono text-sm font-bold text-[#f59e0b]">{row.total_arena_xp}</div>
                 <span className="text-[10px] text-zinc-500">XP</span>
@@ -157,7 +157,7 @@ export function ArenaHome({ onPick }: { onPick: (g: GameKey) => void }) {
             );
           })}
           {(!leaderboard || leaderboard.length === 0) && (
-            <p className="text-sm text-zinc-500 text-center py-6">Abhi koi rank nahi. Game khelo, leaderboard pe aao.</p>
+            <p className="text-sm text-zinc-500 text-center py-6">No ranks yet. Play a game to claim a spot.</p>
           )}
         </div>
       </div>

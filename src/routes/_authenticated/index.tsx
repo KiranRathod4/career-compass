@@ -265,13 +265,13 @@ function UpcomingInterviews({ userId }: { userId: string }) {
     queryKey: ["upcoming-interviews", userId],
     queryFn: async () => (await supabase.from("jobs").select("id,company,role,deadline,status").eq("user_id", userId).gte("deadline", today).lte("deadline", in14).in("status", ["applied", "interview", "oa"]).order("deadline")).data ?? [],
   });
-  if (data.length === 0) return <EmptyHint icon={Briefcase} text="Koi interview schedule nahi. Job tracker mein date add karo." actionTo="/jobs" actionLabel="Open Job Tracker" />;
+  if (data.length === 0) return <EmptyHint icon={Briefcase} text="No interviews scheduled. Add a date in the Job Tracker." actionTo="/jobs" actionLabel="Open Job Tracker" />;
   return (
     <div className="space-y-2">
       {data.map((j: any) => {
         const days = differenceInDays(new Date(j.deadline), new Date());
         const tone: any = days <= 2 ? "destructive" : days <= 5 ? "warning" : "neutral";
-        const lbl = days === 0 ? "Aaj hai!" : days === 1 ? "Kal hai!" : `${days}d`;
+        const lbl = days === 0 ? "Today" : days === 1 ? "Tomorrow" : `${days}d`;
         return (
           <div key={j.id} className="flex items-center gap-3 px-3 py-2 rounded-md border border-border text-sm">
             <span className="flex-1 truncate"><b>{j.company}</b> · <span className="text-muted-foreground">{j.role}</span></span>
@@ -290,7 +290,7 @@ function UpcomingEvents({ userId }: { userId: string }) {
     queryKey: ["upcoming-events", userId],
     queryFn: async () => (await (supabase as any).from("placement_events").select("*").eq("user_id", userId).gte("event_date", today).order("event_date").limit(5)).data ?? [],
   });
-  if (data.length === 0) return <EmptyHint icon={Clock} text="Koi event nahi. Calendar pe add karo." actionTo="/calendar" actionLabel="Open Calendar" />;
+  if (data.length === 0) return <EmptyHint icon={Clock} text="No events scheduled. Add one to your Calendar." actionTo="/calendar" actionLabel="Open Calendar" />;
   return (
     <div className="space-y-2">
       {data.map((e: any) => {
@@ -299,7 +299,7 @@ function UpcomingEvents({ userId }: { userId: string }) {
           <div key={e.id} className="flex items-center gap-3 px-3 py-2 rounded-md border border-border text-sm">
             <span className="flex-1 truncate"><b>{e.event_name}</b>{e.company && <span className="text-muted-foreground"> · {e.company}</span>}</span>
             <Pill tone="info">{e.event_type}</Pill>
-            <span className="text-xs text-muted-foreground">{days === 0 ? "Aaj" : `${days}d`}</span>
+            <span className="text-xs text-muted-foreground">{days === 0 ? "Today" : `${days}d`}</span>
             {e.registration_url && <a href={e.registration_url} target="_blank" rel="noreferrer" className="text-xs text-primary hover:underline">Register</a>}
           </div>
         );
@@ -323,7 +323,7 @@ function ActiveChallenges({ userId }: { userId: string }) {
       });
     },
   });
-  if (data.length === 0) return <EmptyHint icon={CheckCircle2} text="Is hafte koi challenge nahi. Wapas check karo." />;
+  if (data.length === 0) return <EmptyHint icon={CheckCircle2} text="No challenges this week. Check back soon." />;
   return (
     <div className="space-y-3">
       {data.map((c: any) => {

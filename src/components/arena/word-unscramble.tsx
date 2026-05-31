@@ -113,15 +113,15 @@ export function WordUnscramble({ onBack }: { onBack: () => void }) {
 
       {state === "correct" && (
         <div className="text-center arena-anim-slide-in">
-          <p className="text-emerald-400 font-semibold mb-3">सही! {item.word} ✓</p>
-          <button onClick={next} className="h-11 px-6 rounded-xl bg-[#7c3aed] text-white font-semibold">Agla word →</button>
+          <p className="text-emerald-400 font-semibold mb-3">Correct! {item.word} ✓</p>
+          <button onClick={next} className="h-11 px-6 rounded-xl bg-[#7c3aed] text-white font-semibold">Next word →</button>
         </div>
       )}
       {state === "wrong" && (
         <div className="text-center arena-anim-slide-in">
-          <p className="text-rose-400 font-semibold mb-3">Galat! Sahi word tha: {item.word}</p>
+          <p className="text-rose-400 font-semibold mb-3">Wrong. The word was: {item.word}</p>
           <button onClick={reset} className="h-11 px-6 rounded-xl border border-zinc-700 text-sm font-medium mr-2">Reset</button>
-          <button onClick={next} className="h-11 px-6 rounded-xl bg-[#7c3aed] text-white font-semibold">Agla word →</button>
+          <button onClick={next} className="h-11 px-6 rounded-xl bg-[#7c3aed] text-white font-semibold">Next word →</button>
         </div>
       )}
     </div>

@@ -37,7 +37,7 @@ export function ArenaLocked({ windows }: { windows: Array<{ day: string; start: 
         {h}:{m}:{s}
       </div>
       <p className="mt-2 text-xs text-zinc-500">Opens in</p>
-      <p className="mt-8 text-sm text-zinc-300 max-w-sm">Padhai karo, phir khelo. You deserve the break. 🎮</p>
+      <p className="mt-8 text-sm text-zinc-300 max-w-sm">Study first, then play. You'll earn the break.</p>
     </div>
   );
 }

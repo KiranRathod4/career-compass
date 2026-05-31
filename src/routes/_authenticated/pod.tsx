@@ -86,7 +86,7 @@ function PodContent() {
                 <Badge variant="secondary" className="gap-1"><Crown className="h-3 w-3" /> Elite</Badge>
               </div>
               <p className="text-sm text-muted-foreground mt-0.5">
-                5-student squad. Saath grow karo, weekly goals hit karo, ek dusre ko push karo.
+                A 5-student squad. Grow together, hit weekly goals, push each other.
               </p>
             </div>
           </div>
@@ -133,7 +133,7 @@ function PodContent() {
             <div className="section-label mb-4">Pod activity</div>
             <div className="text-center py-8 text-sm text-muted-foreground">
               <Sparkles className="h-6 w-6 mx-auto mb-2 opacity-50" />
-              Jab tumhare pod members join honge, unke wins yahan dikhenge —
+              When your pod members join, their wins show up here —
               DSA solves, applications, mock interviews, streaks.
             </div>
           </div>
@@ -159,8 +159,8 @@ function PodContent() {
               <div className="section-label">Pod chat</div>
             </div>
             <p className="text-xs text-muted-foreground">
-              Realtime chat aur daily check-ins bahut jald aa rahe hain.
-              Tumhara slot reserved hai.
+              Realtime chat and daily check-ins are arriving soon.
+              Your slot is reserved.
             </p>
             <Button size="sm" variant="outline" disabled className="w-full mt-3">
               Coming soon
@@ -174,9 +174,9 @@ function PodContent() {
               <div className="section-label">Daily standup</div>
             </div>
             <ul className="text-xs text-muted-foreground space-y-1.5 mt-2">
-              <li className="flex gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" /> Kal kya kiya?</li>
-              <li className="flex gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" /> Aaj kya karoge?</li>
-              <li className="flex gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" /> Koi blocker hai?</li>
+              <li className="flex gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" /> What did you do yesterday?</li>
+              <li className="flex gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" /> What will you do today?</li>
+              <li className="flex gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" /> Any blockers?</li>
             </ul>
           </div>
         </div>

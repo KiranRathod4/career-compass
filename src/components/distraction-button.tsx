@@ -44,7 +44,7 @@ export function DistractionButton() {
       user_id: user!.id, action_type: "distraction", xp_amount: -10, metadata: { reasons: all, minutes: duration },
     });
     awardXP; // no-op; just for type ref
-    toast.success("Hota hai. Ab wapas focus karo. 💪 (-10 XP)");
+    toast.success("Logged. Back to focus. (-10 XP)");
     setOpen(false);
     setReasons([]); setOther(""); setDuration(15);
   };
@@ -57,13 +57,13 @@ export function DistractionButton() {
         title="Log a distraction"
       >
         <AlertTriangle className="h-3.5 w-3.5" />
-        Distract ho gaya?
+        Got distracted?
       </button>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Kya hua? 😔</DialogTitle>
+            <DialogTitle>What happened?</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
@@ -79,11 +79,11 @@ export function DistractionButton() {
                   );
                 })}
               </div>
-              <input value={other} onChange={(e) => setOther(e.target.value)} placeholder="Other (likh sakte ho)"
+              <input value={other} onChange={(e) => setOther(e.target.value)} placeholder="Other reason"
                 className="mt-2 w-full h-8 px-2 rounded border border-border bg-background text-xs" />
             </div>
             <div>
-              <div className="text-[11px] text-muted-foreground mb-2">Kitna time gaya?</div>
+              <div className="text-[11px] text-muted-foreground mb-2">How much time?</div>
               <div className="grid grid-cols-4 gap-1.5">
                 {DURATIONS.map((d) => (
                   <button key={d.v} onClick={() => setDuration(d.v)}
