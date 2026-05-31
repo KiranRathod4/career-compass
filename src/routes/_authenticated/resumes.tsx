@@ -49,7 +49,7 @@ function ResumesPage() {
 
   const save = useMutation({
     mutationFn: async () => {
-      if (!pending) throw new Error("File select karo");
+      if (!pending) throw new Error("Select a file");
       if (!draft.name.trim()) throw new Error("Name required");
       const ext = pending.name.split(".").pop();
       const path = `${user!.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;

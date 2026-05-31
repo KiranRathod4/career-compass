@@ -36,7 +36,7 @@ function ChallengesPage() {
     <div className="max-w-5xl mx-auto space-y-6">
       <div>
         <h1 className="text-xl font-semibold">Weekly Challenges</h1>
-        <p className="text-sm text-muted-foreground">Har hafte naye targets. Complete karo, XP earn karo.</p>
+        <p className="text-sm text-muted-foreground">New targets every week. Complete them and earn XP.</p>
       </div>
 
       <div className="grid grid-cols-3 gap-4">
@@ -48,7 +48,7 @@ function ChallengesPage() {
       {challenges.length === 0 ? (
         <div className="card-flat p-10 text-center">
           <Target className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
-          <p className="text-sm text-muted-foreground">Is hafte ke liye koi challenge nahi hai. Naye challenges jaldi aayenge!</p>
+          <p className="text-sm text-muted-foreground">No challenges this week. New ones drop soon.</p>
         </div>
       ) : (
         <div className="grid md:grid-cols-2 gap-4">

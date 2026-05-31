@@ -61,8 +61,8 @@ export function useAwardXP() {
     },
     onSuccess: (xp) => {
       qc.invalidateQueries({ queryKey: ["xp-total"] });
-      toast.success(`+${xp} XP mila! 💪`);
+      toast.success(`+${xp} XP earned`);
     },
-    onError: (e: any) => toast.error(e.message ?? "XP add nahi hua"),
+    onError: (e: any) => toast.error(e.message ?? "Failed to add XP"),
   });
 }

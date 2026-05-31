@@ -9,7 +9,7 @@ export function AptitudeDuel({ onBack }: { onBack: () => void }) {
 
   const startMatch = () => {
     setSearching(true);
-    setTimeout(() => { setSearching(false); toast.info("Multiplayer coming soon — abhi practice mode try karo!"); }, 2500);
+    setTimeout(() => { setSearching(false); toast.info("Multiplayer coming soon — try practice mode for now."); }, 2500);
   };
 
   const inviteCode = "DUEL-" + Math.random().toString(36).slice(2, 7).toUpperCase();

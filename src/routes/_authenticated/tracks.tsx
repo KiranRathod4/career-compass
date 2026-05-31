@@ -38,7 +38,7 @@ function TracksPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-semibold flex items-center gap-2"><BookOpen className="h-5 w-5 text-primary" /> Custom Tracks</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">Apna khud ka roadmap banao — AI se generate kar lo ya manually add karo.</p>
+          <p className="text-xs text-muted-foreground mt-0.5">Build your own roadmap — generate with AI or add topics manually.</p>
         </div>
         <button onClick={() => setShowNew(true)} className="h-9 px-3 rounded-md bg-primary text-primary-foreground text-sm flex items-center gap-1.5">
           <Plus className="h-4 w-4" /> New track
@@ -48,8 +48,8 @@ function TracksPage() {
       {tracks.length === 0 ? (
         <div className="card-flat p-10 text-center">
           <BookOpen className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
-          <div className="text-sm font-medium">Koi custom track nahi hai abhi</div>
-          <p className="text-xs text-muted-foreground mt-1">System Design, ML, Mobile Dev — koi bhi topic ka roadmap bana lo.</p>
+          <div className="text-sm font-medium">No custom tracks yet</div>
+          <p className="text-xs text-muted-foreground mt-1">System Design, ML, Mobile Dev — build a roadmap for any topic.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -165,7 +165,7 @@ function NewTrackModal({ onClose, onCreated }: { onClose: () => void; onCreated:
           <label className="flex items-center gap-2 text-xs cursor-pointer p-2 rounded-md border border-border hover:bg-accent">
             <input type="checkbox" checked={genAI} onChange={(e) => setGenAI(e.target.checked)} className="accent-primary" />
             <Sparkles className="h-3.5 w-3.5 text-primary" />
-            <span>AI se full roadmap generate karo (sections + topics)</span>
+            <span>Generate a full roadmap with AI (sections + topics)</span>
           </label>
         </div>
         <div className="flex justify-end gap-2 mt-4">
@@ -217,7 +217,7 @@ function TrackDetail({ trackId, onBack }: { trackId: string; onBack: () => void 
   });
   const delTrack = useMutation({
     mutationFn: async () => { const { error } = await supabase.from("custom_tracks").delete().eq("id", trackId); if (error) throw error; },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["custom_tracks"] }); toast.success("Track delete ho gaya"); onBack(); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["custom_tracks"] }); toast.success("Track deleted"); onBack(); },
   });
   const add = useMutation({
     mutationFn: async () => {
@@ -252,7 +252,7 @@ function TrackDetail({ trackId, onBack }: { trackId: string; onBack: () => void 
             {track.target_type && <div className="text-xs text-muted-foreground mt-0.5">Target: {track.target_type}</div>}
             {track.why_this_track && <div className="text-xs text-muted-foreground mt-2 italic">"{track.why_this_track}"</div>}
           </div>
-          <button onClick={() => { if (confirm("Delete track aur saare topics?")) delTrack.mutate(); }}
+          <button onClick={() => { if (confirm("Delete this track and all its topics?")) delTrack.mutate(); }}
             className="h-8 w-8 rounded-md hover:bg-destructive/10 hover:text-destructive flex items-center justify-center text-muted-foreground">
             <Trash2 className="h-4 w-4" />
           </button>
@@ -275,7 +275,7 @@ function TrackDetail({ trackId, onBack }: { trackId: string; onBack: () => void 
       </div>
 
       {sectionNames.length === 0 ? (
-        <div className="card-flat p-8 text-center text-sm text-muted-foreground">Koi topic nahi. Upar add karo.</div>
+        <div className="card-flat p-8 text-center text-sm text-muted-foreground">No topics yet. Add one above.</div>
       ) : (
         sectionNames.map((sec) => (
           <div key={sec} className="card-flat p-4">

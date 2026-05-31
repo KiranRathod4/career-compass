@@ -23,7 +23,7 @@ export function PlanGate({
         <Sparkles className="h-4 w-4 text-primary" />
         {feature} is a {min === "pro" ? "Pro" : "Elite"} feature
       </h3>
-      <p className="mt-1 text-sm text-muted-foreground">Upgrade karo, full power unlock karo.</p>
+      <p className="mt-1 text-sm text-muted-foreground">Upgrade to unlock the full feature set.</p>
       <Link to="/pricing" className="inline-block mt-4">
         <Button>See plans</Button>
       </Link>

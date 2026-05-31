@@ -17,19 +17,19 @@ declare global {
 
 const PLANS = [
   {
-    id: "free" as const, name: "Free", price: 0, tagline: "Shuruaat ke liye",
+    id: "free" as const, name: "Free", price: 0, tagline: "For getting started",
     icon: Sparkles,
     features: ["DSA tracker (50 problems)", "Job tracker (10 apps)", "Daily planner", "Basic analytics"],
   },
   {
     id: "pro" as const, name: "Pro", price: 299, tagline: "Serious prep mode",
     icon: Zap, highlight: true,
-    features: ["Sab kuch unlimited", "AI Daily Planner", "Resume Review (AI)", "Probability Score", "All challenges + badges"],
+    features: ["Everything unlimited", "AI Daily Planner", "Resume Review (AI)", "Probability Score", "All challenges + badges"],
   },
   {
-    id: "elite" as const, name: "Elite", price: 599, tagline: "Placement guaranteed mindset",
+    id: "elite" as const, name: "Elite", price: 599, tagline: "Placement-guaranteed mindset",
     icon: Crown,
-    features: ["Pro ka sab kuch", "My Pod (5-student group)", "1-on-1 mock interviews", "Priority support", "Mentor matching"],
+    features: ["Everything in Pro", "My Pod (5-student group)", "1-on-1 mock interviews", "Priority support", "Mentor matching"],
   },
 ];
 

@@ -86,9 +86,9 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
       {phase !== "idle" && (
         <>
           <div className="text-center mb-4 text-sm font-medium text-zinc-300 h-5">
-            {phase === "show" && "Dekho!"}
-            {phase === "input" && "Yaad karo! Ab tumhari baari."}
-            {phase === "gameover" && `Game over! Level ${level} tak pahuncha.`}
+            {phase === "show" && "Watch."}
+            {phase === "input" && "Your turn — repeat the sequence."}
+            {phase === "gameover" && `Game over. You reached Level ${level}.`}
           </div>
           <div className="grid grid-cols-3 gap-2">
             {Array.from({ length: 9 }).map((_, i) => {
@@ -116,7 +116,7 @@ export function MemoryGame({ onBack }: { onBack: () => void }) {
       {phase === "gameover" && (
         <div className="text-center mt-8">
           <div className="text-sm text-zinc-400 mb-1">+{level * 5} XP earned</div>
-          <button onClick={start} className="mt-4 h-11 px-6 rounded-xl bg-[#7c3aed] text-white font-semibold">Phir try karo</button>
+          <button onClick={start} className="mt-4 h-11 px-6 rounded-xl bg-[#7c3aed] text-white font-semibold">Try again</button>
         </div>
       )}
     </div>

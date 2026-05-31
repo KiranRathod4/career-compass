@@ -141,14 +141,14 @@ function OnboardingPage() {
     },
     {
       icon: Calendar,
-      title: "Timeline kya hai?",
-      subtitle: "Kab tak job chahiye, planning isi par hogi",
+      title: "What's your timeline?",
+      subtitle: "Your plan will be built around your target date",
       content: (
         <div className="space-y-4">
           <Field label="Graduation year">
             <input type="number" min={2024} max={2030} value={form.graduation_year} onChange={(e) => update("graduation_year", Number(e.target.value))} className={inputCls} />
           </Field>
-          <Field label="Placement season kab shuru ho rahi hai?">
+          <Field label="When does your placement season start?">
             <input type="date" value={form.placement_start_date} onChange={(e) => update("placement_start_date", e.target.value)} className={inputCls} />
           </Field>
         </div>
@@ -157,8 +157,8 @@ function OnboardingPage() {
     },
     {
       icon: Target,
-      title: "Kis role ke liye taiyaar ho rahe ho?",
-      subtitle: "Ek ya zyada chuno — skills isi hisab se aayengi",
+      title: "Which roles are you targeting?",
+      subtitle: "Pick one or more — your skills will be tailored to these",
       content: (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {TARGET_DOMAINS.map((d) => {
@@ -183,8 +183,8 @@ function OnboardingPage() {
     },
     {
       icon: Zap,
-      title: "Daily targets set karo",
-      subtitle: "Chhote aur realistic rakho — streak banegi tabhi",
+      title: "Set your daily targets",
+      subtitle: "Keep them small and realistic — that's how streaks survive",
       content: (
         <div className="space-y-5">
           <Slider label="DSA problems / day" value={form.daily_dsa_target} min={1} max={10} onChange={(v) => update("daily_dsa_target", v)} />
@@ -196,8 +196,8 @@ function OnboardingPage() {
     },
     {
       icon: BookOpen,
-      title: "Starter content load karein?",
-      subtitle: "Time bachega — abhi se grind shuru",
+      title: "Load starter content?",
+      subtitle: "Saves time — start the grind immediately",
       content: (
         <div className="space-y-3">
           <Toggle
