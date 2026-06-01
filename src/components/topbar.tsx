@@ -22,6 +22,7 @@ const titles: Record<string, string> = {
   "/review": "Weekly Review", "/sprints": "Sprints", "/achievements": "Achievements",
   "/challenges": "Challenges", "/pod": "My Pod", "/settings": "Settings & Plan",
   "/pricing": "Pricing", "/calendar": "Calendar", "/arena": "Arena", "/rankings": "Taiyaar Rankings",
+  "/coach": "AI Career Coach",
 };
 
 export function Topbar() {
