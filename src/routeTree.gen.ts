@@ -43,6 +43,7 @@ import { Route as AuthenticatedAptitudeRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
 import { Route as ApiPublicRazorpayWebhookRouteImport } from './routes/api/public/razorpay-webhook'
+import { Route as ApiCoachStreamRouteImport } from './routes/api/coach.stream'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -215,6 +216,11 @@ const ApiPublicRazorpayWebhookRoute =
     path: '/api/public/razorpay-webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiCoachStreamRoute = ApiCoachStreamRouteImport.update({
+  id: '/api/coach/stream',
+  path: '/api/coach/stream',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -249,6 +255,7 @@ export interface FileRoutesByFullPath {
   '/timer': typeof AuthenticatedTimerRoute
   '/tracks': typeof AuthenticatedTracksRoute
   '/u/$username': typeof UUsernameRoute
+  '/api/coach/stream': typeof ApiCoachStreamRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -284,6 +291,7 @@ export interface FileRoutesByTo {
   '/tracks': typeof AuthenticatedTracksRoute
   '/u/$username': typeof UUsernameRoute
   '/': typeof AuthenticatedIndexRoute
+  '/api/coach/stream': typeof ApiCoachStreamRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
 }
 export interface FileRoutesById {
@@ -321,6 +329,7 @@ export interface FileRoutesById {
   '/_authenticated/tracks': typeof AuthenticatedTracksRoute
   '/u/$username': typeof UUsernameRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/api/coach/stream': typeof ApiCoachStreamRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
 }
 export interface FileRouteTypes {
@@ -358,6 +367,7 @@ export interface FileRouteTypes {
     | '/timer'
     | '/tracks'
     | '/u/$username'
+    | '/api/coach/stream'
     | '/api/public/razorpay-webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -393,6 +403,7 @@ export interface FileRouteTypes {
     | '/tracks'
     | '/u/$username'
     | '/'
+    | '/api/coach/stream'
     | '/api/public/razorpay-webhook'
   id:
     | '__root__'
@@ -429,6 +440,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tracks'
     | '/u/$username'
     | '/_authenticated/'
+    | '/api/coach/stream'
     | '/api/public/razorpay-webhook'
   fileRoutesById: FileRoutesById
 }
@@ -436,6 +448,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
   UUsernameRoute: typeof UUsernameRoute
+  ApiCoachStreamRoute: typeof ApiCoachStreamRoute
   ApiPublicRazorpayWebhookRoute: typeof ApiPublicRazorpayWebhookRoute
 }
 
@@ -679,6 +692,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicRazorpayWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/coach/stream': {
+      id: '/api/coach/stream'
+      path: '/api/coach/stream'
+      fullPath: '/api/coach/stream'
+      preLoaderRoute: typeof ApiCoachStreamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -756,8 +776,19 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
   UUsernameRoute: UUsernameRoute,
+  ApiCoachStreamRoute: ApiCoachStreamRoute,
   ApiPublicRazorpayWebhookRoute: ApiPublicRazorpayWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
