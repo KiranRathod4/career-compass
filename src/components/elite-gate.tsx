@@ -45,7 +45,7 @@ export function EliteGate({
 
   if (variant === "banner") {
     return (
-      <div className="flex items-center justify-between gap-4 rounded-lg border border-border bg-subtle px-4 py-3">
+      <div className="flex items-center justify-between gap-4 rounded-lg border border-border bg-muted px-4 py-3">
         <div className="flex items-center gap-3 min-w-0">
           <div className="h-8 w-8 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
             <Icon className="h-4 w-4 text-primary" />

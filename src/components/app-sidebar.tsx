@@ -4,7 +4,7 @@ import {
   Home, Timer, Calendar, Code2, Calculator, Database, Server, Beaker,
   BookOpen, Radar as RadarIcon, BarChart3, Briefcase, Building2, Users, FolderOpen,
   GitBranch, Mic, TrendingUp, RotateCcw, Settings, Target, Trophy, Users2,
-  PanelLeftClose, PanelLeftOpen, ArrowUpRight, Sparkles, Gamepad2, Medal, CalendarDays,
+  PanelLeftClose, PanelLeftOpen, ArrowUpRight, Sparkles, Gamepad2, Medal, CalendarDays, Bot,
 } from "lucide-react";
 import { useXP } from "@/hooks/use-gamification";
 
@@ -33,6 +33,7 @@ const groups: Group[] = [
     { label: "Network", to: "/network", icon: Users },
   ]},
   { label: "Grow", items: [
+    { label: "AI Coach", to: "/coach", icon: Bot },
     { label: "Resources", to: "/resources", icon: BookOpen },
     { label: "Projects", to: "/projects", icon: GitBranch },
     { label: "Interview Prep", to: "/interview", icon: Mic },

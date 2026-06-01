@@ -36,6 +36,7 @@ import { Route as AuthenticatedInterviewRouteImport } from './routes/_authentica
 import { Route as AuthenticatedDsaRouteImport } from './routes/_authenticated/dsa'
 import { Route as AuthenticatedDevopsRouteImport } from './routes/_authenticated/devops'
 import { Route as AuthenticatedCompaniesRouteImport } from './routes/_authenticated/companies'
+import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
 import { Route as AuthenticatedChallengesRouteImport } from './routes/_authenticated/challenges'
 import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
 import { Route as AuthenticatedArenaRouteImport } from './routes/_authenticated/arena'
@@ -43,6 +44,7 @@ import { Route as AuthenticatedAptitudeRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
 import { Route as ApiPublicRazorpayWebhookRouteImport } from './routes/api/public/razorpay-webhook'
+import { Route as ApiCoachStreamRouteImport } from './routes/api/coach.stream'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -178,6 +180,11 @@ const AuthenticatedCompaniesRoute = AuthenticatedCompaniesRouteImport.update({
   path: '/companies',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedCoachRoute = AuthenticatedCoachRouteImport.update({
+  id: '/coach',
+  path: '/coach',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedChallengesRoute = AuthenticatedChallengesRouteImport.update({
   id: '/challenges',
   path: '/challenges',
@@ -215,6 +222,11 @@ const ApiPublicRazorpayWebhookRoute =
     path: '/api/public/razorpay-webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiCoachStreamRoute = ApiCoachStreamRouteImport.update({
+  id: '/api/coach/stream',
+  path: '/api/coach/stream',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -225,6 +237,7 @@ export interface FileRoutesByFullPath {
   '/arena': typeof AuthenticatedArenaRoute
   '/calendar': typeof AuthenticatedCalendarRoute
   '/challenges': typeof AuthenticatedChallengesRoute
+  '/coach': typeof AuthenticatedCoachRoute
   '/companies': typeof AuthenticatedCompaniesRoute
   '/devops': typeof AuthenticatedDevopsRoute
   '/dsa': typeof AuthenticatedDsaRoute
@@ -249,6 +262,7 @@ export interface FileRoutesByFullPath {
   '/timer': typeof AuthenticatedTimerRoute
   '/tracks': typeof AuthenticatedTracksRoute
   '/u/$username': typeof UUsernameRoute
+  '/api/coach/stream': typeof ApiCoachStreamRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -259,6 +273,7 @@ export interface FileRoutesByTo {
   '/arena': typeof AuthenticatedArenaRoute
   '/calendar': typeof AuthenticatedCalendarRoute
   '/challenges': typeof AuthenticatedChallengesRoute
+  '/coach': typeof AuthenticatedCoachRoute
   '/companies': typeof AuthenticatedCompaniesRoute
   '/devops': typeof AuthenticatedDevopsRoute
   '/dsa': typeof AuthenticatedDsaRoute
@@ -284,6 +299,7 @@ export interface FileRoutesByTo {
   '/tracks': typeof AuthenticatedTracksRoute
   '/u/$username': typeof UUsernameRoute
   '/': typeof AuthenticatedIndexRoute
+  '/api/coach/stream': typeof ApiCoachStreamRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
 }
 export interface FileRoutesById {
@@ -296,6 +312,7 @@ export interface FileRoutesById {
   '/_authenticated/arena': typeof AuthenticatedArenaRoute
   '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
   '/_authenticated/challenges': typeof AuthenticatedChallengesRoute
+  '/_authenticated/coach': typeof AuthenticatedCoachRoute
   '/_authenticated/companies': typeof AuthenticatedCompaniesRoute
   '/_authenticated/devops': typeof AuthenticatedDevopsRoute
   '/_authenticated/dsa': typeof AuthenticatedDsaRoute
@@ -321,6 +338,7 @@ export interface FileRoutesById {
   '/_authenticated/tracks': typeof AuthenticatedTracksRoute
   '/u/$username': typeof UUsernameRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/api/coach/stream': typeof ApiCoachStreamRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
 }
 export interface FileRouteTypes {
@@ -334,6 +352,7 @@ export interface FileRouteTypes {
     | '/arena'
     | '/calendar'
     | '/challenges'
+    | '/coach'
     | '/companies'
     | '/devops'
     | '/dsa'
@@ -358,6 +377,7 @@ export interface FileRouteTypes {
     | '/timer'
     | '/tracks'
     | '/u/$username'
+    | '/api/coach/stream'
     | '/api/public/razorpay-webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -368,6 +388,7 @@ export interface FileRouteTypes {
     | '/arena'
     | '/calendar'
     | '/challenges'
+    | '/coach'
     | '/companies'
     | '/devops'
     | '/dsa'
@@ -393,6 +414,7 @@ export interface FileRouteTypes {
     | '/tracks'
     | '/u/$username'
     | '/'
+    | '/api/coach/stream'
     | '/api/public/razorpay-webhook'
   id:
     | '__root__'
@@ -404,6 +426,7 @@ export interface FileRouteTypes {
     | '/_authenticated/arena'
     | '/_authenticated/calendar'
     | '/_authenticated/challenges'
+    | '/_authenticated/coach'
     | '/_authenticated/companies'
     | '/_authenticated/devops'
     | '/_authenticated/dsa'
@@ -429,6 +452,7 @@ export interface FileRouteTypes {
     | '/_authenticated/tracks'
     | '/u/$username'
     | '/_authenticated/'
+    | '/api/coach/stream'
     | '/api/public/razorpay-webhook'
   fileRoutesById: FileRoutesById
 }
@@ -436,6 +460,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
   UUsernameRoute: typeof UUsernameRoute
+  ApiCoachStreamRoute: typeof ApiCoachStreamRoute
   ApiPublicRazorpayWebhookRoute: typeof ApiPublicRazorpayWebhookRoute
 }
 
@@ -630,6 +655,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCompaniesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/coach': {
+      id: '/_authenticated/coach'
+      path: '/coach'
+      fullPath: '/coach'
+      preLoaderRoute: typeof AuthenticatedCoachRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/challenges': {
       id: '/_authenticated/challenges'
       path: '/challenges'
@@ -679,6 +711,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicRazorpayWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/coach/stream': {
+      id: '/api/coach/stream'
+      path: '/api/coach/stream'
+      fullPath: '/api/coach/stream'
+      preLoaderRoute: typeof ApiCoachStreamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -689,6 +728,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedArenaRoute: typeof AuthenticatedArenaRoute
   AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
   AuthenticatedChallengesRoute: typeof AuthenticatedChallengesRoute
+  AuthenticatedCoachRoute: typeof AuthenticatedCoachRoute
   AuthenticatedCompaniesRoute: typeof AuthenticatedCompaniesRoute
   AuthenticatedDevopsRoute: typeof AuthenticatedDevopsRoute
   AuthenticatedDsaRoute: typeof AuthenticatedDsaRoute
@@ -722,6 +762,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedArenaRoute: AuthenticatedArenaRoute,
   AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
   AuthenticatedChallengesRoute: AuthenticatedChallengesRoute,
+  AuthenticatedCoachRoute: AuthenticatedCoachRoute,
   AuthenticatedCompaniesRoute: AuthenticatedCompaniesRoute,
   AuthenticatedDevopsRoute: AuthenticatedDevopsRoute,
   AuthenticatedDsaRoute: AuthenticatedDsaRoute,
@@ -756,6 +797,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
   UUsernameRoute: UUsernameRoute,
+  ApiCoachStreamRoute: ApiCoachStreamRoute,
   ApiPublicRazorpayWebhookRoute: ApiPublicRazorpayWebhookRoute,
 }
 export const routeTree = rootRouteImport
