@@ -25,6 +25,7 @@ import { Route as AuthenticatedResourcesRouteImport } from './routes/_authentica
 import { Route as AuthenticatedRankingsRouteImport } from './routes/_authenticated/rankings'
 import { Route as AuthenticatedQaRouteImport } from './routes/_authenticated/qa'
 import { Route as AuthenticatedProjectsRouteImport } from './routes/_authenticated/projects'
+import { Route as AuthenticatedProbabilityRouteImport } from './routes/_authenticated/probability'
 import { Route as AuthenticatedPricingRouteImport } from './routes/_authenticated/pricing'
 import { Route as AuthenticatedPodRouteImport } from './routes/_authenticated/pod'
 import { Route as AuthenticatedPlannerRouteImport } from './routes/_authenticated/planner'
@@ -125,6 +126,12 @@ const AuthenticatedProjectsRoute = AuthenticatedProjectsRouteImport.update({
   path: '/projects',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedProbabilityRoute =
+  AuthenticatedProbabilityRouteImport.update({
+    id: '/probability',
+    path: '/probability',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedPricingRoute = AuthenticatedPricingRouteImport.update({
   id: '/pricing',
   path: '/pricing',
@@ -249,6 +256,7 @@ export interface FileRoutesByFullPath {
   '/planner': typeof AuthenticatedPlannerRoute
   '/pod': typeof AuthenticatedPodRoute
   '/pricing': typeof AuthenticatedPricingRoute
+  '/probability': typeof AuthenticatedProbabilityRoute
   '/projects': typeof AuthenticatedProjectsRoute
   '/qa': typeof AuthenticatedQaRoute
   '/rankings': typeof AuthenticatedRankingsRoute
@@ -285,6 +293,7 @@ export interface FileRoutesByTo {
   '/planner': typeof AuthenticatedPlannerRoute
   '/pod': typeof AuthenticatedPodRoute
   '/pricing': typeof AuthenticatedPricingRoute
+  '/probability': typeof AuthenticatedProbabilityRoute
   '/projects': typeof AuthenticatedProjectsRoute
   '/qa': typeof AuthenticatedQaRoute
   '/rankings': typeof AuthenticatedRankingsRoute
@@ -324,6 +333,7 @@ export interface FileRoutesById {
   '/_authenticated/planner': typeof AuthenticatedPlannerRoute
   '/_authenticated/pod': typeof AuthenticatedPodRoute
   '/_authenticated/pricing': typeof AuthenticatedPricingRoute
+  '/_authenticated/probability': typeof AuthenticatedProbabilityRoute
   '/_authenticated/projects': typeof AuthenticatedProjectsRoute
   '/_authenticated/qa': typeof AuthenticatedQaRoute
   '/_authenticated/rankings': typeof AuthenticatedRankingsRoute
@@ -364,6 +374,7 @@ export interface FileRouteTypes {
     | '/planner'
     | '/pod'
     | '/pricing'
+    | '/probability'
     | '/projects'
     | '/qa'
     | '/rankings'
@@ -400,6 +411,7 @@ export interface FileRouteTypes {
     | '/planner'
     | '/pod'
     | '/pricing'
+    | '/probability'
     | '/projects'
     | '/qa'
     | '/rankings'
@@ -438,6 +450,7 @@ export interface FileRouteTypes {
     | '/_authenticated/planner'
     | '/_authenticated/pod'
     | '/_authenticated/pricing'
+    | '/_authenticated/probability'
     | '/_authenticated/projects'
     | '/_authenticated/qa'
     | '/_authenticated/rankings'
@@ -576,6 +589,13 @@ declare module '@tanstack/react-router' {
       path: '/projects'
       fullPath: '/projects'
       preLoaderRoute: typeof AuthenticatedProjectsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/probability': {
+      id: '/_authenticated/probability'
+      path: '/probability'
+      fullPath: '/probability'
+      preLoaderRoute: typeof AuthenticatedProbabilityRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/pricing': {
@@ -740,6 +760,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedPlannerRoute: typeof AuthenticatedPlannerRoute
   AuthenticatedPodRoute: typeof AuthenticatedPodRoute
   AuthenticatedPricingRoute: typeof AuthenticatedPricingRoute
+  AuthenticatedProbabilityRoute: typeof AuthenticatedProbabilityRoute
   AuthenticatedProjectsRoute: typeof AuthenticatedProjectsRoute
   AuthenticatedQaRoute: typeof AuthenticatedQaRoute
   AuthenticatedRankingsRoute: typeof AuthenticatedRankingsRoute
@@ -774,6 +795,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedPlannerRoute: AuthenticatedPlannerRoute,
   AuthenticatedPodRoute: AuthenticatedPodRoute,
   AuthenticatedPricingRoute: AuthenticatedPricingRoute,
+  AuthenticatedProbabilityRoute: AuthenticatedProbabilityRoute,
   AuthenticatedProjectsRoute: AuthenticatedProjectsRoute,
   AuthenticatedQaRoute: AuthenticatedQaRoute,
   AuthenticatedRankingsRoute: AuthenticatedRankingsRoute,
