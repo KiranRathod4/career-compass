@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, Trash2, Search, Building2 } from "lucide-react";
+import { Plus, Trash2, Search, Building2, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
+import { CompanyInsiderDrawer } from "@/components/company-insider-drawer";
 
 export const Route = createFileRoute("/_authenticated/companies")({ component: CompaniesPage });
 
@@ -20,6 +21,7 @@ function CompaniesPage() {
   const [fPrio, setFPrio] = useState("");
   const [sort, setSort] = useState<"created_at"|"priority"|"name">("created_at");
   const [showAdd, setShowAdd] = useState(false);
+  const [insider, setInsider] = useState<any | null>(null);
   const [draft, setDraft] = useState({ name: "", role_focus: "", ctc: "", location: "", priority: "medium" as typeof PRIORITIES[number] });
 
   const { data: rows = [] } = useQuery({
@@ -110,7 +112,10 @@ function CompaniesPage() {
                       <Building2 className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                       <span className="text-sm font-medium truncate">{r.name}</span>
                     </div>
-                    <button onClick={() => del.mutate(r.id)} className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive"><Trash2 className="h-3 w-3" /></button>
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100">
+                      <button onClick={() => setInsider(r)} title="Insider intel" className="text-muted-foreground hover:text-primary"><Sparkles className="h-3 w-3" /></button>
+                      <button onClick={() => del.mutate(r.id)} title="Delete" className="text-muted-foreground hover:text-destructive"><Trash2 className="h-3 w-3" /></button>
+                    </div>
                   </div>
                   {r.role_focus && <div className="text-[11px] text-muted-foreground mt-1 truncate">{r.role_focus}</div>}
                   <div className="flex flex-wrap gap-1.5 mt-2 items-center">
@@ -118,9 +123,14 @@ function CompaniesPage() {
                     {r.ctc && <span className="text-[10px] text-muted-foreground">{r.ctc}</span>}
                     {r.location && <span className="text-[10px] text-muted-foreground">· {r.location}</span>}
                   </div>
-                  <select value={r.status} onChange={(e) => update.mutate({ id: r.id, status: e.target.value })} className="mt-2 w-full h-7 px-1 rounded border border-border bg-background text-[11px]">
-                    {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
-                  </select>
+                  <div className="flex gap-1 mt-2">
+                    <select value={r.status} onChange={(e) => update.mutate({ id: r.id, status: e.target.value })} className="flex-1 h-7 px-1 rounded border border-border bg-background text-[11px]">
+                      {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                    <button onClick={() => setInsider(r)} className="h-7 px-2 rounded border border-border bg-background text-[10px] font-medium inline-flex items-center gap-1 hover:bg-primary/5 hover:text-primary hover:border-primary/30">
+                      <Sparkles className="h-3 w-3" /> Insider
+                    </button>
+                  </div>
                 </div>
               ))}
               {g.items.length === 0 && <div className="text-[11px] text-muted-foreground italic py-3 text-center">empty</div>}
@@ -128,6 +138,12 @@ function CompaniesPage() {
           </div>
         ))}
       </div>
+
+      <CompanyInsiderDrawer
+        open={!!insider}
+        onOpenChange={(v) => !v && setInsider(null)}
+        company={insider}
+      />
     </div>
   );
 }
