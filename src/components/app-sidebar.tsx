@@ -34,6 +34,7 @@ const groups: Group[] = [
   ]},
   { label: "Grow", items: [
     { label: "AI Coach", to: "/coach", icon: Bot },
+    { label: "Probability", to: "/probability", icon: TrendingUp },
     { label: "Resources", to: "/resources", icon: BookOpen },
     { label: "Projects", to: "/projects", icon: GitBranch },
     { label: "Interview Prep", to: "/interview", icon: Mic },

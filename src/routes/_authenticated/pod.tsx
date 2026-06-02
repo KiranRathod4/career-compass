@@ -3,11 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { PlanGate } from "@/components/plan-gate";
+import { PodChat } from "@/components/pod-chat";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  Users2, MessageCircle, Trophy, Target, Flame, Calendar,
+  Users2, Trophy, Target, Flame, Calendar,
   Copy, Crown, Sparkles, CheckCircle2, Clock, TrendingUp,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -152,20 +153,8 @@ function PodContent() {
             <GoalRow label="20 focus sessions" done={stats?.focus ?? 0} target={20} />
           </div>
 
-          {/* Chat coming soon */}
-          <div className="card-flat p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <MessageCircle className="h-4 w-4 text-primary" />
-              <div className="section-label">Pod chat</div>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Realtime chat and daily check-ins are arriving soon.
-              Your slot is reserved.
-            </p>
-            <Button size="sm" variant="outline" disabled className="w-full mt-3">
-              Coming soon
-            </Button>
-          </div>
+          {/* Realtime chat */}
+          <PodChat podCode={podCode} myName={me.name} />
 
           {/* Standup */}
           <div className="card-flat p-5">
