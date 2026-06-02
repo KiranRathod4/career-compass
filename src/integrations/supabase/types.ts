@@ -1027,6 +1027,33 @@ export type Database = {
         }
         Relationships: []
       }
+      pod_messages: {
+        Row: {
+          author_name: string
+          content: string
+          created_at: string
+          id: string
+          pod_code: string
+          user_id: string
+        }
+        Insert: {
+          author_name?: string
+          content: string
+          created_at?: string
+          id?: string
+          pod_code: string
+          user_id: string
+        }
+        Update: {
+          author_name?: string
+          content?: string
+          created_at?: string
+          id?: string
+          pod_code?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           college_name: string | null
