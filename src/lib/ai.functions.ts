@@ -222,3 +222,49 @@ export const aiTrackRoadmap = createServerFn({ method: "POST" })
       tool,
     );
   });
+
+/* ---------------- Company Insider Intelligence ---------------- */
+export const aiCompanyInsider = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { companyName: string; roleFocus?: string; location?: string }) => d)
+  .handler(async ({ data }) => {
+    const tool = {
+      type: "function",
+      function: {
+        name: "company_insider",
+        description: "Insider intelligence on a company's hiring process for engineering candidates in India.",
+        parameters: {
+          type: "object",
+          properties: {
+            overview: { type: "string", description: "2-3 line snapshot of the company and what they look for." },
+            interview_rounds: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  name: { type: "string" },
+                  focus: { type: "string", description: "What this round tests" },
+                  tips: { type: "string", description: "1-line practical tip" },
+                },
+                required: ["name", "focus"],
+              },
+            },
+            commonly_asked: { type: "array", items: { type: "string" }, description: "5-8 specific questions/topics frequently asked" },
+            tech_stack_signals: { type: "array", items: { type: "string" }, description: "Technologies/skills they value" },
+            culture_signals: { type: "array", items: { type: "string" }, description: "Cultural traits and what they care about" },
+            red_flags: { type: "array", items: { type: "string" }, description: "Things that get candidates rejected" },
+            two_week_plan: { type: "array", items: { type: "string" }, description: "5-7 concrete prep actions for the next 2 weeks" },
+          },
+          required: ["overview", "interview_rounds", "commonly_asked", "tech_stack_signals", "culture_signals", "red_flags", "two_week_plan"],
+        },
+      },
+    };
+    return await callAI(
+      [
+        { role: "system", content: "You are an insider sharing how a company hires engineers in India. Be specific and current. If unsure, prefer common patterns at companies of similar size/domain. Never fabricate named individuals." },
+        { role: "user", content: `Company: ${data.companyName}\nRole focus: ${data.roleFocus || "Software Engineer / Intern"}\nLocation: ${data.location || "India"}` },
+      ],
+      tool,
+    );
+  });
+
