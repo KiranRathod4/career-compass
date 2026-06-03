@@ -14,6 +14,7 @@ import appCss from "../styles.css?url";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ThemeProvider } from "@/hooks/use-theme";
 import { supabase } from "@/integrations/supabase/client";
+import { OfflineBanner } from "@/components/offline-banner";
 
 function NotFoundComponent() {
   return (
@@ -85,6 +86,7 @@ function RootComponent() {
       <ThemeProvider>
         <AuthProvider>
           <Outlet />
+          <OfflineBanner />
           <Toaster position="top-right" />
         </AuthProvider>
       </ThemeProvider>
