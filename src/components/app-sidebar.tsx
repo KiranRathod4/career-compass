@@ -64,44 +64,54 @@ export function AppSidebar() {
   return (
     <aside
       className="hidden md:flex flex-col border-r border-sidebar-border bg-sidebar shrink-0 transition-[width] duration-200"
-      style={{ width: collapsed ? 56 : 240 }}
+      style={{ width: collapsed ? 52 : 232 }}
     >
-      <div className="px-4 pt-4 pb-3 border-b border-sidebar-border">
-        <div className="flex items-center justify-between">
-          {!collapsed && (
-            <div className="flex items-center gap-0.5">
-              <span className="text-[20px] font-extrabold tracking-tight text-primary leading-none">T</span>
-              <ArrowUpRight className="h-3 w-3 -ml-1 -mt-2 text-primary" strokeWidth={3} />
-              <span className="text-[20px] font-extrabold tracking-tight leading-none">aiyaar</span>
-            </div>
-          )}
-          <button onClick={() => setCollapsed((c) => !c)} className="h-7 w-7 rounded-md hover:bg-sidebar-accent flex items-center justify-center text-muted-foreground">
-            {collapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
-          </button>
-        </div>
-        {!collapsed && level && (
-          <div className="mt-2 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[11px] font-medium">
-            <span>{level.name}</span>
-            <span className="text-primary/60">·</span>
-            <span>Lv. {level.level}</span>
+      <div className="h-[52px] px-4 flex items-center justify-between border-b border-sidebar-border shrink-0">
+        {!collapsed && (
+          <div className="flex items-center gap-0.5">
+            <span className="text-[15px] font-bold tracking-[-0.3px] text-foreground leading-none">T</span>
+            <ArrowUpRight className="h-3 w-3 -ml-0.5 -mt-2 text-primary" strokeWidth={3} />
+            <span className="text-[15px] font-bold tracking-[-0.3px] leading-none">aiyaar</span>
           </div>
         )}
+        <button
+          onClick={() => setCollapsed((c) => !c)}
+          className="h-7 w-7 rounded-md hover:bg-sidebar-accent flex items-center justify-center text-muted-foreground transition-colors"
+        >
+          {collapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+        </button>
       </div>
 
-      <nav className="flex-1 overflow-y-auto py-3 px-2">
+      {!collapsed && level && (
+        <div className="mx-3 mt-2 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-[var(--p-alpha-08)] text-primary text-[11px] font-medium w-fit">
+          <span>{level.name}</span>
+          <span className="text-primary/60">·</span>
+          <span>Lv. {level.level}</span>
+        </div>
+      )}
+
+      <nav className="flex-1 overflow-y-auto py-2">
         {groups.map((g) => (
-          <div key={g.label} className="mb-4">
-            {!collapsed && <div className="section-label px-2 mb-1">{g.label}</div>}
+          <div key={g.label} className="mb-3">
+            {!collapsed && (
+              <div className="px-4 pt-3 pb-1 text-[10px] font-semibold tracking-[0.08em] uppercase text-[color:var(--text-3)]">
+                {g.label}
+              </div>
+            )}
             {g.items.map((item) => {
               const active = pathname === item.to;
               const Icon = item.icon;
               return (
-                <Link key={item.to} to={item.to} title={collapsed ? item.label : undefined}
-                  className={`flex items-center gap-2.5 px-2 h-8 rounded-md text-sm transition-colors ${
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  title={collapsed ? item.label : undefined}
+                  className={`mx-1.5 flex items-center gap-2 px-2.5 h-[30px] rounded-md text-[13px] transition-[background-color,color] duration-[80ms] ${
                     active
-                      ? "bg-primary/10 text-primary font-medium border-l-2 border-primary rounded-l-none pl-[6px]"
-                      : "text-foreground/80 hover:bg-sidebar-accent"
-                  }`}>
+                      ? "bg-[var(--p-alpha-08)] text-primary font-medium shadow-[inset_2px_0_0_var(--p-6)]"
+                      : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground"
+                  }`}
+                >
                   <Icon className="h-4 w-4 shrink-0" />
                   {!collapsed && <span className="truncate">{item.label}</span>}
                 </Link>
@@ -111,11 +121,16 @@ export function AppSidebar() {
         ))}
       </nav>
 
-      <div className="border-t border-sidebar-border p-2">
-        <Link to="/settings" title="Settings"
-          className={`flex items-center gap-2.5 px-2 h-8 rounded-md text-sm ${
-            pathname === "/settings" ? "bg-primary/10 text-primary font-medium" : "text-foreground/80 hover:bg-sidebar-accent"
-          }`}>
+      <div className="border-t border-sidebar-border py-3">
+        <Link
+          to="/settings"
+          title="Settings"
+          className={`mx-1.5 flex items-center gap-2 px-2.5 h-[30px] rounded-md text-[13px] transition-colors ${
+            pathname === "/settings"
+              ? "bg-[var(--p-alpha-08)] text-primary font-medium shadow-[inset_2px_0_0_var(--p-6)]"
+              : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground"
+          }`}
+        >
           <Settings className="h-4 w-4 shrink-0" />
           {!collapsed && <span>Settings & Plan</span>}
         </Link>
@@ -123,3 +138,4 @@ export function AppSidebar() {
     </aside>
   );
 }
+
