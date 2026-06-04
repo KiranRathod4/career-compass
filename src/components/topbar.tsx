@@ -1,4 +1,4 @@
-import { Moon, Sun, LogOut, Sparkles, Gift } from "lucide-react";
+import { Moon, Sun, LogOut, Gift } from "lucide-react";
 import { useState } from "react";
 import { useTheme } from "@/hooks/use-theme";
 import { useAuth } from "@/hooks/use-auth";
