@@ -38,34 +38,57 @@ export function Topbar() {
   const { unlock, dismiss } = useLevelUpDetector();
 
   return (
-    <header className="h-14 border-b border-border bg-background flex items-center justify-between px-6 shrink-0">
+    <header className="h-[52px] sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-[12px] flex items-center justify-between px-6 shrink-0">
       <LevelRewardModal unlock={unlock} onClose={dismiss} />
-      <h1 className="page-title">{title}</h1>
-      <div className="flex items-center gap-3">
+      <h1 className="text-[14px] font-medium text-foreground tracking-[-0.1px]">{title}</h1>
+      <div className="flex items-center gap-2">
         {plan?.source === "reward" && plan.rewardEnd && (
-          <Link to="/pricing" className="hidden md:inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md bg-warning/10 text-warning text-xs font-medium" title={`Reward Elite ends ${plan.rewardEnd}`}>
-            <Gift className="h-3.5 w-3.5" />
-            Elite reward · {formatDistanceToNowStrict(new Date(plan.rewardEnd))} left
+          <Link
+            to="/pricing"
+            className="hidden md:inline-flex items-center gap-1.5 h-7 px-2 rounded-sm bg-[var(--a-alpha-10)] text-[color:var(--a-6)] text-[11px] font-medium"
+            title={`Reward Elite ends ${plan.rewardEnd}`}
+          >
+            <Gift className="h-3 w-3" />
+            Elite · {formatDistanceToNowStrict(new Date(plan.rewardEnd))} left
           </Link>
         )}
         <DistractionButton />
         {level && (
-          <div className="hidden md:flex items-center gap-2" title={`${level.xp.toLocaleString()} / ${level.next_threshold.toLocaleString()} XP to Lv. ${level.level + 1}`}>
-            <Sparkles className="h-3.5 w-3.5 text-primary" />
-            <span className="text-xs font-medium">{level.xp.toLocaleString()} XP</span>
-            <div className="w-24 h-1 rounded-full bg-muted overflow-hidden">
-              <div className="h-full bg-primary" style={{ width: `${Math.min(100, level.progress_pct)}%` }} />
+          <div
+            className="hidden lg:flex items-center gap-2 mr-1"
+            title={`${level.xp.toLocaleString()} / ${level.next_threshold.toLocaleString()} XP to Lv. ${level.level + 1}`}
+          >
+            <span className="text-[12px] text-[color:var(--text-3)]">{level.name}</span>
+            <div className="w-[140px] h-[3px] rounded-full bg-[color:var(--border-2)] overflow-hidden">
+              <div
+                className="h-full bg-primary transition-[width] duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
+                style={{ width: `${Math.min(100, level.progress_pct)}%` }}
+              />
             </div>
-            <span className="text-[11px] text-muted-foreground">Lv. {level.level}</span>
+            <span className="text-[12px] font-mono text-[color:var(--text-3)]">{level.xp.toLocaleString()} XP</span>
           </div>
         )}
-        <button onClick={toggle} className="h-8 w-8 rounded-md hover:bg-accent flex items-center justify-center text-muted-foreground" title="Toggle theme">
+        <button
+          onClick={toggle}
+          className="h-7 w-7 rounded-md hover:bg-secondary flex items-center justify-center text-muted-foreground transition-colors"
+          title="Toggle theme"
+        >
           {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </button>
-        <button onClick={signOut} className="h-8 w-8 rounded-md hover:bg-accent flex items-center justify-center text-muted-foreground" title="Sign out">
+        <button
+          onClick={signOut}
+          className="h-7 w-7 rounded-md hover:bg-secondary flex items-center justify-center text-muted-foreground transition-colors"
+          title="Sign out"
+        >
           <LogOut className="h-4 w-4" />
         </button>
-        <button onClick={() => setDrawerOpen(true)} className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-semibold hover:opacity-90" title="My portfolio">{initial}</button>
+        <button
+          onClick={() => setDrawerOpen(true)}
+          className="h-7 w-7 rounded-full bg-[var(--p-alpha-12)] text-primary flex items-center justify-center text-[11px] font-semibold hover:bg-[var(--p-alpha-08)] transition-colors"
+          title="My portfolio"
+        >
+          {initial}
+        </button>
       </div>
       <PortfolioDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
     </header>
