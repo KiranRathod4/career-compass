@@ -268,3 +268,42 @@ export const aiCompanyInsider = createServerFn({ method: "POST" })
     );
   });
 
+/* ---------------- Track Interview Questions ---------------- */
+export const aiTrackQuestions = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { trackName: string; skillLevel?: string }) => d)
+  .handler(async ({ data }) => {
+    const tool = {
+      type: "function",
+      function: {
+        name: "track_questions",
+        description: "Generate interview questions for a custom learning track.",
+        parameters: {
+          type: "object",
+          properties: {
+            questions: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  question: { type: "string" },
+                  category: { type: "string" },
+                  difficulty: { type: "string", enum: ["Easy", "Medium", "Hard"] },
+                },
+                required: ["question", "category", "difficulty"],
+              },
+            },
+          },
+          required: ["questions"],
+        },
+      },
+    };
+    return await callAI(
+      [
+        { role: "system", content: "You generate realistic interview questions for Indian tech company hiring (Amazon, Flipkart, Razorpay, Zomato, mid-stage startups). Mix difficulty (3 Easy, 4 Medium, 3 Hard). Use practical categories drawn from the track topic. No fluff." },
+        { role: "user", content: `Generate exactly 10 interview questions for someone preparing "${data.trackName}" (${data.skillLevel || "Intermediate"} level).` },
+      ],
+      tool,
+    );
+  });
+

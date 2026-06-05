@@ -337,6 +337,7 @@ export type Database = {
           status: string
           topic_name: string
           track_id: string
+          updated_at: string
           user_id: string
         }
         Insert: {
@@ -351,6 +352,7 @@ export type Database = {
           status?: string
           topic_name: string
           track_id: string
+          updated_at?: string
           user_id: string
         }
         Update: {
@@ -365,6 +367,7 @@ export type Database = {
           status?: string
           topic_name?: string
           track_id?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: [
@@ -382,11 +385,14 @@ export type Database = {
           color: string
           completion_pct: number
           created_at: string
+          description: string | null
           icon: string
           id: string
           name: string
           notes: string | null
+          notes_content: string | null
           skill_level: string
+          target_role: string | null
           target_type: string | null
           updated_at: string
           user_id: string
@@ -396,11 +402,14 @@ export type Database = {
           color?: string
           completion_pct?: number
           created_at?: string
+          description?: string | null
           icon?: string
           id?: string
           name: string
           notes?: string | null
+          notes_content?: string | null
           skill_level?: string
+          target_role?: string | null
           target_type?: string | null
           updated_at?: string
           user_id: string
@@ -410,11 +419,14 @@ export type Database = {
           color?: string
           completion_pct?: number
           created_at?: string
+          description?: string | null
           icon?: string
           id?: string
           name?: string
           notes?: string | null
+          notes_content?: string | null
           skill_level?: string
+          target_role?: string | null
           target_type?: string | null
           updated_at?: string
           user_id?: string
@@ -1071,6 +1083,8 @@ export type Database = {
           onboarded_at: string | null
           placement_start_date: string | null
           quick_links: Json | null
+          sidebar_prepare_items: Json
+          sidebar_section_order: Json
           study_windows: Json | null
           target_domains: string[] | null
           updated_at: string
@@ -1092,6 +1106,8 @@ export type Database = {
           onboarded_at?: string | null
           placement_start_date?: string | null
           quick_links?: Json | null
+          sidebar_prepare_items?: Json
+          sidebar_section_order?: Json
           study_windows?: Json | null
           target_domains?: string[] | null
           updated_at?: string
@@ -1113,6 +1129,8 @@ export type Database = {
           onboarded_at?: string | null
           placement_start_date?: string | null
           quick_links?: Json | null
+          sidebar_prepare_items?: Json
+          sidebar_section_order?: Json
           study_windows?: Json | null
           target_domains?: string[] | null
           updated_at?: string
@@ -1223,6 +1241,7 @@ export type Database = {
           status: string
           title: string
           topic: string | null
+          track_id: string | null
           updated_at: string
           url: string | null
           user_id: string
@@ -1236,6 +1255,7 @@ export type Database = {
           status?: string
           title: string
           topic?: string | null
+          track_id?: string | null
           updated_at?: string
           url?: string | null
           user_id: string
@@ -1249,11 +1269,20 @@ export type Database = {
           status?: string
           title?: string
           topic?: string | null
+          track_id?: string | null
           updated_at?: string
           url?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "resources_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "custom_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       resumes: {
         Row: {

@@ -15,6 +15,7 @@ import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/
 import { Route as UUsernameRouteImport } from './routes/u.$username'
 import { Route as AuthenticatedTracksRouteImport } from './routes/_authenticated/tracks'
 import { Route as AuthenticatedTimerRouteImport } from './routes/_authenticated/timer'
+import { Route as AuthenticatedSystemDesignRouteImport } from './routes/_authenticated/system-design'
 import { Route as AuthenticatedSqlRouteImport } from './routes/_authenticated/sql'
 import { Route as AuthenticatedSprintsRouteImport } from './routes/_authenticated/sprints'
 import { Route as AuthenticatedSkillsRouteImport } from './routes/_authenticated/skills'
@@ -33,6 +34,7 @@ import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authentic
 import { Route as AuthenticatedNetworkRouteImport } from './routes/_authenticated/network'
 import { Route as AuthenticatedLinkedinRouteImport } from './routes/_authenticated/linkedin'
 import { Route as AuthenticatedJobsRouteImport } from './routes/_authenticated/jobs'
+import { Route as AuthenticatedJavaRouteImport } from './routes/_authenticated/java'
 import { Route as AuthenticatedInterviewRouteImport } from './routes/_authenticated/interview'
 import { Route as AuthenticatedDsaRouteImport } from './routes/_authenticated/dsa'
 import { Route as AuthenticatedDevopsRouteImport } from './routes/_authenticated/devops'
@@ -76,6 +78,12 @@ const AuthenticatedTimerRoute = AuthenticatedTimerRouteImport.update({
   path: '/timer',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedSystemDesignRoute =
+  AuthenticatedSystemDesignRouteImport.update({
+    id: '/system-design',
+    path: '/system-design',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedSqlRoute = AuthenticatedSqlRouteImport.update({
   id: '/sql',
   path: '/sql',
@@ -167,6 +175,11 @@ const AuthenticatedJobsRoute = AuthenticatedJobsRouteImport.update({
   path: '/jobs',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedJavaRoute = AuthenticatedJavaRouteImport.update({
+  id: '/java',
+  path: '/java',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedInterviewRoute = AuthenticatedInterviewRouteImport.update({
   id: '/interview',
   path: '/interview',
@@ -249,6 +262,7 @@ export interface FileRoutesByFullPath {
   '/devops': typeof AuthenticatedDevopsRoute
   '/dsa': typeof AuthenticatedDsaRoute
   '/interview': typeof AuthenticatedInterviewRoute
+  '/java': typeof AuthenticatedJavaRoute
   '/jobs': typeof AuthenticatedJobsRoute
   '/linkedin': typeof AuthenticatedLinkedinRoute
   '/network': typeof AuthenticatedNetworkRoute
@@ -267,6 +281,7 @@ export interface FileRoutesByFullPath {
   '/skills': typeof AuthenticatedSkillsRoute
   '/sprints': typeof AuthenticatedSprintsRoute
   '/sql': typeof AuthenticatedSqlRoute
+  '/system-design': typeof AuthenticatedSystemDesignRoute
   '/timer': typeof AuthenticatedTimerRoute
   '/tracks': typeof AuthenticatedTracksRoute
   '/u/$username': typeof UUsernameRoute
@@ -286,6 +301,7 @@ export interface FileRoutesByTo {
   '/devops': typeof AuthenticatedDevopsRoute
   '/dsa': typeof AuthenticatedDsaRoute
   '/interview': typeof AuthenticatedInterviewRoute
+  '/java': typeof AuthenticatedJavaRoute
   '/jobs': typeof AuthenticatedJobsRoute
   '/linkedin': typeof AuthenticatedLinkedinRoute
   '/network': typeof AuthenticatedNetworkRoute
@@ -304,6 +320,7 @@ export interface FileRoutesByTo {
   '/skills': typeof AuthenticatedSkillsRoute
   '/sprints': typeof AuthenticatedSprintsRoute
   '/sql': typeof AuthenticatedSqlRoute
+  '/system-design': typeof AuthenticatedSystemDesignRoute
   '/timer': typeof AuthenticatedTimerRoute
   '/tracks': typeof AuthenticatedTracksRoute
   '/u/$username': typeof UUsernameRoute
@@ -326,6 +343,7 @@ export interface FileRoutesById {
   '/_authenticated/devops': typeof AuthenticatedDevopsRoute
   '/_authenticated/dsa': typeof AuthenticatedDsaRoute
   '/_authenticated/interview': typeof AuthenticatedInterviewRoute
+  '/_authenticated/java': typeof AuthenticatedJavaRoute
   '/_authenticated/jobs': typeof AuthenticatedJobsRoute
   '/_authenticated/linkedin': typeof AuthenticatedLinkedinRoute
   '/_authenticated/network': typeof AuthenticatedNetworkRoute
@@ -344,6 +362,7 @@ export interface FileRoutesById {
   '/_authenticated/skills': typeof AuthenticatedSkillsRoute
   '/_authenticated/sprints': typeof AuthenticatedSprintsRoute
   '/_authenticated/sql': typeof AuthenticatedSqlRoute
+  '/_authenticated/system-design': typeof AuthenticatedSystemDesignRoute
   '/_authenticated/timer': typeof AuthenticatedTimerRoute
   '/_authenticated/tracks': typeof AuthenticatedTracksRoute
   '/u/$username': typeof UUsernameRoute
@@ -367,6 +386,7 @@ export interface FileRouteTypes {
     | '/devops'
     | '/dsa'
     | '/interview'
+    | '/java'
     | '/jobs'
     | '/linkedin'
     | '/network'
@@ -385,6 +405,7 @@ export interface FileRouteTypes {
     | '/skills'
     | '/sprints'
     | '/sql'
+    | '/system-design'
     | '/timer'
     | '/tracks'
     | '/u/$username'
@@ -404,6 +425,7 @@ export interface FileRouteTypes {
     | '/devops'
     | '/dsa'
     | '/interview'
+    | '/java'
     | '/jobs'
     | '/linkedin'
     | '/network'
@@ -422,6 +444,7 @@ export interface FileRouteTypes {
     | '/skills'
     | '/sprints'
     | '/sql'
+    | '/system-design'
     | '/timer'
     | '/tracks'
     | '/u/$username'
@@ -443,6 +466,7 @@ export interface FileRouteTypes {
     | '/_authenticated/devops'
     | '/_authenticated/dsa'
     | '/_authenticated/interview'
+    | '/_authenticated/java'
     | '/_authenticated/jobs'
     | '/_authenticated/linkedin'
     | '/_authenticated/network'
@@ -461,6 +485,7 @@ export interface FileRouteTypes {
     | '/_authenticated/skills'
     | '/_authenticated/sprints'
     | '/_authenticated/sql'
+    | '/_authenticated/system-design'
     | '/_authenticated/timer'
     | '/_authenticated/tracks'
     | '/u/$username'
@@ -519,6 +544,13 @@ declare module '@tanstack/react-router' {
       path: '/timer'
       fullPath: '/timer'
       preLoaderRoute: typeof AuthenticatedTimerRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/system-design': {
+      id: '/_authenticated/system-design'
+      path: '/system-design'
+      fullPath: '/system-design'
+      preLoaderRoute: typeof AuthenticatedSystemDesignRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/sql': {
@@ -647,6 +679,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedJobsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/java': {
+      id: '/_authenticated/java'
+      path: '/java'
+      fullPath: '/java'
+      preLoaderRoute: typeof AuthenticatedJavaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/interview': {
       id: '/_authenticated/interview'
       path: '/interview'
@@ -753,6 +792,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDevopsRoute: typeof AuthenticatedDevopsRoute
   AuthenticatedDsaRoute: typeof AuthenticatedDsaRoute
   AuthenticatedInterviewRoute: typeof AuthenticatedInterviewRoute
+  AuthenticatedJavaRoute: typeof AuthenticatedJavaRoute
   AuthenticatedJobsRoute: typeof AuthenticatedJobsRoute
   AuthenticatedLinkedinRoute: typeof AuthenticatedLinkedinRoute
   AuthenticatedNetworkRoute: typeof AuthenticatedNetworkRoute
@@ -771,6 +811,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedSkillsRoute: typeof AuthenticatedSkillsRoute
   AuthenticatedSprintsRoute: typeof AuthenticatedSprintsRoute
   AuthenticatedSqlRoute: typeof AuthenticatedSqlRoute
+  AuthenticatedSystemDesignRoute: typeof AuthenticatedSystemDesignRoute
   AuthenticatedTimerRoute: typeof AuthenticatedTimerRoute
   AuthenticatedTracksRoute: typeof AuthenticatedTracksRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
@@ -788,6 +829,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDevopsRoute: AuthenticatedDevopsRoute,
   AuthenticatedDsaRoute: AuthenticatedDsaRoute,
   AuthenticatedInterviewRoute: AuthenticatedInterviewRoute,
+  AuthenticatedJavaRoute: AuthenticatedJavaRoute,
   AuthenticatedJobsRoute: AuthenticatedJobsRoute,
   AuthenticatedLinkedinRoute: AuthenticatedLinkedinRoute,
   AuthenticatedNetworkRoute: AuthenticatedNetworkRoute,
@@ -806,6 +848,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedSkillsRoute: AuthenticatedSkillsRoute,
   AuthenticatedSprintsRoute: AuthenticatedSprintsRoute,
   AuthenticatedSqlRoute: AuthenticatedSqlRoute,
+  AuthenticatedSystemDesignRoute: AuthenticatedSystemDesignRoute,
   AuthenticatedTimerRoute: AuthenticatedTimerRoute,
   AuthenticatedTracksRoute: AuthenticatedTracksRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
