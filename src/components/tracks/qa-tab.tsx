@@ -71,7 +71,7 @@ export function TrackQATab({ trackId, trackName, skillLevel }: { trackId: string
           <table className="w-full text-[13px]">
             <thead style={{ background: "var(--bg-subtle)" }}>
               <tr className="text-left">
-                <Th>Question</Th><Th>Category</Th><Th>Difficulty</Th><Th>Reviewed</Th><Th></Th>
+                <Th>Question</Th><Th>Category</Th><Th>Difficulty</Th><Th>Reviewed</Th><Th> </Th>
               </tr>
             </thead>
             <tbody>
