@@ -6,6 +6,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { ExternalLink, Plus, Trash2 } from "lucide-react";
 
+import { SidebarCustomization } from "@/components/sidebar-customization";
+
 export const Route = createFileRoute("/_authenticated/settings")({ component: SettingsPage });
 
 const DOMAINS = ["QA", "DevOps", "Data", "Full Stack", "AI-ML"];
@@ -138,6 +140,12 @@ function SettingsPage() {
         <div className="section-label mb-4">Study Windows (Arena Break-Time Enforcer)</div>
         <StudyWindowsEditor windows={form.study_windows ?? []} onChange={(w) => setForm({ ...form, study_windows: w })} />
       </div>
+
+      <SidebarCustomization
+        initialPrepare={profile?.sidebar_prepare_items as string[] | null}
+        initialOrder={profile?.sidebar_section_order as string[] | null}
+      />
+
 
 
       <div className="card-flat p-6">
