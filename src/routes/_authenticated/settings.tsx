@@ -6,6 +6,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { ExternalLink, Plus, Trash2 } from "lucide-react";
 
+import { SidebarCustomization } from "@/components/sidebar-customization";
+
 export const Route = createFileRoute("/_authenticated/settings")({ component: SettingsPage });
 
 const DOMAINS = ["QA", "DevOps", "Data", "Full Stack", "AI-ML"];
