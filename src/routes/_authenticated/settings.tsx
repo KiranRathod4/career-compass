@@ -141,6 +141,12 @@ function SettingsPage() {
         <StudyWindowsEditor windows={form.study_windows ?? []} onChange={(w) => setForm({ ...form, study_windows: w })} />
       </div>
 
+      <SidebarCustomization
+        initialPrepare={profile?.sidebar_prepare_items as string[] | null}
+        initialOrder={profile?.sidebar_section_order as string[] | null}
+      />
+
+
 
       <div className="card-flat p-6">
         <div className="section-label mb-4">Quick Links</div>
