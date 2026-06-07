@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { Trophy, Medal, Flame, Lock, RefreshCw } from "lucide-react";
+import { Crown, Flame, Lock, RefreshCw, Trophy, Zap } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
@@ -32,7 +32,6 @@ function RankingsPage() {
   const optedIn = (profile as any)?.leaderboard_opt_in === true;
   const weekStart = getWeekStart();
 
-  // Auto-snapshot on first visit when opted in
   useEffect(() => {
     if (!optedIn) return;
     snapshot().catch(() => {});
@@ -44,7 +43,6 @@ function RankingsPage() {
     catch (e: any) { toast.error(e?.message ?? "Failed"); }
     finally { setRefreshing(false); }
   };
-
 
   const { data: study } = useQuery({
     queryKey: ["study-leaderboard", weekStart],
@@ -75,6 +73,20 @@ function RankingsPage() {
     },
   });
 
+  const rawRows = tab === "study" ? (study ?? []) : (arena ?? []);
+  const userIds = rawRows.map((r: any) => r.user_id);
+
+  const { data: profilesMap } = useQuery({
+    queryKey: ["rank-profiles", userIds.join(",")],
+    enabled: userIds.length > 0,
+    queryFn: async () => {
+      const { data } = await supabase.from("profiles").select("id, full_name, username, college_name").in("id", userIds);
+      const m: Record<string, any> = {};
+      (data ?? []).forEach((p: any) => { m[p.id] = p; });
+      return m;
+    },
+  });
+
   if (!optedIn) {
     return (
       <div className="max-w-2xl mx-auto card-flat p-10 text-center">
@@ -88,96 +100,192 @@ function RankingsPage() {
     );
   }
 
-  const rows = tab === "study" ? (study ?? []) : (arena ?? []);
+  const scoreKey = tab === "study" ? "consistency_score" : "total_arena_xp";
+  const scoreLabel = tab === "study" ? "XP" : "XP";
+
+  const enriched = rawRows.map((r: any) => ({
+    ...r,
+    profile: profilesMap?.[r.user_id],
+    isMe: r.user_id === user?.id,
+    score: Math.round(r[scoreKey] ?? 0),
+  }));
+
+  const top3 = enriched.slice(0, 3);
+  const rest = enriched.slice(3);
+  const myRank = enriched.findIndex((r: any) => r.isMe);
 
   return (
-    <div className="max-w-4xl mx-auto space-y-4">
-      <div className="card-flat p-5 flex items-center justify-between gap-3 flex-wrap">
-        <div className="flex items-center gap-3">
-          <Trophy className="h-6 w-6 text-primary" />
-          <div>
-            <h1 className="text-xl font-semibold">Taiyaar Rankings</h1>
-            <p className="text-xs text-muted-foreground">Weekly rankings — reset every Monday.</p>
+    <div className="max-w-5xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="relative overflow-hidden rounded-2xl border border-amber-500/20 bg-gradient-to-br from-[#1a1428] via-[#0f0a1f] to-[#1a1428] p-6">
+        <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "radial-gradient(circle at 20% 30%, rgba(245,158,11,0.25), transparent 40%), radial-gradient(circle at 80% 70%, rgba(124,58,237,0.25), transparent 40%)" }} />
+        <div className="relative flex items-center justify-between gap-3 flex-wrap">
+          <div className="flex items-center gap-4">
+            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
+              <Trophy className="h-6 w-6 text-amber-950" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight">Hall of Fame</h1>
+              <p className="text-xs text-zinc-400 uppercase tracking-widest mt-0.5">Weekly Rankings · Resets Monday</p>
+            </div>
           </div>
+          <Button size="sm" variant="outline" onClick={refresh} disabled={refreshing} className="border-amber-500/30 hover:bg-amber-500/10">
+            <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${refreshing ? "animate-spin" : ""}`} />
+            {refreshing ? "Refreshing…" : "Refresh"}
+          </Button>
         </div>
-        <Button size="sm" variant="outline" onClick={refresh} disabled={refreshing}>
-          <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${refreshing ? "animate-spin" : ""}`} />
-          {refreshing ? "Refreshing…" : "Refresh my rank"}
-        </Button>
+
+        {/* Tabs */}
+        <div className="relative mt-5 inline-flex p-1 rounded-lg bg-black/40 border border-white/5">
+          <TabPill active={tab === "study"} onClick={() => setTab("study")} icon={<Flame className="h-3.5 w-3.5" />} label="Study Arena" />
+          <TabPill active={tab === "arena"} onClick={() => setTab("arena")} icon={<Zap className="h-3.5 w-3.5" />} label="Game Arena" />
+        </div>
       </div>
 
-      <div className="flex gap-2">
-        <Button variant={tab === "study" ? "default" : "outline"} size="sm" onClick={() => setTab("study")}>📚 Study</Button>
-        <Button variant={tab === "arena" ? "default" : "outline"} size="sm" onClick={() => setTab("arena")}>🎮 Arena</Button>
-      </div>
+      {enriched.length === 0 ? (
+        <div className="card-flat p-12 text-center text-sm text-muted-foreground">
+          No data yet this week. Be the first to claim the throne.
+        </div>
+      ) : (
+        <>
+          {/* Podium */}
+          <Podium top3={top3} scoreLabel={scoreLabel} />
 
-      <div className="card-flat overflow-hidden">
-        {rows.length === 0 ? (
-          <div className="p-8 text-center text-sm text-muted-foreground">
-            No data yet this week. Be the first — log activity to claim the top spot.
-          </div>
-        ) : (
-          <table className="w-full text-sm">
-            <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">
-              <tr>
-                <th className="text-left p-3 w-12">#</th>
-                <th className="text-left p-3">User</th>
-                {tab === "study" ? (
-                  <>
-                    <th className="text-right p-3 hidden md:table-cell">DSA</th>
-                    <th className="text-right p-3 hidden md:table-cell">Apps</th>
-                    <th className="text-right p-3 hidden md:table-cell">Focus</th>
-                    <th className="text-right p-3">Score</th>
-                  </>
-                ) : (
-                  <>
-                    <th className="text-right p-3 hidden md:table-cell">Math</th>
-                    <th className="text-right p-3 hidden md:table-cell">Memory</th>
-                    <th className="text-right p-3 hidden md:table-cell">Duels</th>
-                    <th className="text-right p-3">XP</th>
-                  </>
-                )}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r: any, i: number) => {
-                const isMe = r.user_id === user?.id;
-                return (
-                  <tr key={r.user_id} className={`border-t ${isMe ? "bg-primary/5 font-medium" : ""}`}>
-                    <td className="p-3">
-                      {i === 0 ? <Medal className="h-4 w-4 text-yellow-500" /> :
-                       i === 1 ? <Medal className="h-4 w-4 text-zinc-400" /> :
-                       i === 2 ? <Medal className="h-4 w-4 text-amber-700" /> :
-                       <span className="text-muted-foreground">{i + 1}</span>}
-                    </td>
-                    <td className="p-3">
-                      <div>{isMe ? "You" : `User ${r.user_id.slice(0, 6)}`}</div>
-                      {r.college_name && <div className="text-xs text-muted-foreground">{r.college_name}</div>}
-                    </td>
-                    {tab === "study" ? (
-                      <>
-                        <td className="text-right p-3 hidden md:table-cell">{r.dsa_count}</td>
-                        <td className="text-right p-3 hidden md:table-cell">{r.apps_count}</td>
-                        <td className="text-right p-3 hidden md:table-cell">{r.focus_sessions}</td>
-                        <td className="text-right p-3 font-semibold flex items-center justify-end gap-1"><Flame className="h-3 w-3 text-primary" />{Math.round(r.consistency_score)}</td>
-                      </>
-                    ) : (
-                      <>
-                        <td className="text-right p-3 hidden md:table-cell">{r.math_sprint_best}</td>
-                        <td className="text-right p-3 hidden md:table-cell">{r.memory_best}</td>
-                        <td className="text-right p-3 hidden md:table-cell">{r.duel_wins}</td>
-                        <td className="text-right p-3 font-semibold">{r.total_arena_xp}</td>
-                      </>
-                    )}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          {/* Your rank pill */}
+          {myRank >= 0 && (
+            <div className="rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 to-transparent p-4 flex items-center gap-4">
+              <div className="h-10 w-10 rounded-lg bg-primary/20 border border-primary/40 flex items-center justify-center font-bold tabular-nums text-primary">
+                #{myRank + 1}
+              </div>
+              <div className="flex-1">
+                <div className="text-sm font-semibold">Your position this week</div>
+                <div className="text-xs text-muted-foreground">{enriched[myRank].score} {scoreLabel} · keep grinding to climb</div>
+              </div>
+              <Trophy className="h-5 w-5 text-amber-500" />
+            </div>
+          )}
+
+          {/* Rest of leaderboard */}
+          {rest.length > 0 && (
+            <div className="space-y-2">
+              <div className="section-label px-1">Challengers</div>
+              {rest.map((r: any, i: number) => (
+                <RankRow key={r.user_id} row={r} rank={i + 4} tab={tab} />
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      <p className="text-xs text-muted-foreground text-center pt-2">Opt-in only. Turn off in Settings to hide your data.</p>
+    </div>
+  );
+}
+
+function TabPill({ active, onClick, icon, label }: { active: boolean; onClick: () => void; icon: React.ReactNode; label: string }) {
+  return (
+    <button onClick={onClick} className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wider transition ${active ? "bg-gradient-to-r from-amber-500 to-amber-600 text-amber-950 shadow-md" : "text-zinc-400 hover:text-white"}`}>
+      {icon} {label}
+    </button>
+  );
+}
+
+function Podium({ top3, scoreLabel }: { top3: any[]; scoreLabel: string }) {
+  // Order: 2nd, 1st, 3rd visually
+  const second = top3[1];
+  const first = top3[0];
+  const third = top3[2];
+  return (
+    <div className="relative">
+      <div className="grid grid-cols-3 gap-3 items-end max-w-2xl mx-auto pt-8">
+        <PodiumColumn place={2} row={second} height="h-28" scoreLabel={scoreLabel} />
+        <PodiumColumn place={1} row={first} height="h-40" scoreLabel={scoreLabel} />
+        <PodiumColumn place={3} row={third} height="h-20" scoreLabel={scoreLabel} />
+      </div>
+    </div>
+  );
+}
+
+function PodiumColumn({ place, row, height, scoreLabel }: { place: 1 | 2 | 3; row: any; height: string; scoreLabel: string }) {
+  if (!row) {
+    return (
+      <div className="flex flex-col items-center gap-3">
+        <div className="h-16 w-16 rounded-full bg-zinc-900 border border-dashed border-zinc-700 flex items-center justify-center text-zinc-600">—</div>
+        <div className={`w-full ${height} rounded-t-xl bg-zinc-900/40 border border-white/5 border-b-0 flex items-start justify-center pt-2 text-zinc-700 font-bold text-2xl tabular-nums`}>{place}</div>
+      </div>
+    );
+  }
+  const name = row.profile?.full_name || row.profile?.username || `Player ${row.user_id.slice(0, 4)}`;
+  const college = row.profile?.college_name || row.college_name;
+  const initial = (name[0] || "?").toUpperCase();
+
+  const styles = {
+    1: { ring: "ring-amber-400", glow: "shadow-[0_0_40px_rgba(245,158,11,0.4)]", bg: "from-amber-500 to-amber-700", podium: "from-amber-500/30 to-amber-900/20 border-amber-500/40", label: "text-amber-300", crown: true },
+    2: { ring: "ring-zinc-300", glow: "shadow-[0_0_25px_rgba(212,212,216,0.25)]", bg: "from-zinc-300 to-zinc-500", podium: "from-zinc-400/20 to-zinc-700/10 border-zinc-400/30", label: "text-zinc-300", crown: false },
+    3: { ring: "ring-amber-700", glow: "shadow-[0_0_20px_rgba(180,83,9,0.3)]", bg: "from-amber-700 to-amber-900", podium: "from-amber-800/20 to-amber-950/10 border-amber-700/30", label: "text-amber-600", crown: false },
+  }[place];
+
+  const size = place === 1 ? "h-20 w-20 text-2xl" : "h-16 w-16 text-xl";
+
+  return (
+    <div className="flex flex-col items-center gap-3">
+      <div className="relative">
+        {styles.crown && (
+          <Crown className="absolute -top-7 left-1/2 -translate-x-1/2 h-7 w-7 text-amber-400 fill-amber-400 drop-shadow-[0_2px_8px_rgba(245,158,11,0.6)]" />
         )}
+        <div className={`${size} rounded-full bg-gradient-to-br ${styles.bg} ring-4 ${styles.ring} ring-offset-4 ring-offset-background ${styles.glow} flex items-center justify-center font-extrabold text-white`}>
+          {initial}
+        </div>
+        <div className={`absolute -bottom-2 left-1/2 -translate-x-1/2 h-7 w-7 rounded-full bg-gradient-to-br ${styles.bg} border-2 border-background flex items-center justify-center text-xs font-bold text-white`}>
+          {place}
+        </div>
       </div>
+      <div className="text-center min-h-[2.5rem]">
+        <div className={`text-sm font-semibold truncate max-w-[8rem] ${row.isMe ? "text-primary" : ""}`}>{row.isMe ? "You" : name}</div>
+        {college && <div className="text-[10px] text-muted-foreground truncate max-w-[8rem]">{college}</div>}
+      </div>
+      <div className={`w-full ${height} rounded-t-xl bg-gradient-to-b ${styles.podium} border border-b-0 flex flex-col items-center justify-start pt-2 gap-1`}>
+        <div className={`text-3xl font-extrabold tabular-nums ${styles.label}`}>{place}</div>
+        <div className="text-xs font-bold tabular-nums text-white">{row.score}</div>
+        <div className="text-[9px] uppercase tracking-widest text-muted-foreground">{scoreLabel}</div>
+      </div>
+    </div>
+  );
+}
 
-      <p className="text-xs text-muted-foreground text-center">Rankings are opt-in. Turn the toggle off in Settings to hide your data.</p>
+function RankRow({ row, rank, tab }: { row: any; rank: number; tab: Tab }) {
+  const name = row.profile?.full_name || row.profile?.username || `Player ${row.user_id.slice(0, 4)}`;
+  const college = row.profile?.college_name || row.college_name;
+  const initial = (name[0] || "?").toUpperCase();
+  return (
+    <div className={`flex items-center gap-3 p-3 rounded-xl border transition hover:border-primary/30 ${row.isMe ? "border-primary/40 bg-primary/5" : "border-white/5 bg-card"}`}>
+      <div className="w-8 text-center text-sm font-bold tabular-nums text-muted-foreground">{rank}</div>
+      <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary/40 to-primary/10 border border-primary/20 flex items-center justify-center font-bold">
+        {initial}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-medium truncate">
+          {row.isMe ? "You" : name}
+          {row.isMe && <span className="ml-2 text-[10px] px-1.5 py-0.5 rounded bg-primary/20 text-primary">YOU</span>}
+        </div>
+        {college && <div className="text-xs text-muted-foreground truncate">{college}</div>}
+      </div>
+      {tab === "study" ? (
+        <div className="hidden md:flex items-center gap-4 text-xs text-muted-foreground tabular-nums">
+          <span title="DSA"><span className="text-foreground font-semibold">{row.dsa_count}</span> dsa</span>
+          <span title="Applications"><span className="text-foreground font-semibold">{row.apps_count}</span> apps</span>
+          <span title="Focus"><span className="text-foreground font-semibold">{row.focus_sessions}</span> focus</span>
+        </div>
+      ) : (
+        <div className="hidden md:flex items-center gap-4 text-xs text-muted-foreground tabular-nums">
+          <span><span className="text-foreground font-semibold">{row.math_sprint_best}</span> math</span>
+          <span><span className="text-foreground font-semibold">{row.memory_best}</span> mem</span>
+        </div>
+      )}
+      <div className="flex items-center gap-1.5 pl-3 border-l border-white/5">
+        <Flame className="h-3.5 w-3.5 text-amber-500" />
+        <span className="text-sm font-bold tabular-nums text-amber-400">{row.score}</span>
+      </div>
     </div>
   );
 }
