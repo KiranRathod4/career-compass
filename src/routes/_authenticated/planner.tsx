@@ -9,6 +9,7 @@ import { format, subDays } from "date-fns";
 import { toast } from "sonner";
 import { aiDailyPlan, aiOverload } from "@/lib/ai.functions";
 import { AICard, ScoreBar } from "@/components/ai-insight-card";
+import { TaskBoard } from "@/components/task-manager/task-board";
 
 export const Route = createFileRoute("/_authenticated/planner")({ component: PlannerPage });
 
