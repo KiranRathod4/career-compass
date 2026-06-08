@@ -276,7 +276,17 @@ function StatusManager({ statuses, onUpdate, onClose }: { statuses: Status[]; on
 
 /* ---------------- Table view ---------------- */
 
-function TableView({ board, tasks, onOpen, onUpdate, onDelete, onAddTask, onAddOption }: any) {
+type ViewProps = {
+  board: Board;
+  tasks: Task[];
+  onOpen: (id: string) => void;
+  onUpdate: (id: string, patch: Partial<Task>) => void;
+  onDelete: (id: string) => void;
+  onAddTask: (statusId?: string) => void;
+  onAddOption?: (propId: string, label: string, color: string) => void;
+};
+
+function TableView({ board, tasks, onOpen, onUpdate, onDelete, onAddTask, onAddOption }: ViewProps) {
   return (
     <div className="card-flat overflow-x-auto">
       <table className="w-full text-sm border-collapse">
