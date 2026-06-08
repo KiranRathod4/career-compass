@@ -1566,6 +1566,51 @@ export type Database = {
         }
         Relationships: []
       }
+      task_boards: {
+        Row: {
+          created_at: string
+          icon: string
+          id: string
+          name: string
+          project_id: string | null
+          properties: Json
+          scope: string
+          sort_order: number
+          statuses: Json
+          updated_at: string
+          user_id: string
+          view_type: string
+        }
+        Insert: {
+          created_at?: string
+          icon?: string
+          id?: string
+          name?: string
+          project_id?: string | null
+          properties?: Json
+          scope?: string
+          sort_order?: number
+          statuses?: Json
+          updated_at?: string
+          user_id: string
+          view_type?: string
+        }
+        Update: {
+          created_at?: string
+          icon?: string
+          id?: string
+          name?: string
+          project_id?: string | null
+          properties?: Json
+          scope?: string
+          sort_order?: number
+          statuses?: Json
+          updated_at?: string
+          user_id?: string
+          view_type?: string
+        }
+        Relationships: []
+      }
       time_blocks: {
         Row: {
           category: string | null
@@ -1601,6 +1646,103 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      tm_blocks: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          sort_order: number
+          task_id: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          id?: string
+          sort_order?: number
+          task_id: string
+          type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          sort_order?: number
+          task_id?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tm_blocks_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tm_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tm_tasks: {
+        Row: {
+          assignee: string | null
+          board_id: string
+          created_at: string
+          due_date: string | null
+          emoji: string | null
+          id: string
+          progress: number
+          properties: Json
+          sort_order: number
+          status_id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assignee?: string | null
+          board_id: string
+          created_at?: string
+          due_date?: string | null
+          emoji?: string | null
+          id?: string
+          progress?: number
+          properties?: Json
+          sort_order?: number
+          status_id?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assignee?: string | null
+          board_id?: string
+          created_at?: string
+          due_date?: string | null
+          emoji?: string | null
+          id?: string
+          progress?: number
+          properties?: Json
+          sort_order?: number
+          status_id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tm_tasks_board_id_fkey"
+            columns: ["board_id"]
+            isOneToOne: false
+            referencedRelation: "task_boards"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_badges: {
         Row: {
