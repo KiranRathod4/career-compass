@@ -338,7 +338,7 @@ function TableView({ board, tasks, onOpen, onUpdate, onDelete, onAddTask, onAddO
           ))}
           <tr>
             <td colSpan={board.properties.length + 4} className="px-3 py-2">
-              <button onClick={onAddTask} className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5"><Plus className="h-3.5 w-3.5" /> New row</button>
+              <button onClick={() => onAddTask()} className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5"><Plus className="h-3.5 w-3.5" /> New row</button>
             </td>
           </tr>
         </tbody>
