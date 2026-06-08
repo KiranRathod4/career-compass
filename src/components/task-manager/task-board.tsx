@@ -325,7 +325,7 @@ function TableView({ board, tasks, onOpen, onUpdate, onDelete, onAddTask, onAddO
               </td>
               {board.properties.map((p: Property) => (
                 <td key={p.id} className="px-3 py-2 min-w-[140px]">
-                  <PropertyCellWithCreate prop={p} value={t.properties?.[p.id]} onChange={(v) => onUpdate(t.id, { properties: { ...t.properties, [p.id]: v } })} onAddOption={(label, color) => onAddOption(p.id, label, color)} />
+                  <PropertyCellWithCreate prop={p} value={t.properties?.[p.id]} onChange={(v) => onUpdate(t.id, { properties: { ...t.properties, [p.id]: v } })} onAddOption={(label, color) => onAddOption?.(p.id, label, color)} />
                 </td>
               ))}
               <td className="px-3 py-2">
