@@ -177,7 +177,19 @@ function Header({ board, onPatch }: { board: Board; onPatch: (p: Partial<Board>)
   );
 }
 
-function Toolbar({ board, search, setSearch, filterStatus, setFilterStatus, onAddTask, onAddProperty, onRemoveProperty, onSetView, onUpdateStatuses }: any) {
+type ToolbarProps = {
+  board: Board;
+  search: string;
+  setSearch: (v: string) => void;
+  filterStatus: string;
+  setFilterStatus: (v: string) => void;
+  onAddTask: () => void;
+  onAddProperty: (p: Property) => void;
+  onRemoveProperty: (id: string) => void;
+  onSetView: (v: Board["view_type"]) => void;
+  onUpdateStatuses: (s: Status[]) => void;
+};
+function Toolbar({ board, search, setSearch, filterStatus, setFilterStatus, onAddTask, onAddProperty, onRemoveProperty, onSetView, onUpdateStatuses }: ToolbarProps) {
   const [propMenu, setPropMenu] = useState(false);
   const [statusMenu, setStatusMenu] = useState(false);
   return (
