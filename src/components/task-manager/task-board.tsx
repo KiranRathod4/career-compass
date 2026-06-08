@@ -405,7 +405,7 @@ function StatusSelector({ board, value, onChange }: { board: Board; value: strin
 
 /* ---------------- Kanban ---------------- */
 
-function KanbanView({ board, tasks, onOpen, onUpdate, onDelete, onAddTask }: any) {
+function KanbanView({ board, tasks, onOpen, onUpdate, onDelete, onAddTask }: ViewProps) {
   return (
     <div className="flex gap-4 overflow-x-auto pb-2">
       {board.statuses.map((s: Status) => {
