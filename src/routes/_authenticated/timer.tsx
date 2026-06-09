@@ -18,33 +18,88 @@ const MODES = [
 ];
 
 const CATEGORIES = ["DSA","Aptitude","SQL","DevOps","QA","Job Applications","Projects","Other"];
+const STORAGE_KEY = "taiyaar.timer.state.v1";
+
+type Persisted = {
+  modeId: string;
+  startedAtMs: number;   // absolute epoch when timer was last started/resumed
+  elapsedBeforeMs: number; // accumulated elapsed time prior to startedAtMs
+  running: boolean;
+  task: string;
+  category: string;
+};
+
+function loadState(): Persisted | null {
+  try { const raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : null; } catch { return null; }
+}
+function saveState(s: Persisted | null) {
+  try { s ? localStorage.setItem(STORAGE_KEY, JSON.stringify(s)) : localStorage.removeItem(STORAGE_KEY); } catch {}
+}
 
 function TimerPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const { reward, unlocked, closeUnlock } = useReward();
-  const [mode, setMode] = useState(MODES[0]);
-  const [remaining, setRemaining] = useState(MODES[0].min * 60);
-  const [running, setRunning] = useState(false);
-  const [task, setTask] = useState("");
-  const [category, setCategory] = useState(CATEGORIES[0]);
-  const startRef = useRef<Date | null>(null);
 
-  useEffect(() => { setRemaining(mode.min * 60); setRunning(false); }, [mode]);
+  // hydrate from localStorage so tab-switch / refresh keeps progress
+  const initial = (() => {
+    const s = loadState();
+    if (s) {
+      const m = MODES.find((x) => x.id === s.modeId) ?? MODES[0];
+      return { mode: m, task: s.task, category: s.category, persisted: s };
+    }
+    return { mode: MODES[0], task: "", category: CATEGORIES[0], persisted: null as Persisted | null };
+  })();
 
+  const [mode, setMode] = useState(initial.mode);
+  const [task, setTask] = useState(initial.task);
+  const [category, setCategory] = useState(initial.category);
+  const [running, setRunning] = useState(initial.persisted?.running ?? false);
+  const [now, setNow] = useState(Date.now());
+  // start moment + accumulated time
+  const startedAtRef = useRef<number | null>(initial.persisted?.startedAtMs ?? null);
+  const elapsedBeforeRef = useRef<number>(initial.persisted?.elapsedBeforeMs ?? 0);
+  // first wall-clock start of this whole session (for DB started_at)
+  const sessionStartRef = useRef<Date | null>(
+    initial.persisted && (initial.persisted.elapsedBeforeMs > 0 || initial.persisted.running)
+      ? new Date(initial.persisted.startedAtMs - initial.persisted.elapsedBeforeMs)
+      : null,
+  );
+
+  const totalSec = mode.min * 60;
+  const elapsedMs = elapsedBeforeRef.current + (running && startedAtRef.current ? now - startedAtRef.current : 0);
+  const remaining = Math.max(0, totalSec - Math.floor(elapsedMs / 1000));
+
+  // tick — Date.now based, so background-tab throttling doesn't affect correctness
   useEffect(() => {
     if (!running) return;
-    const i = setInterval(() => setRemaining((r) => Math.max(0, r - 1)), 1000);
-    return () => clearInterval(i);
+    const i = setInterval(() => setNow(Date.now()), 250);
+    const onVis = () => setNow(Date.now());
+    document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("focus", onVis);
+    return () => { clearInterval(i); document.removeEventListener("visibilitychange", onVis); window.removeEventListener("focus", onVis); };
   }, [running]);
+
+  // persist whenever meaningful state changes
+  useEffect(() => {
+    if (!running && elapsedBeforeRef.current === 0 && !sessionStartRef.current) { saveState(null); return; }
+    saveState({
+      modeId: mode.id,
+      startedAtMs: startedAtRef.current ?? Date.now(),
+      elapsedBeforeMs: elapsedBeforeRef.current,
+      running,
+      task,
+      category,
+    });
+  }, [running, mode.id, task, category, now]);
 
   const saveSession = useMutation({
     mutationFn: async (completed: boolean) => {
-      if (!startRef.current) return null;
-      const dur = Math.round((Date.now() - startRef.current.getTime()) / 60000);
+      if (!sessionStartRef.current) return null;
+      const dur = Math.round(elapsedMs / 60000);
       if (dur < 1) return null;
       await supabase.from("focus_sessions").insert({
-        user_id: user!.id, started_at: startRef.current.toISOString(),
+        user_id: user!.id, started_at: sessionStartRef.current.toISOString(),
         duration_minutes: dur, mode: mode.id, task, category, completed,
       });
       return { dur, completed };
@@ -58,19 +113,55 @@ function TimerPage() {
     },
   });
 
+  // auto-complete when timer hits 0
   useEffect(() => {
     if (running && remaining === 0) {
       setRunning(false);
       saveSession.mutate(true);
-      startRef.current = null;
+      startedAtRef.current = null;
+      elapsedBeforeRef.current = 0;
+      sessionStartRef.current = null;
+      saveState(null);
     }
   }, [remaining, running]);
 
-  const start = () => { if (!startRef.current) startRef.current = new Date(); setRunning(true); };
-  const pause = () => setRunning(false);
+  const switchMode = (m: typeof MODES[number]) => {
+    if (running || elapsedBeforeRef.current > 0) {
+      // saving prior progress if user changes mode mid-session
+      if (sessionStartRef.current) saveSession.mutate(false);
+    }
+    setMode(m);
+    setRunning(false);
+    startedAtRef.current = null;
+    elapsedBeforeRef.current = 0;
+    sessionStartRef.current = null;
+    saveState(null);
+  };
+
+  const start = () => {
+    const n = Date.now();
+    if (!sessionStartRef.current) sessionStartRef.current = new Date(n);
+    startedAtRef.current = n;
+    setNow(n);
+    setRunning(true);
+  };
+
+  const pause = () => {
+    if (running && startedAtRef.current) {
+      elapsedBeforeRef.current += Date.now() - startedAtRef.current;
+    }
+    startedAtRef.current = null;
+    setRunning(false);
+  };
+
   const reset = () => {
-    if (startRef.current) saveSession.mutate(false);
-    setRunning(false); setRemaining(mode.min * 60); startRef.current = null;
+    if (sessionStartRef.current) saveSession.mutate(false);
+    setRunning(false);
+    startedAtRef.current = null;
+    elapsedBeforeRef.current = 0;
+    sessionStartRef.current = null;
+    setNow(Date.now());
+    saveState(null);
   };
 
   const { data: sessions = [] } = useQuery({
@@ -82,18 +173,18 @@ function TimerPage() {
     },
   });
 
-  const today = format(new Date(), "yyyy-MM-dd");
-  const todaySessions = sessions.filter((s: any) => s.started_at.startsWith(today));
+  const todayKey = format(new Date(), "yyyy-MM-dd");
+  const isSameLocalDay = (iso: string) => format(new Date(iso), "yyyy-MM-dd") === todayKey;
+  const todaySessions = sessions.filter((s: any) => isSameLocalDay(s.started_at));
   const totalToday = todaySessions.reduce((s: number, x: any) => s + x.duration_minutes, 0);
 
   const weekData = Array.from({ length: 7 }, (_, i) => {
     const d = subDays(new Date(), 6 - i);
     const key = format(d, "yyyy-MM-dd");
-    const mins = sessions.filter((s: any) => s.started_at.startsWith(key)).reduce((sum: number, s: any) => sum + s.duration_minutes, 0);
+    const mins = sessions.filter((s: any) => format(new Date(s.started_at), "yyyy-MM-dd") === key).reduce((sum: number, s: any) => sum + s.duration_minutes, 0);
     return { day: format(d, "EEE"), hours: +(mins / 60).toFixed(1) };
   });
 
-  const totalSec = mode.min * 60;
   const pct = ((totalSec - remaining) / totalSec) * 100;
   const mm = Math.floor(remaining / 60).toString().padStart(2, "0");
   const ss = (remaining % 60).toString().padStart(2, "0");
@@ -105,7 +196,7 @@ function TimerPage() {
       <div className="card-flat p-8">
         <div className="flex gap-2 justify-center mb-6 flex-wrap">
           {MODES.map((m) => (
-            <button key={m.id} onClick={() => setMode(m)}
+            <button key={m.id} onClick={() => switchMode(m)}
               className={`px-4 h-8 rounded-full text-xs font-medium border transition ${mode.id === m.id ? "bg-primary text-primary-foreground border-primary" : "border-border hover:bg-accent"}`}>
               {m.label}
             </button>
@@ -116,11 +207,11 @@ function TimerPage() {
           <svg width="280" height="280" viewBox="0 0 280 280" className="-rotate-90">
             <circle cx="140" cy="140" r={r} fill="none" stroke="var(--color-border)" strokeWidth="6" />
             <circle cx="140" cy="140" r={r} fill="none" stroke="var(--color-primary)" strokeWidth="6" strokeLinecap="round"
-              strokeDasharray={c} strokeDashoffset={c * (1 - pct / 100)} style={{ transition: "stroke-dashoffset 1s linear" }} />
+              strokeDasharray={c} strokeDashoffset={c * (1 - pct / 100)} style={{ transition: "stroke-dashoffset 0.3s linear" }} />
           </svg>
           <div className="absolute flex flex-col items-center justify-center" style={{ width: 280, height: 280 }}>
             <div className="text-5xl font-semibold tabular-nums">{mm}:{ss}</div>
-            <div className="text-xs text-muted-foreground mt-1">Session {todaySessions.length + (running ? 1 : 0)}</div>
+            <div className="text-xs text-muted-foreground mt-1">Session {todaySessions.length + (sessionStartRef.current ? 1 : 0)}</div>
           </div>
         </div>
 
@@ -132,12 +223,15 @@ function TimerPage() {
           </select>
           <div className="flex gap-2 justify-center pt-2">
             {!running ? (
-              <button onClick={start} className="h-10 px-6 rounded-md bg-primary text-primary-foreground text-sm font-medium flex items-center gap-2"><Play className="h-4 w-4" /> Start</button>
+              <button onClick={start} className="h-10 px-6 rounded-md bg-primary text-primary-foreground text-sm font-medium flex items-center gap-2"><Play className="h-4 w-4" /> {elapsedBeforeRef.current > 0 ? "Resume" : "Start"}</button>
             ) : (
               <button onClick={pause} className="h-10 px-6 rounded-md bg-primary text-primary-foreground text-sm font-medium flex items-center gap-2"><Pause className="h-4 w-4" /> Pause</button>
             )}
             <button onClick={reset} className="h-10 px-4 rounded-md border border-border text-sm flex items-center gap-2"><RotateCcw className="h-4 w-4" /> Reset</button>
           </div>
+          {sessionStartRef.current && (
+            <p className="text-[11px] text-center text-muted-foreground">Keeps running across tab switches and refreshes.</p>
+          )}
         </div>
       </div>
 
