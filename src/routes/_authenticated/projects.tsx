@@ -42,8 +42,38 @@ function ProjectsPage() {
   const update = useMutation({ mutationFn: async ({ id, ...p }: any) => { const { error } = await supabase.from("projects").update(p).eq("id", id); if (error) throw error; }, onSuccess: () => qc.invalidateQueries({ queryKey: ["projects"] }) });
   const del = useMutation({ mutationFn: async (id: string) => { await supabase.from("projects").delete().eq("id", id); }, onSuccess: () => qc.invalidateQueries({ queryKey: ["projects"] }) });
 
-  const filtered = useMemo(() => rows.filter((r: any) => !fStatus || r.status === fStatus), [rows, fStatus]);
-  const chart = STATUSES.map((s) => ({ name: STATUS_LABEL[s], value: rows.filter((r: any) => r.status === s).length })).filter((x) => x.value > 0);
+  const statusRank: Record<string, number> = { in_progress: 0, idea: 1, shipped: 2, archived: 3 };
+  const allTech = useMemo(() => Array.from(new Set(rows.flatMap((r: any) => r.tech_stack ?? []))).sort() as string[], [rows]);
+
+  const filtered = useMemo(() => {
+    const qq = q.trim().toLowerCase();
+    let list = rows.filter((r: any) => {
+      if (fStatus && r.status !== fStatus) return false;
+      if (fTech && !(r.tech_stack ?? []).includes(fTech)) return false;
+      if (qq) {
+        const hay = `${r.title} ${r.description ?? ""} ${(r.tech_stack ?? []).join(" ")}`.toLowerCase();
+        if (!hay.includes(qq)) return false;
+      }
+      return true;
+    });
+    list = [...list].sort((a: any, b: any) => {
+      if (sort === "title") return a.title.localeCompare(b.title);
+      if (sort === "status") return (statusRank[a.status] ?? 9) - (statusRank[b.status] ?? 9);
+      const ta = new Date(a.created_at).getTime(), tb = new Date(b.created_at).getTime();
+      return sort === "oldest" ? ta - tb : tb - ta;
+    });
+    return list;
+  }, [rows, fStatus, fTech, q, sort]);
+
+  const chart = STATUSES.map((s) => ({ name: STATUS_LABEL[s], key: s, value: filtered.filter((r: any) => r.status === s).length })).filter((x) => x.value > 0);
+  const techChart = useMemo(() => {
+    const m = new Map<string, number>();
+    filtered.forEach((r: any) => (r.tech_stack ?? []).forEach((t: string) => m.set(t, (m.get(t) ?? 0) + 1)));
+    return Array.from(m, ([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value).slice(0, 6);
+  }, [filtered]);
+
+  const clearFilters = () => { setFStatus(""); setFTech(""); setQ(""); setSort("recent"); };
+  const hasFilters = fStatus || fTech || q || sort !== "recent";
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
@@ -57,28 +87,12 @@ function ProjectsPage() {
         </button>
       </div>
 
-      <div className="grid md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Stat label="Total" value={rows.length} />
         <Stat label="Building" value={rows.filter((r: any) => r.status === "in_progress").length} accent="text-info" />
         <Stat label="Shipped" value={rows.filter((r: any) => r.status === "shipped").length} accent="text-success" />
         <Stat label="Ideas" value={rows.filter((r: any) => r.status === "idea").length} />
       </div>
-
-      {chart.length > 0 && (
-        <div className="card-flat p-4">
-          <div className="section-label mb-2">Pipeline</div>
-          <div className="h-48">
-            <ResponsiveContainer>
-              <PieChart>
-                <Pie data={chart} dataKey="value" nameKey="name" innerRadius={40} outerRadius={70}>
-                  {chart.map((_, i) => <Cell key={i} fill={PIE[i % PIE.length]} />)}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      )}
 
       {showAdd && (
         <div className="card-flat p-4 grid md:grid-cols-2 gap-2">
@@ -96,39 +110,133 @@ function ProjectsPage() {
         </div>
       )}
 
-      <div className="card-flat p-3 flex flex-wrap gap-2 items-center">
-        <select value={fStatus} onChange={(e) => setFStatus(e.target.value)} className="h-8 px-2 rounded-md border border-border bg-background text-xs">
-          <option value="">All status</option>
-          {STATUSES.map((s) => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}
-        </select>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-3">
-        {filtered.map((p: any) => (
-          <div key={p.id} className="card-flat p-4 group flex flex-col">
-            <div className="flex items-start justify-between gap-2">
-              <div className="font-medium text-sm">{p.title}</div>
-              <button onClick={() => del.mutate(p.id)} className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
+      <div className="grid lg:grid-cols-3 gap-6">
+        {/* Main column: filters + list */}
+        <div className="lg:col-span-2 space-y-4">
+          <div className="card-flat p-3 flex flex-wrap gap-2 items-center">
+            <div className="relative flex-1 min-w-[180px]">
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search title, description, tech…"
+                className="w-full h-8 pl-7 pr-2 rounded-md border border-border bg-background text-xs focus:outline-none focus:ring-2 focus:ring-ring" />
             </div>
-            {p.description && <div className="text-xs text-muted-foreground mt-1 line-clamp-2">{p.description}</div>}
-            {p.tech_stack?.length > 0 && (
-              <div className="flex flex-wrap gap-1 mt-2">
-                {p.tech_stack.map((t: string) => <span key={t} className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">{t}</span>)}
+            <select value={fStatus} onChange={(e) => setFStatus(e.target.value)} className="h-8 px-2 rounded-md border border-border bg-background text-xs">
+              <option value="">All status</option>
+              {STATUSES.map((s) => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}
+            </select>
+            <select value={fTech} onChange={(e) => setFTech(e.target.value)} className="h-8 px-2 rounded-md border border-border bg-background text-xs" disabled={allTech.length === 0}>
+              <option value="">All tech</option>
+              {allTech.map((t) => <option key={t} value={t}>{t}</option>)}
+            </select>
+            <div className="flex items-center gap-1">
+              <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
+              <select value={sort} onChange={(e) => setSort(e.target.value as any)} className="h-8 px-2 rounded-md border border-border bg-background text-xs">
+                <option value="recent">Newest</option>
+                <option value="oldest">Oldest</option>
+                <option value="title">Title A–Z</option>
+                <option value="status">By status</option>
+              </select>
+            </div>
+            {hasFilters && (
+              <button onClick={clearFilters} className="h-8 px-2 rounded-md text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1">
+                <X className="h-3 w-3" /> Clear
+              </button>
+            )}
+            <div className="ml-auto text-[11px] text-muted-foreground tabular-nums">{filtered.length} of {rows.length}</div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-3">
+            {filtered.map((p: any) => (
+              <div key={p.id} className="card-flat p-4 group flex flex-col">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="font-medium text-sm">{p.title}</div>
+                  <button onClick={() => del.mutate(p.id)} className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
+                </div>
+                {p.description && <div className="text-xs text-muted-foreground mt-1 line-clamp-2">{p.description}</div>}
+                {p.tech_stack?.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {p.tech_stack.map((t: string) => (
+                      <button key={t} onClick={() => setFTech(t)} className={`text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground hover:bg-accent ${fTech === t ? "ring-1 ring-primary" : ""}`}>{t}</button>
+                    ))}
+                  </div>
+                )}
+                {p.highlights && <div className="mt-2 text-xs text-foreground/80 whitespace-pre-wrap border-l-2 border-primary/40 pl-2">{p.highlights}</div>}
+                <div className="mt-3 flex items-center gap-2">
+                  <select value={p.status} onChange={(e) => update.mutate({ id: p.id, status: e.target.value })} className={`text-[11px] px-2 h-6 rounded border-0 ${STATUS_COLOR[p.status]}`}>
+                    {STATUSES.map((s) => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}
+                  </select>
+                  <div className="ml-auto flex gap-2">
+                    {p.repo_url && <a href={p.repo_url} target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-foreground"><Github className="h-3.5 w-3.5" /></a>}
+                    {p.demo_url && <a href={p.demo_url} target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-foreground"><Globe className="h-3.5 w-3.5" /></a>}
+                  </div>
+                </div>
+              </div>
+            ))}
+            {filtered.length === 0 && (
+              <div className="md:col-span-2 card-flat p-10 text-center text-sm text-muted-foreground">
+                {rows.length === 0 ? "No projects yet. Add your first build." : "No projects match your filters."}
               </div>
             )}
-            {p.highlights && <div className="mt-2 text-xs text-foreground/80 whitespace-pre-wrap border-l-2 border-primary/40 pl-2">{p.highlights}</div>}
-            <div className="mt-3 flex items-center gap-2">
-              <select value={p.status} onChange={(e) => update.mutate({ id: p.id, status: e.target.value })} className={`text-[11px] px-2 h-6 rounded border-0 ${STATUS_COLOR[p.status]}`}>
-                {STATUSES.map((s) => <option key={s} value={s}>{STATUS_LABEL[s]}</option>)}
-              </select>
-              <div className="ml-auto flex gap-2">
-                {p.repo_url && <a href={p.repo_url} target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-foreground"><Github className="h-3.5 w-3.5" /></a>}
-                {p.demo_url && <a href={p.demo_url} target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-foreground"><Globe className="h-3.5 w-3.5" /></a>}
+          </div>
+        </div>
+
+        {/* Right rail: progress graphs (reflect filtered set) */}
+        <div className="space-y-4">
+          <div className="card-flat p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="section-label">Pipeline</div>
+              <div className="text-[10px] text-muted-foreground">{filtered.length} shown</div>
+            </div>
+            {chart.length > 0 ? (
+              <div className="h-44">
+                <ResponsiveContainer>
+                  <PieChart>
+                    <Pie data={chart} dataKey="value" nameKey="name" innerRadius={36} outerRadius={64} paddingAngle={2}>
+                      {chart.map((c, i) => <Cell key={i} fill={PIE[STATUSES.indexOf(c.key as any) % PIE.length]} />)}
+                    </Pie>
+                    <Tooltip contentStyle={{ background: "var(--color-card)", border: "1px solid var(--color-border)", borderRadius: 8, fontSize: 12 }} />
+                  </PieChart>
+                </ResponsiveContainer>
               </div>
+            ) : <div className="h-44 grid place-items-center text-xs text-muted-foreground">No data</div>}
+            <div className="grid grid-cols-2 gap-1.5 mt-2">
+              {STATUSES.map((s, i) => (
+                <div key={s} className="flex items-center gap-1.5 text-[11px]">
+                  <span className="h-2 w-2 rounded-full" style={{ background: PIE[i % PIE.length] }} />
+                  <span className="text-muted-foreground">{STATUS_LABEL[s]}</span>
+                  <span className="ml-auto tabular-nums">{filtered.filter((r: any) => r.status === s).length}</span>
+                </div>
+              ))}
             </div>
           </div>
-        ))}
-        {filtered.length === 0 && <div className="md:col-span-2 card-flat p-10 text-center text-sm text-muted-foreground">No projects yet. Add your first build.</div>}
+
+          <div className="card-flat p-4">
+            <div className="section-label mb-2">Top tech</div>
+            {techChart.length > 0 ? (
+              <div className="h-44">
+                <ResponsiveContainer>
+                  <BarChart data={techChart} layout="vertical" margin={{ left: 8, right: 8, top: 4, bottom: 4 }}>
+                    <XAxis type="number" hide />
+                    <YAxis type="category" dataKey="name" width={70} tickLine={false} axisLine={false} fontSize={11} stroke="var(--color-muted-foreground)" />
+                    <Tooltip contentStyle={{ background: "var(--color-card)", border: "1px solid var(--color-border)", borderRadius: 8, fontSize: 12 }} />
+                    <Bar dataKey="value" fill="var(--color-primary)" radius={[0, 4, 4, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            ) : <div className="h-44 grid place-items-center text-xs text-muted-foreground">No tech tagged yet</div>}
+          </div>
+
+          <div className="card-flat p-4">
+            <div className="section-label mb-2">Quick filter</div>
+            <div className="flex flex-wrap gap-1.5">
+              {STATUSES.map((s) => (
+                <button key={s} onClick={() => setFStatus(fStatus === s ? "" : s)}
+                  className={`text-[11px] px-2 h-6 rounded-full border transition ${fStatus === s ? "bg-primary text-primary-foreground border-primary" : "border-border hover:bg-accent"}`}>
+                  {STATUS_LABEL[s]}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
