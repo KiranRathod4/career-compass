@@ -19,6 +19,9 @@ function ProjectsPage() {
   const qc = useQueryClient();
   const [showAdd, setShowAdd] = useState(false);
   const [fStatus, setFStatus] = useState("");
+  const [fTech, setFTech] = useState("");
+  const [q, setQ] = useState("");
+  const [sort, setSort] = useState<"recent" | "oldest" | "title" | "status">("recent");
   const [draft, setDraft] = useState({ title: "", description: "", tech_stack: "", status: "idea" as string, repo_url: "", demo_url: "", highlights: "" });
 
   const { data: rows = [] } = useQuery({
