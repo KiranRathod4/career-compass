@@ -7,7 +7,7 @@ import { format, startOfWeek, addDays, differenceInDays } from "date-fns";
 import { Flame, CheckCircle2, Briefcase, Code2, Clock, Plus } from "lucide-react";
 import { useReward, BadgeUnlockModal } from "@/hooks/use-reward";
 
-export const Route = createFileRoute("/_authenticated/")({
+export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
 });
 

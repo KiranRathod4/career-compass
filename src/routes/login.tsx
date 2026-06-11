@@ -20,7 +20,7 @@ function LoginPage() {
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
 
-  if (!loading && user) return <Navigate to="/" />;
+  if (!loading && user) return <Navigate to="/dashboard" />;
 
   const handleEmail = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +37,7 @@ function LoginPage() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
       }
-      navigate({ to: "/" });
+      navigate({ to: "/dashboard" });
     } catch (err: any) {
       toast.error(err.message ?? "Authentication failed");
     } finally { setBusy(false); }

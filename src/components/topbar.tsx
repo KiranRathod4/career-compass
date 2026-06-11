@@ -13,7 +13,7 @@ import { formatDistanceToNowStrict } from "date-fns";
 
 
 const titles: Record<string, string> = {
-  "/": "Dashboard", "/timer": "Focus Timer", "/planner": "Daily Planner",
+  "/dashboard": "Dashboard", "/timer": "Focus Timer", "/planner": "Daily Planner",
   "/dsa": "DSA Tracker", "/aptitude": "Aptitude Tracker", "/sql": "SQL Tracker",
   "/devops": "DevOps Hub", "/qa": "QA Hub", "/resources": "Resources",
   "/skills": "Skill Matrix", "/jobs": "Job Tracker", "/companies": "Company Prep",

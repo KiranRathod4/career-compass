@@ -116,7 +116,7 @@ function OnboardingPage() {
 
       await qc.invalidateQueries();
       toast.success("Taiyaar ho! Chalo shuru karte hain 🚀");
-      navigate({ to: "/" });
+      navigate({ to: "/dashboard" });
     } catch (err: any) {
       toast.error(err.message ?? "Setup failed");
       setBusy(false);
