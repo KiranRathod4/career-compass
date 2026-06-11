@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as UUsernameRouteImport } from './routes/u.$username'
 import { Route as AuthenticatedTracksRouteImport } from './routes/_authenticated/tracks'
 import { Route as AuthenticatedTimerRouteImport } from './routes/_authenticated/timer'
@@ -56,6 +57,11 @@ const LoginRoute = LoginRouteImport.update({
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const UUsernameRoute = UUsernameRouteImport.update({
@@ -249,7 +255,7 @@ const ApiCoachStreamRoute = ApiCoachStreamRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof AuthenticatedRouteWithChildren
+  '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
@@ -290,7 +296,7 @@ export interface FileRoutesByFullPath {
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof AuthenticatedRouteWithChildren
+  '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
@@ -332,6 +338,7 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
@@ -457,6 +464,7 @@ export interface FileRouteTypes {
     | '/api/public/razorpay-webhook'
   id:
     | '__root__'
+    | '/'
     | '/_authenticated'
     | '/login'
     | '/_authenticated/achievements'
@@ -499,6 +507,7 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
   UUsernameRoute: typeof UUsernameRoute
@@ -520,6 +529,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/u/$username': {
@@ -863,6 +879,7 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 )
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
   UUsernameRoute: UUsernameRoute,
