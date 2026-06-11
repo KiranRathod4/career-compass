@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
-import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as UUsernameRouteImport } from './routes/u.$username'
 import { Route as AuthenticatedTracksRouteImport } from './routes/_authenticated/tracks'
 import { Route as AuthenticatedTimerRouteImport } from './routes/_authenticated/timer'
@@ -38,6 +37,7 @@ import { Route as AuthenticatedJavaRouteImport } from './routes/_authenticated/j
 import { Route as AuthenticatedInterviewRouteImport } from './routes/_authenticated/interview'
 import { Route as AuthenticatedDsaRouteImport } from './routes/_authenticated/dsa'
 import { Route as AuthenticatedDevopsRouteImport } from './routes/_authenticated/devops'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCompaniesRouteImport } from './routes/_authenticated/companies'
 import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
 import { Route as AuthenticatedChallengesRouteImport } from './routes/_authenticated/challenges'
@@ -57,11 +57,6 @@ const LoginRoute = LoginRouteImport.update({
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const UUsernameRoute = UUsernameRouteImport.update({
   id: '/u/$username',
@@ -195,6 +190,11 @@ const AuthenticatedDevopsRoute = AuthenticatedDevopsRouteImport.update({
   path: '/devops',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedCompaniesRoute = AuthenticatedCompaniesRouteImport.update({
   id: '/companies',
   path: '/companies',
@@ -249,7 +249,7 @@ const ApiCoachStreamRoute = ApiCoachStreamRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof AuthenticatedIndexRoute
+  '/': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
@@ -259,6 +259,7 @@ export interface FileRoutesByFullPath {
   '/challenges': typeof AuthenticatedChallengesRoute
   '/coach': typeof AuthenticatedCoachRoute
   '/companies': typeof AuthenticatedCompaniesRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/devops': typeof AuthenticatedDevopsRoute
   '/dsa': typeof AuthenticatedDsaRoute
   '/interview': typeof AuthenticatedInterviewRoute
@@ -289,6 +290,7 @@ export interface FileRoutesByFullPath {
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
@@ -298,6 +300,7 @@ export interface FileRoutesByTo {
   '/challenges': typeof AuthenticatedChallengesRoute
   '/coach': typeof AuthenticatedCoachRoute
   '/companies': typeof AuthenticatedCompaniesRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/devops': typeof AuthenticatedDevopsRoute
   '/dsa': typeof AuthenticatedDsaRoute
   '/interview': typeof AuthenticatedInterviewRoute
@@ -324,7 +327,6 @@ export interface FileRoutesByTo {
   '/timer': typeof AuthenticatedTimerRoute
   '/tracks': typeof AuthenticatedTracksRoute
   '/u/$username': typeof UUsernameRoute
-  '/': typeof AuthenticatedIndexRoute
   '/api/coach/stream': typeof ApiCoachStreamRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
 }
@@ -340,6 +342,7 @@ export interface FileRoutesById {
   '/_authenticated/challenges': typeof AuthenticatedChallengesRoute
   '/_authenticated/coach': typeof AuthenticatedCoachRoute
   '/_authenticated/companies': typeof AuthenticatedCompaniesRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/devops': typeof AuthenticatedDevopsRoute
   '/_authenticated/dsa': typeof AuthenticatedDsaRoute
   '/_authenticated/interview': typeof AuthenticatedInterviewRoute
@@ -366,7 +369,6 @@ export interface FileRoutesById {
   '/_authenticated/timer': typeof AuthenticatedTimerRoute
   '/_authenticated/tracks': typeof AuthenticatedTracksRoute
   '/u/$username': typeof UUsernameRoute
-  '/_authenticated/': typeof AuthenticatedIndexRoute
   '/api/coach/stream': typeof ApiCoachStreamRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
 }
@@ -383,6 +385,7 @@ export interface FileRouteTypes {
     | '/challenges'
     | '/coach'
     | '/companies'
+    | '/dashboard'
     | '/devops'
     | '/dsa'
     | '/interview'
@@ -413,6 +416,7 @@ export interface FileRouteTypes {
     | '/api/public/razorpay-webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
     | '/login'
     | '/achievements'
     | '/analytics'
@@ -422,6 +426,7 @@ export interface FileRouteTypes {
     | '/challenges'
     | '/coach'
     | '/companies'
+    | '/dashboard'
     | '/devops'
     | '/dsa'
     | '/interview'
@@ -448,7 +453,6 @@ export interface FileRouteTypes {
     | '/timer'
     | '/tracks'
     | '/u/$username'
-    | '/'
     | '/api/coach/stream'
     | '/api/public/razorpay-webhook'
   id:
@@ -463,6 +467,7 @@ export interface FileRouteTypes {
     | '/_authenticated/challenges'
     | '/_authenticated/coach'
     | '/_authenticated/companies'
+    | '/_authenticated/dashboard'
     | '/_authenticated/devops'
     | '/_authenticated/dsa'
     | '/_authenticated/interview'
@@ -489,7 +494,6 @@ export interface FileRouteTypes {
     | '/_authenticated/timer'
     | '/_authenticated/tracks'
     | '/u/$username'
-    | '/_authenticated/'
     | '/api/coach/stream'
     | '/api/public/razorpay-webhook'
   fileRoutesById: FileRoutesById
@@ -517,13 +521,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/': {
-      id: '/_authenticated/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
     }
     '/u/$username': {
       id: '/u/$username'
@@ -707,6 +704,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDevopsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/companies': {
       id: '/_authenticated/companies'
       path: '/companies'
@@ -789,6 +793,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedChallengesRoute: typeof AuthenticatedChallengesRoute
   AuthenticatedCoachRoute: typeof AuthenticatedCoachRoute
   AuthenticatedCompaniesRoute: typeof AuthenticatedCompaniesRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDevopsRoute: typeof AuthenticatedDevopsRoute
   AuthenticatedDsaRoute: typeof AuthenticatedDsaRoute
   AuthenticatedInterviewRoute: typeof AuthenticatedInterviewRoute
@@ -814,7 +819,6 @@ interface AuthenticatedRouteChildren {
   AuthenticatedSystemDesignRoute: typeof AuthenticatedSystemDesignRoute
   AuthenticatedTimerRoute: typeof AuthenticatedTimerRoute
   AuthenticatedTracksRoute: typeof AuthenticatedTracksRoute
-  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -826,6 +830,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedChallengesRoute: AuthenticatedChallengesRoute,
   AuthenticatedCoachRoute: AuthenticatedCoachRoute,
   AuthenticatedCompaniesRoute: AuthenticatedCompaniesRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDevopsRoute: AuthenticatedDevopsRoute,
   AuthenticatedDsaRoute: AuthenticatedDsaRoute,
   AuthenticatedInterviewRoute: AuthenticatedInterviewRoute,
@@ -851,7 +856,6 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedSystemDesignRoute: AuthenticatedSystemDesignRoute,
   AuthenticatedTimerRoute: AuthenticatedTimerRoute,
   AuthenticatedTracksRoute: AuthenticatedTracksRoute,
-  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
