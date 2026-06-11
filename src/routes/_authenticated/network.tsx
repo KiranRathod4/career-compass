@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { localDateKey } from "@/lib/utils";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, Trash2, ExternalLink, Mail, Search } from "lucide-react";
@@ -50,7 +51,7 @@ function NetworkPage() {
     referred: rows.filter((r: any) => r.status === "referred").length,
   };
 
-  const touch = (id: string) => update.mutate({ id, last_contact_at: new Date().toISOString().slice(0, 10) });
+  const touch = (id: string) => update.mutate({ id, last_contact_at: localDateKey() });
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">

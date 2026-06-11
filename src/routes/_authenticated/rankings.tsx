@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { localDateKey } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
@@ -295,5 +296,5 @@ function getWeekStart(): string {
   const day = d.getDay();
   const diff = day === 0 ? -6 : 1 - day;
   d.setDate(d.getDate() + diff);
-  return d.toISOString().slice(0, 10);
+  return localDateKey(d);
 }

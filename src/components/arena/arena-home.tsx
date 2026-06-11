@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { localDateKey } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -19,7 +20,7 @@ export function ArenaHome({ onPick }: { onPick: (g: GameKey) => void }) {
   const [now, setNow] = useState(new Date());
   useEffect(() => { const t = setInterval(() => setNow(new Date()), 1000); return () => clearInterval(t); }, []);
 
-  const today = now.toISOString().slice(0, 10);
+  const today = localDateKey(now);
   const { data: levelInfo } = useXP();
 
   const { data: attempts } = useQuery({
@@ -374,7 +375,7 @@ function weekStart(): string {
   const day = d.getDay();
   const diff = day === 0 ? -6 : 1 - day;
   d.setDate(d.getDate() + diff);
-  return d.toISOString().slice(0, 10);
+  return localDateKey(d);
 }
 function seasonNum(): number {
   const start = new Date(2026, 0, 1).getTime();

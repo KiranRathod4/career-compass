@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { localDateKey } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getPublicPortfolio } from "@/lib/portfolio.functions";
@@ -151,7 +152,7 @@ function Heatmap({ data }: { data: Record<string, number> }) {
   for (let i = 364; i >= 0; i--) {
     const d = new Date(end);
     d.setDate(end.getDate() - i);
-    const key = d.toISOString().slice(0, 10);
+    const key = localDateKey(d);
     days.push({ date: key, v: data[key] ?? 0 });
   }
   const weeks: { date: string; v: number }[][] = [];

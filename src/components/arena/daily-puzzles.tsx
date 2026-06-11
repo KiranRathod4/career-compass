@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { localDateKey } from "@/lib/utils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -11,7 +12,7 @@ export function DailyPuzzles({ onBack }: { onBack: () => void }) {
   const { user } = useAuth();
   const qc = useQueryClient();
   const award = useAwardXP();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDateKey();
   const [active, setActive] = useState(0);
 
   const { data: questions } = useQuery({

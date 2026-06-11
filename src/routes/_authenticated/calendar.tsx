@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { localDateKey } from "@/lib/utils";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,7 +21,7 @@ const TYPE_COLORS: Record<string, string> = {
 };
 
 function startOfMonth(d: Date) { return new Date(d.getFullYear(), d.getMonth(), 1); }
-function fmtDate(d: Date) { return d.toISOString().slice(0, 10); }
+function fmtDate(d: Date) { return localDateKey(d); }
 function sameDay(a: string, b: string) { return a === b; }
 
 function CalendarPage() {
