@@ -33,7 +33,7 @@ export const PREPARE_ITEM_ORDER = [
 
 const STATIC_GROUPS: Record<string, Group> = {
   overview: { key: "overview", label: "Overview", items: [
-    { label: "Dashboard", to: "/", icon: Home },
+    { label: "Dashboard", to: "/dashboard", icon: Home },
     { label: "Focus Timer", to: "/timer", icon: Timer },
     { label: "Daily Planner", to: "/planner", icon: Calendar },
     { label: "Calendar", to: "/calendar", icon: CalendarDays },
