@@ -136,7 +136,7 @@ function LinkedInPage() {
               <select value={p.status} onChange={(e) => {
                 const v = e.target.value;
                 const patch: any = { status: v };
-                if (v === "posted" && !p.posted_at) patch.posted_at = new Date().toISOString().slice(0, 10);
+                if (v === "posted" && !p.posted_at) patch.posted_at = localDateKey();
                 update.mutate({ id: p.id, ...patch });
               }} className={`text-[11px] px-2 h-6 rounded border-0 ${STATUS_COLOR[p.status]}`}>
                 {STATUSES.map((s) => <option key={s}>{s}</option>)}

@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_authenticated/sprints")({ component: Spr
 const STATUSES = ["planned", "active", "complete", "archived"] as const;
 const STATUS_COLOR: Record<string, string> = { planned: "bg-muted text-muted-foreground", active: "bg-info/15 text-info", complete: "bg-success/15 text-success", archived: "bg-muted text-muted-foreground/60" };
 
-function todayPlus(days: number) { const d = new Date(); d.setDate(d.getDate() + days); return d.toISOString().slice(0, 10); }
+function todayPlus(days: number) { const d = new Date(); d.setDate(d.getDate() + days); return localDateKey(d); }
 
 function SprintsPage() {
   const { user } = useAuth();

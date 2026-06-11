@@ -12,7 +12,7 @@ export function DailyPuzzles({ onBack }: { onBack: () => void }) {
   const { user } = useAuth();
   const qc = useQueryClient();
   const award = useAwardXP();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDateKey();
   const [active, setActive] = useState(0);
 
   const { data: questions } = useQuery({

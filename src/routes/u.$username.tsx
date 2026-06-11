@@ -152,7 +152,7 @@ function Heatmap({ data }: { data: Record<string, number> }) {
   for (let i = 364; i >= 0; i--) {
     const d = new Date(end);
     d.setDate(end.getDate() - i);
-    const key = d.toISOString().slice(0, 10);
+    const key = localDateKey(d);
     days.push({ date: key, v: data[key] ?? 0 });
   }
   const weeks: { date: string; v: number }[][] = [];

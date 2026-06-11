@@ -44,7 +44,7 @@ function AnalyticsPage() {
     const arr: any[] = [];
     for (let i = 13; i >= 0; i--) {
       const dt = new Date(); dt.setDate(dt.getDate() - i);
-      const key = dt.toISOString().slice(0, 10);
+      const key = localDateKey(dt);
       const day = daily.find((x: any) => x.date === key);
       const focusMin = sessions.filter((s: any) => (s.started_at || "").slice(0, 10) === key).reduce((a: number, s: any) => a + (s.duration_minutes || 0), 0);
       arr.push({ date: key.slice(5), focus: Math.round(focusMin / 60 * 10) / 10, deep: Number(day?.deep_work_hours || 0), apps: day?.applications_count || 0 });

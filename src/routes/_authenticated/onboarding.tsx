@@ -45,7 +45,7 @@ function OnboardingPage() {
     full_name: "",
     college_name: "",
     graduation_year: new Date().getFullYear() + 1,
-    placement_start_date: new Date().toISOString().slice(0, 10),
+    placement_start_date: localDateKey(),
     target_domains: [],
     daily_dsa_target: 3,
     daily_application_target: 2,

@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_authenticated/review")({ component: Revi
 
 function mondayOf(d: Date) {
   const x = new Date(d); const day = (x.getDay() + 6) % 7; x.setDate(x.getDate() - day);
-  return x.toISOString().slice(0, 10);
+  return localDateKey(x);
 }
 
 function ReviewPage() {
