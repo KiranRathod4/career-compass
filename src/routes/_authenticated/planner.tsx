@@ -45,6 +45,70 @@ const TEMPLATES: Record<string, { start_time: string; end_time: string; task: st
   "Rest Day": [{ start_time: "10:00", end_time: "10:30", task: "Light DSA review", category: "DSA" }],
 };
 
+interface MoodOption {
+  label: string;
+  emoji: string;
+  color: string;
+  bg: string;
+  border: string;
+  quote: string;
+  author: string;
+  tip: string;
+}
+
+const MOODS: MoodOption[] = [
+  {
+    label: "Tired",
+    emoji: "😴",
+    color: "text-slate-700 dark:text-slate-300",
+    bg: "bg-slate-100 dark:bg-slate-800/60",
+    border: "border-slate-300 dark:border-slate-600",
+    quote: "Rest is not idleness. It is the fuel that powers your next breakthrough.",
+    author: "Lin Yutang",
+    tip: "Take a 20-min power nap or a light walk before your next session.",
+  },
+  {
+    label: "Okay",
+    emoji: "😐",
+    color: "text-amber-700 dark:text-amber-300",
+    bg: "bg-amber-50 dark:bg-amber-900/20",
+    border: "border-amber-300 dark:border-amber-700",
+    quote: "You don't have to be great to start, but you have to start to be great.",
+    author: "Zig Ziglar",
+    tip: "Pick one small win — a single DSA problem or 15 mins of revision — to build momentum.",
+  },
+  {
+    label: "Focused",
+    emoji: "⚡",
+    color: "text-emerald-700 dark:text-emerald-300",
+    bg: "bg-emerald-50 dark:bg-emerald-900/20",
+    border: "border-emerald-300 dark:border-emerald-700",
+    quote: "Deep work is the superpower of the 21st century. Protect it fiercely.",
+    author: "Cal Newport",
+    tip: "You're in flow — lock in a 90-min deep-work block on your hardest topic.",
+  },
+  {
+    label: "Motivated",
+    emoji: "🔥",
+    color: "text-rose-700 dark:text-rose-300",
+    bg: "bg-rose-50 dark:bg-rose-900/20",
+    border: "border-rose-300 dark:border-rose-700",
+    quote: "The future belongs to those who believe in the beauty of their dreams.",
+    author: "Eleanor Roosevelt",
+    tip: "Channel this energy into mock interviews or job applications — strike while the iron is hot!",
+  },
+  {
+    label: "Burnt Out",
+    emoji: "🪫",
+    color: "text-red-700 dark:text-red-300",
+    bg: "bg-red-50 dark:bg-red-900/20",
+    border: "border-red-300 dark:border-red-700",
+    quote: "It's okay to pause. A battery recharges only when it stops giving.",
+    author: "Taiyaar",
+    tip: "Step away from the screen. Hydrate, breathe, and come back tomorrow stronger.",
+  },
+];
+
 function PlannerPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
