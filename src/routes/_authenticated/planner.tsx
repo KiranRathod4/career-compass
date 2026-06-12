@@ -51,8 +51,7 @@ interface MoodOption {
   color: string;
   bg: string;
   border: string;
-  quote: string;
-  author: string;
+  quotes: { quote: string; author: string }[];
   tip: string;
 }
 
@@ -63,8 +62,13 @@ const MOODS: MoodOption[] = [
     color: "text-slate-700 dark:text-slate-300",
     bg: "bg-slate-100 dark:bg-slate-800/60",
     border: "border-slate-300 dark:border-slate-600",
-    quote: "Rest is not idleness. It is the fuel that powers your next breakthrough.",
-    author: "Lin Yutang",
+    quotes: [
+      { quote: "Rest is not idleness. It is the fuel that powers your next breakthrough.", author: "Lin Yutang" },
+      { quote: "Almost everything will work again if you unplug it for a few minutes, including you.", author: "Anne Lamott" },
+      { quote: "Sometimes the most productive thing you can do is rest.", author: "Mark Black" },
+      { quote: "Take rest; a field that has rested gives a bountiful crop.", author: "Ovid" },
+      { quote: "Your calm mind is the ultimate weapon against your challenges.", author: "Bryant McGill" },
+    ],
     tip: "Take a 20-min power nap or a light walk before your next session.",
   },
   {
@@ -73,8 +77,13 @@ const MOODS: MoodOption[] = [
     color: "text-amber-700 dark:text-amber-300",
     bg: "bg-amber-50 dark:bg-amber-900/20",
     border: "border-amber-300 dark:border-amber-700",
-    quote: "You don't have to be great to start, but you have to start to be great.",
-    author: "Zig Ziglar",
+    quotes: [
+      { quote: "You don't have to be great to start, but you have to start to be great.", author: "Zig Ziglar" },
+      { quote: "Small steps every day lead to big results one day.", author: "Anonymous" },
+      { quote: "Progress, not perfection.", author: "Marc Andreessen" },
+      { quote: "An average effort sustained beats brilliance abandoned.", author: "James Clear" },
+      { quote: "Showing up is half the battle.", author: "Woody Allen" },
+    ],
     tip: "Pick one small win — a single DSA problem or 15 mins of revision — to build momentum.",
   },
   {
@@ -83,8 +92,13 @@ const MOODS: MoodOption[] = [
     color: "text-emerald-700 dark:text-emerald-300",
     bg: "bg-emerald-50 dark:bg-emerald-900/20",
     border: "border-emerald-300 dark:border-emerald-700",
-    quote: "Deep work is the superpower of the 21st century. Protect it fiercely.",
-    author: "Cal Newport",
+    quotes: [
+      { quote: "Deep work is the superpower of the 21st century. Protect it fiercely.", author: "Cal Newport" },
+      { quote: "Concentrate all your thoughts upon the work at hand.", author: "Alexander Graham Bell" },
+      { quote: "Where focus goes, energy flows.", author: "Tony Robbins" },
+      { quote: "The successful warrior is the average man, with laser-like focus.", author: "Bruce Lee" },
+      { quote: "Starve your distractions. Feed your focus.", author: "Anonymous" },
+    ],
     tip: "You're in flow — lock in a 90-min deep-work block on your hardest topic.",
   },
   {
@@ -93,8 +107,13 @@ const MOODS: MoodOption[] = [
     color: "text-rose-700 dark:text-rose-300",
     bg: "bg-rose-50 dark:bg-rose-900/20",
     border: "border-rose-300 dark:border-rose-700",
-    quote: "The future belongs to those who believe in the beauty of their dreams.",
-    author: "Eleanor Roosevelt",
+    quotes: [
+      { quote: "The future belongs to those who believe in the beauty of their dreams.", author: "Eleanor Roosevelt" },
+      { quote: "Hard work beats talent when talent doesn't work hard.", author: "Tim Notke" },
+      { quote: "Don't watch the clock; do what it does. Keep going.", author: "Sam Levenson" },
+      { quote: "Discipline is choosing between what you want now and what you want most.", author: "Abraham Lincoln" },
+      { quote: "You are one decision away from a totally different life.", author: "Mark Batterson" },
+    ],
     tip: "Channel this energy into mock interviews or job applications — strike while the iron is hot!",
   },
   {
@@ -103,8 +122,13 @@ const MOODS: MoodOption[] = [
     color: "text-red-700 dark:text-red-300",
     bg: "bg-red-50 dark:bg-red-900/20",
     border: "border-red-300 dark:border-red-700",
-    quote: "It's okay to pause. A battery recharges only when it stops giving.",
-    author: "Taiyaar",
+    quotes: [
+      { quote: "It's okay to pause. A battery recharges only when it stops giving.", author: "Taiyaar" },
+      { quote: "You can't pour from an empty cup. Take care of yourself first.", author: "Anonymous" },
+      { quote: "Burnout is your body's way of saying you've been carrying too much for too long.", author: "Anonymous" },
+      { quote: "Healing takes time, and asking for help is a courageous step.", author: "Mariska Hargitay" },
+      { quote: "Slow down. Calm down. Trust the process.", author: "Alexandra Stoddard" },
+    ],
     tip: "Step away from the screen. Hydrate, breathe, and come back tomorrow stronger.",
   },
 ];
@@ -113,6 +137,8 @@ function PlannerPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [activeMood, setActiveMood] = useState<string>("");
+  const [quoteIdx, setQuoteIdx] = useState<number>(0);
 
   const { data: entry } = useQuery({
     queryKey: ["daily", user!.id, date],
@@ -210,13 +236,20 @@ function PlannerPage() {
             <Field label="Mood & Energy">
               <div className="flex flex-wrap gap-2 mt-0.5">
                 {MOODS.map((m) => {
-                  const isActive = entry?.mood === m.label;
+                  const isActive = (activeMood || entry?.mood) === m.label;
                   return (
                     <button
                       key={m.label}
                       type="button"
                       onClick={() => {
-                        upsert.mutate({ mood: isActive ? "" : m.label });
+                        if (isActive) {
+                          // cycle to next quote on repeat click
+                          setQuoteIdx((i) => (i + 1) % m.quotes.length);
+                        } else {
+                          setActiveMood(m.label);
+                          setQuoteIdx(Math.floor(Math.random() * m.quotes.length));
+                          upsert.mutate({ mood: m.label });
+                        }
                       }}
                       className={cn(
                         "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200",
@@ -245,23 +278,36 @@ function PlannerPage() {
       </details>
 
       {/* Mood Quote Card */}
-      {entry?.mood && (() => {
-        const m = MOODS.find((x) => x.label === entry.mood);
+      {(() => {
+        const moodLabel = activeMood || entry?.mood;
+        if (!moodLabel) return null;
+        const m = MOODS.find((x) => x.label === moodLabel);
         if (!m) return null;
+        const q = m.quotes[quoteIdx % m.quotes.length];
         return (
-          <div className={cn("card-flat p-5 border-l-4 animate-fade-in", m.border)}>
+          <div key={`${m.label}-${quoteIdx}`} className={cn("card-flat p-5 border-l-4 animate-fade-in", m.border)}>
             <div className="flex items-start gap-3">
               <div className={cn("text-3xl select-none", m.color)}>{m.emoji}</div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <Quote className="h-4 w-4 text-primary opacity-60" />
-                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{m.label} Vibes</span>
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <div className="flex items-center gap-2">
+                    <Quote className="h-4 w-4 text-primary opacity-60" />
+                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{m.label} Vibes</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setQuoteIdx((i) => (i + 1) % m.quotes.length)}
+                    className="text-[11px] px-2 py-1 rounded-md border border-border hover:bg-secondary transition"
+                  >
+                    New quote ✨
+                  </button>
                 </div>
                 <blockquote className="text-sm font-medium leading-relaxed text-foreground mb-2">
-                  "{m.quote}"
+                  "{q.quote}"
                 </blockquote>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">— {m.author}</span>
+                  <span className="text-xs text-muted-foreground">— {q.author}</span>
+                  <span className="text-[10px] text-muted-foreground">{(quoteIdx % m.quotes.length) + 1} / {m.quotes.length}</span>
                 </div>
                 <div className={cn("mt-3 p-3 rounded-lg text-xs", m.bg, m.color)}>
                   <span className="font-semibold">Tip:</span> {m.tip}
