@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Plus, Trash2, Flame, AlertTriangle } from "lucide-react";
+import { Plus, Trash2, Flame, AlertTriangle, Quote } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { format, subDays } from "date-fns";
@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { aiDailyPlan, aiOverload } from "@/lib/ai.functions";
 import { AICard, ScoreBar } from "@/components/ai-insight-card";
 import { TaskBoard } from "@/components/task-manager/task-board";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/planner")({ component: PlannerPage });
 
