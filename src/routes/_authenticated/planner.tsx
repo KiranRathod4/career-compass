@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Plus, Trash2, Flame, AlertTriangle } from "lucide-react";
+import { Plus, Trash2, Flame, AlertTriangle, Quote } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { format, subDays } from "date-fns";
@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { aiDailyPlan, aiOverload } from "@/lib/ai.functions";
 import { AICard, ScoreBar } from "@/components/ai-insight-card";
 import { TaskBoard } from "@/components/task-manager/task-board";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/planner")({ component: PlannerPage });
 
@@ -43,6 +44,70 @@ const TEMPLATES: Record<string, { start_time: string; end_time: string; task: st
   ],
   "Rest Day": [{ start_time: "10:00", end_time: "10:30", task: "Light DSA review", category: "DSA" }],
 };
+
+interface MoodOption {
+  label: string;
+  emoji: string;
+  color: string;
+  bg: string;
+  border: string;
+  quote: string;
+  author: string;
+  tip: string;
+}
+
+const MOODS: MoodOption[] = [
+  {
+    label: "Tired",
+    emoji: "😴",
+    color: "text-slate-700 dark:text-slate-300",
+    bg: "bg-slate-100 dark:bg-slate-800/60",
+    border: "border-slate-300 dark:border-slate-600",
+    quote: "Rest is not idleness. It is the fuel that powers your next breakthrough.",
+    author: "Lin Yutang",
+    tip: "Take a 20-min power nap or a light walk before your next session.",
+  },
+  {
+    label: "Okay",
+    emoji: "😐",
+    color: "text-amber-700 dark:text-amber-300",
+    bg: "bg-amber-50 dark:bg-amber-900/20",
+    border: "border-amber-300 dark:border-amber-700",
+    quote: "You don't have to be great to start, but you have to start to be great.",
+    author: "Zig Ziglar",
+    tip: "Pick one small win — a single DSA problem or 15 mins of revision — to build momentum.",
+  },
+  {
+    label: "Focused",
+    emoji: "⚡",
+    color: "text-emerald-700 dark:text-emerald-300",
+    bg: "bg-emerald-50 dark:bg-emerald-900/20",
+    border: "border-emerald-300 dark:border-emerald-700",
+    quote: "Deep work is the superpower of the 21st century. Protect it fiercely.",
+    author: "Cal Newport",
+    tip: "You're in flow — lock in a 90-min deep-work block on your hardest topic.",
+  },
+  {
+    label: "Motivated",
+    emoji: "🔥",
+    color: "text-rose-700 dark:text-rose-300",
+    bg: "bg-rose-50 dark:bg-rose-900/20",
+    border: "border-rose-300 dark:border-rose-700",
+    quote: "The future belongs to those who believe in the beauty of their dreams.",
+    author: "Eleanor Roosevelt",
+    tip: "Channel this energy into mock interviews or job applications — strike while the iron is hot!",
+  },
+  {
+    label: "Burnt Out",
+    emoji: "🪫",
+    color: "text-red-700 dark:text-red-300",
+    bg: "bg-red-50 dark:bg-red-900/20",
+    border: "border-red-300 dark:border-red-700",
+    quote: "It's okay to pause. A battery recharges only when it stops giving.",
+    author: "Taiyaar",
+    tip: "Step away from the screen. Hydrate, breathe, and come back tomorrow stronger.",
+  },
+];
 
 function PlannerPage() {
   const { user } = useAuth();
@@ -142,7 +207,31 @@ function PlannerPage() {
             <Field label="Deep work (hrs)"><input type="number" step="0.5" value={entry?.deep_work_hours ?? 0} onChange={(e) => upsert.mutate({ deep_work_hours: +e.target.value })} className="w-full h-8 px-2 rounded border border-border bg-background text-sm" /></Field>
             <Field label="Applications"><input type="number" value={entry?.applications_count ?? 0} onChange={(e) => upsert.mutate({ applications_count: +e.target.value })} className="w-full h-8 px-2 rounded border border-border bg-background text-sm" /></Field>
             <Field label="Productivity"><input type="number" min={1} max={10} value={entry?.productivity_score ?? ""} onChange={(e) => upsert.mutate({ productivity_score: +e.target.value })} className="w-full h-8 px-2 rounded border border-border bg-background text-sm" /></Field>
-            <Field label="Mood"><select value={entry?.mood ?? ""} onChange={(e) => upsert.mutate({ mood: e.target.value })} className="w-full h-8 px-2 rounded border border-border bg-background text-sm"><option value="">—</option>{["Tired","Okay","Focused","Motivated","Burnt Out"].map((m) => <option key={m}>{m}</option>)}</select></Field>
+            <Field label="Mood & Energy">
+              <div className="flex flex-wrap gap-2 mt-0.5">
+                {MOODS.map((m) => {
+                  const isActive = entry?.mood === m.label;
+                  return (
+                    <button
+                      key={m.label}
+                      type="button"
+                      onClick={() => {
+                        upsert.mutate({ mood: isActive ? "" : m.label });
+                      }}
+                      className={cn(
+                        "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200",
+                        isActive
+                          ? `${m.bg} ${m.border} ${m.color} ring-1 ring-offset-1 ring-offset-background scale-105 shadow-sm`
+                          : "bg-muted border-border text-muted-foreground hover:bg-secondary hover:text-foreground"
+                      )}
+                    >
+                      <span className="text-base leading-none">{m.emoji}</span>
+                      <span>{m.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </Field>
           </div>
           <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
             {CHECKS.map(([key, label]) => (
@@ -155,6 +244,33 @@ function PlannerPage() {
         </div>
       </details>
 
+      {/* Mood Quote Card */}
+      {entry?.mood && (() => {
+        const m = MOODS.find((x) => x.label === entry.mood);
+        if (!m) return null;
+        return (
+          <div className={cn("card-flat p-5 border-l-4 animate-fade-in", m.border)}>
+            <div className="flex items-start gap-3">
+              <div className={cn("text-3xl select-none", m.color)}>{m.emoji}</div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <Quote className="h-4 w-4 text-primary opacity-60" />
+                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{m.label} Vibes</span>
+                </div>
+                <blockquote className="text-sm font-medium leading-relaxed text-foreground mb-2">
+                  "{m.quote}"
+                </blockquote>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">— {m.author}</span>
+                </div>
+                <div className={cn("mt-3 p-3 rounded-lg text-xs", m.bg, m.color)}>
+                  <span className="font-semibold">Tip:</span> {m.tip}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       <AIPanels date={date} entry={entry} blocks={blocks} monthEntries={monthEntries} onBlocksAdded={() => qc.invalidateQueries({ queryKey: ["blocks"] })} />
     </div>
