@@ -217,7 +217,6 @@ function PlannerPage() {
                       type="button"
                       onClick={() => {
                         upsert.mutate({ mood: isActive ? "" : m.label });
-                        setActiveMood(isActive ? null : m.label);
                       }}
                       className={cn(
                         "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200",
