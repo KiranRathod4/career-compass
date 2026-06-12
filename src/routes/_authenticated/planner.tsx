@@ -236,13 +236,20 @@ function PlannerPage() {
             <Field label="Mood & Energy">
               <div className="flex flex-wrap gap-2 mt-0.5">
                 {MOODS.map((m) => {
-                  const isActive = entry?.mood === m.label;
+                  const isActive = (activeMood || entry?.mood) === m.label;
                   return (
                     <button
                       key={m.label}
                       type="button"
                       onClick={() => {
-                        upsert.mutate({ mood: isActive ? "" : m.label });
+                        if (isActive) {
+                          // cycle to next quote on repeat click
+                          setQuoteIdx((i) => (i + 1) % m.quotes.length);
+                        } else {
+                          setActiveMood(m.label);
+                          setQuoteIdx(Math.floor(Math.random() * m.quotes.length));
+                          upsert.mutate({ mood: m.label });
+                        }
                       }}
                       className={cn(
                         "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200",
