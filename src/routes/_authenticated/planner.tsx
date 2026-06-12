@@ -156,6 +156,7 @@ function PlannerPage() {
   });
 
   const [newBlock, setNewBlock] = useState({ start_time: "09:00", end_time: "10:00", task: "", category: "DSA" });
+  const [activeMood, setActiveMood] = useState<string | null>(entry?.mood ?? null);
 
   const applyTemplate = async (name: string) => {
     const tpl = TEMPLATES[name];
