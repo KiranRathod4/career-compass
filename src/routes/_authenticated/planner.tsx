@@ -278,23 +278,36 @@ function PlannerPage() {
       </details>
 
       {/* Mood Quote Card */}
-      {entry?.mood && (() => {
-        const m = MOODS.find((x) => x.label === entry.mood);
+      {(() => {
+        const moodLabel = activeMood || entry?.mood;
+        if (!moodLabel) return null;
+        const m = MOODS.find((x) => x.label === moodLabel);
         if (!m) return null;
+        const q = m.quotes[quoteIdx % m.quotes.length];
         return (
-          <div className={cn("card-flat p-5 border-l-4 animate-fade-in", m.border)}>
+          <div key={`${m.label}-${quoteIdx}`} className={cn("card-flat p-5 border-l-4 animate-fade-in", m.border)}>
             <div className="flex items-start gap-3">
               <div className={cn("text-3xl select-none", m.color)}>{m.emoji}</div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <Quote className="h-4 w-4 text-primary opacity-60" />
-                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{m.label} Vibes</span>
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <div className="flex items-center gap-2">
+                    <Quote className="h-4 w-4 text-primary opacity-60" />
+                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{m.label} Vibes</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setQuoteIdx((i) => (i + 1) % m.quotes.length)}
+                    className="text-[11px] px-2 py-1 rounded-md border border-border hover:bg-secondary transition"
+                  >
+                    New quote ✨
+                  </button>
                 </div>
                 <blockquote className="text-sm font-medium leading-relaxed text-foreground mb-2">
-                  "{m.quote}"
+                  "{q.quote}"
                 </blockquote>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">— {m.author}</span>
+                  <span className="text-xs text-muted-foreground">— {q.author}</span>
+                  <span className="text-[10px] text-muted-foreground">{(quoteIdx % m.quotes.length) + 1} / {m.quotes.length}</span>
                 </div>
                 <div className={cn("mt-3 p-3 rounded-lg text-xs", m.bg, m.color)}>
                   <span className="font-semibold">Tip:</span> {m.tip}
