@@ -246,6 +246,33 @@ function PlannerPage() {
         </div>
       </details>
 
+      {/* Mood Quote Card */}
+      {entry?.mood && (() => {
+        const m = MOODS.find((x) => x.label === entry.mood);
+        if (!m) return null;
+        return (
+          <div className={cn("card-flat p-5 border-l-4 animate-fade-in", m.border)}>
+            <div className="flex items-start gap-3">
+              <div className={cn("text-3xl select-none", m.color)}>{m.emoji}</div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <Quote className="h-4 w-4 text-primary opacity-60" />
+                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{m.label} Vibes</span>
+                </div>
+                <blockquote className="text-sm font-medium leading-relaxed text-foreground mb-2">
+                  "{m.quote}"
+                </blockquote>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">— {m.author}</span>
+                </div>
+                <div className={cn("mt-3 p-3 rounded-lg text-xs", m.bg, m.color)}>
+                  <span className="font-semibold">Tip:</span> {m.tip}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       <AIPanels date={date} entry={entry} blocks={blocks} monthEntries={monthEntries} onBlocksAdded={() => qc.invalidateQueries({ queryKey: ["blocks"] })} />
     </div>
