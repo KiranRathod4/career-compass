@@ -208,7 +208,32 @@ function PlannerPage() {
             <Field label="Deep work (hrs)"><input type="number" step="0.5" value={entry?.deep_work_hours ?? 0} onChange={(e) => upsert.mutate({ deep_work_hours: +e.target.value })} className="w-full h-8 px-2 rounded border border-border bg-background text-sm" /></Field>
             <Field label="Applications"><input type="number" value={entry?.applications_count ?? 0} onChange={(e) => upsert.mutate({ applications_count: +e.target.value })} className="w-full h-8 px-2 rounded border border-border bg-background text-sm" /></Field>
             <Field label="Productivity"><input type="number" min={1} max={10} value={entry?.productivity_score ?? ""} onChange={(e) => upsert.mutate({ productivity_score: +e.target.value })} className="w-full h-8 px-2 rounded border border-border bg-background text-sm" /></Field>
-            <Field label="Mood"><select value={entry?.mood ?? ""} onChange={(e) => upsert.mutate({ mood: e.target.value })} className="w-full h-8 px-2 rounded border border-border bg-background text-sm"><option value="">—</option>{["Tired","Okay","Focused","Motivated","Burnt Out"].map((m) => <option key={m}>{m}</option>)}</select></Field>
+            <Field label="Mood & Energy">
+              <div className="flex flex-wrap gap-2 mt-0.5">
+                {MOODS.map((m) => {
+                  const isActive = entry?.mood === m.label;
+                  return (
+                    <button
+                      key={m.label}
+                      type="button"
+                      onClick={() => {
+                        upsert.mutate({ mood: isActive ? "" : m.label });
+                        setActiveMood(isActive ? null : m.label);
+                      }}
+                      className={cn(
+                        "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200",
+                        isActive
+                          ? `${m.bg} ${m.border} ${m.color} ring-1 ring-offset-1 ring-offset-background scale-105 shadow-sm`
+                          : "bg-muted border-border text-muted-foreground hover:bg-secondary hover:text-foreground"
+                      )}
+                    >
+                      <span className="text-base leading-none">{m.emoji}</span>
+                      <span>{m.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </Field>
           </div>
           <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
             {CHECKS.map(([key, label]) => (
