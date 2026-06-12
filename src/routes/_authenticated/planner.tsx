@@ -137,6 +137,8 @@ function PlannerPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [activeMood, setActiveMood] = useState<string>("");
+  const [quoteIdx, setQuoteIdx] = useState<number>(0);
 
   const { data: entry } = useQuery({
     queryKey: ["daily", user!.id, date],
