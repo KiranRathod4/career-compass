@@ -118,6 +118,57 @@ export type Database = {
         }
         Relationships: []
       }
+      arena_battles: {
+        Row: {
+          battle_type: string
+          created_at: string
+          created_by: string | null
+          duration_minutes: number
+          ends_at: string | null
+          id: string
+          max_participants: number
+          question_count: number
+          questions: Json
+          starts_at: string
+          status: string
+          title: string
+          updated_at: string
+          zone: string | null
+        }
+        Insert: {
+          battle_type: string
+          created_at?: string
+          created_by?: string | null
+          duration_minutes?: number
+          ends_at?: string | null
+          id?: string
+          max_participants?: number
+          question_count?: number
+          questions?: Json
+          starts_at: string
+          status?: string
+          title: string
+          updated_at?: string
+          zone?: string | null
+        }
+        Update: {
+          battle_type?: string
+          created_at?: string
+          created_by?: string | null
+          duration_minutes?: number
+          ends_at?: string | null
+          id?: string
+          max_participants?: number
+          question_count?: number
+          questions?: Json
+          starts_at?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          zone?: string | null
+        }
+        Relationships: []
+      }
       arena_leaderboard: {
         Row: {
           duel_wins: number
@@ -189,6 +240,50 @@ export type Database = {
           type?: string
         }
         Relationships: []
+      }
+      battle_participants: {
+        Row: {
+          answers: Json
+          battle_id: string
+          id: string
+          joined_at: string
+          rank: number | null
+          score: number
+          updated_at: string
+          user_id: string
+          xp_earned: number
+        }
+        Insert: {
+          answers?: Json
+          battle_id: string
+          id?: string
+          joined_at?: string
+          rank?: number | null
+          score?: number
+          updated_at?: string
+          user_id: string
+          xp_earned?: number
+        }
+        Update: {
+          answers?: Json
+          battle_id?: string
+          id?: string
+          joined_at?: string
+          rank?: number | null
+          score?: number
+          updated_at?: string
+          user_id?: string
+          xp_earned?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "battle_participants_battle_id_fkey"
+            columns: ["battle_id"]
+            isOneToOne: false
+            referencedRelation: "arena_battles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       companies: {
         Row: {
@@ -1068,6 +1163,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          city: string | null
           college_name: string | null
           created_at: string
           daily_application_target: number | null
@@ -1089,8 +1185,10 @@ export type Database = {
           target_domains: string[] | null
           updated_at: string
           username: string | null
+          zone: string | null
         }
         Insert: {
+          city?: string | null
           college_name?: string | null
           created_at?: string
           daily_application_target?: number | null
@@ -1112,8 +1210,10 @@ export type Database = {
           target_domains?: string[] | null
           updated_at?: string
           username?: string | null
+          zone?: string | null
         }
         Update: {
+          city?: string | null
           college_name?: string | null
           created_at?: string
           daily_application_target?: number | null
@@ -1135,6 +1235,7 @@ export type Database = {
           target_domains?: string[] | null
           updated_at?: string
           username?: string | null
+          zone?: string | null
         }
         Relationships: []
       }
@@ -1950,6 +2051,42 @@ export type Database = {
           metadata?: Json | null
           user_id?: string
           xp_amount?: number
+        }
+        Relationships: []
+      }
+      zone_rankings: {
+        Row: {
+          city_rank: number | null
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+          week_start: string
+          weekly_xp: number
+          zone: string
+          zone_rank: number | null
+        }
+        Insert: {
+          city_rank?: number | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+          week_start: string
+          weekly_xp?: number
+          zone: string
+          zone_rank?: number | null
+        }
+        Update: {
+          city_rank?: number | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+          week_start?: string
+          weekly_xp?: number
+          zone?: string
+          zone_rank?: number | null
         }
         Relationships: []
       }
