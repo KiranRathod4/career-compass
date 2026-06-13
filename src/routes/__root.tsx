@@ -62,10 +62,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
+const NO_FLASH_THEME = `(function(){try{var t=localStorage.getItem('pos-theme')||'light';if(t==='dark')document.documentElement.classList.add('dark');}catch(e){}})();`;
+
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <head><HeadContent /></head>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: NO_FLASH_THEME }} />
+        <HeadContent />
+      </head>
       <body>{children}<Scripts /></body>
     </html>
   );
@@ -87,7 +92,7 @@ function RootComponent() {
         <AuthProvider>
           <Outlet />
           <OfflineBanner />
-          <Toaster position="top-right" />
+          <Toaster position="bottom-right" offset={24} />
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
