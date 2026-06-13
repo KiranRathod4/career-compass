@@ -424,6 +424,14 @@
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(124,58,237,0.6), transparent);
   }
+  .arena-zone-pulse {
+    animation: arena-zone-pulse 2.4s ease-in-out infinite;
+    transform-origin: center;
+  }
+  @keyframes arena-zone-pulse {
+    0%, 100% { opacity: 0.85; }
+    50%      { opacity: 1; filter: drop-shadow(0 0 8px rgba(245,158,11,0.6)); }
+  }
 }
 
 html { scroll-behavior: smooth; }
