@@ -11,6 +11,7 @@ import {
 import {
   IconMathSprint, IconDailyPuzzles, IconUnscramble, IconMemory, IconLogicGrid, IconDuel,
 } from "./icons";
+import { IndiaBattleMap } from "./india-battle-map";
 import { toast } from "sonner";
 
 export type GameKey = "puzzles" | "math" | "unscramble" | "memory" | "logic" | "duel";
@@ -164,8 +165,12 @@ export function ArenaHome({ onPick }: { onPick: (g: GameKey) => void }) {
         </div>
       </div>
 
+      {/* ===== INDIA BATTLE MAP ===== */}
+      <IndiaBattleMap onZoneSelect={(z) => toast(`Zone war room for ${z.toUpperCase()} opens next — coming soon.`)} />
+
       {/* ===== DAILY MISSION HUD ===== */}
       <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4">
+
         <div className="arena-neon-card p-5 relative" style={{ ["--arena-accent" as any]: "rgba(124,58,237,0.6)" }}>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
