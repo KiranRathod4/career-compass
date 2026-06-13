@@ -32,7 +32,8 @@ export function computeLevel(xp: number): LevelInfo {
 
 export function useXP() {
   const { user } = useAuth();
-  return useQuery({
+  const qc = useQueryClient();
+  const query = useQuery({
     queryKey: ["xp-total", user?.id],
     enabled: !!user,
     queryFn: async () => {
@@ -44,6 +45,24 @@ export function useXP() {
       return computeLevel(total);
     },
   });
+
+  // Realtime: refresh on new XP transaction for current user
+  useEffect(() => {
+    if (!user) return;
+    const ch = supabase
+      .channel(`xp-${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "xp_transactions", filter: `user_id=eq.${user.id}` },
+        () => {
+          qc.invalidateQueries({ queryKey: ["xp-total", user.id] });
+        },
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [user, qc]);
+
+  return query;
 }
 
 export function useAwardXP() {
