@@ -425,3 +425,14 @@
     background: linear-gradient(90deg, transparent, rgba(124,58,237,0.6), transparent);
   }
 }
+
+html { scroll-behavior: smooth; }
+body { overflow-x: hidden; }
+
+/* Wrap any wide <table> with <div class="table-scroll"> for mobile usability */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.table-scroll > table { min-width: 640px; }
+
