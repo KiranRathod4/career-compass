@@ -92,7 +92,7 @@ function RootComponent() {
         <AuthProvider>
           <Outlet />
           <OfflineBanner />
-          <Toaster position="top-right" />
+          <Toaster position="bottom-right" offset={24} />
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
