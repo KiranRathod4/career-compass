@@ -187,7 +187,14 @@ function ZoneWarRoom() {
               ) : (
                 <div className="space-y-2">
                   {live.map((b: any) => (
-                    <BattleRow key={b.id} battle={b} count={counts[b.id] ?? 0} accent={zone.accent} live />
+                    <BattleRow
+                      key={b.id}
+                      battle={b}
+                      count={counts[b.id] ?? 0}
+                      accent={zone.accent}
+                      live
+                      onEnter={() => navigate({ to: "/arena/battle/$battleId", params: { battleId: b.id } })}
+                    />
                   ))}
                 </div>
               )}
@@ -199,7 +206,13 @@ function ZoneWarRoom() {
               ) : (
                 <div className="space-y-2">
                   {upcoming.map((b: any) => (
-                    <BattleRow key={b.id} battle={b} count={counts[b.id] ?? 0} accent={zone.accent} />
+                    <BattleRow
+                      key={b.id}
+                      battle={b}
+                      count={counts[b.id] ?? 0}
+                      accent={zone.accent}
+                      onEnter={() => navigate({ to: "/arena/battle/$battleId", params: { battleId: b.id } })}
+                    />
                   ))}
                 </div>
               )}
@@ -326,8 +339,8 @@ function Empty({ text }: { text: string }) {
 }
 
 function BattleRow({
-  battle, count, accent, live,
-}: { battle: any; count: number; accent: string; live?: boolean }) {
+  battle, count, accent, live, onEnter,
+}: { battle: any; count: number; accent: string; live?: boolean; onEnter?: () => void }) {
   const starts = new Date(battle.starts_at);
   const now = new Date();
   const diffMs = starts.getTime() - now.getTime();
@@ -374,7 +387,8 @@ function BattleRow({
           size="sm"
           className="mt-1.5 h-7 text-[11px] font-bold"
           style={{ background: accent, color: "#0b0b14" }}
-          disabled={count >= battle.max_participants}
+          disabled={!onEnter || (!live && count >= battle.max_participants)}
+          onClick={onEnter}
         >
           {live ? "Enter" : "Join"}
         </Button>
