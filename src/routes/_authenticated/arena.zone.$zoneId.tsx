@@ -339,8 +339,8 @@ function Empty({ text }: { text: string }) {
 }
 
 function BattleRow({
-  battle, count, accent, live,
-}: { battle: any; count: number; accent: string; live?: boolean }) {
+  battle, count, accent, live, onEnter,
+}: { battle: any; count: number; accent: string; live?: boolean; onEnter?: () => void }) {
   const starts = new Date(battle.starts_at);
   const now = new Date();
   const diffMs = starts.getTime() - now.getTime();
