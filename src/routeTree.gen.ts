@@ -49,6 +49,7 @@ import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
 import { Route as ApiPublicRazorpayWebhookRouteImport } from './routes/api/public/razorpay-webhook'
 import { Route as ApiCoachStreamRouteImport } from './routes/api/coach.stream'
+import { Route as AuthenticatedArenaZoneZoneIdRouteImport } from './routes/_authenticated/arena.zone.$zoneId'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -253,6 +254,12 @@ const ApiCoachStreamRoute = ApiCoachStreamRouteImport.update({
   path: '/api/coach/stream',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedArenaZoneZoneIdRoute =
+  AuthenticatedArenaZoneZoneIdRouteImport.update({
+    id: '/zone/$zoneId',
+    path: '/zone/$zoneId',
+    getParentRoute: () => AuthenticatedArenaRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -260,7 +267,7 @@ export interface FileRoutesByFullPath {
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/aptitude': typeof AuthenticatedAptitudeRoute
-  '/arena': typeof AuthenticatedArenaRoute
+  '/arena': typeof AuthenticatedArenaRouteWithChildren
   '/calendar': typeof AuthenticatedCalendarRoute
   '/challenges': typeof AuthenticatedChallengesRoute
   '/coach': typeof AuthenticatedCoachRoute
@@ -294,6 +301,7 @@ export interface FileRoutesByFullPath {
   '/u/$username': typeof UUsernameRoute
   '/api/coach/stream': typeof ApiCoachStreamRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
+  '/arena/zone/$zoneId': typeof AuthenticatedArenaZoneZoneIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -301,7 +309,7 @@ export interface FileRoutesByTo {
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/aptitude': typeof AuthenticatedAptitudeRoute
-  '/arena': typeof AuthenticatedArenaRoute
+  '/arena': typeof AuthenticatedArenaRouteWithChildren
   '/calendar': typeof AuthenticatedCalendarRoute
   '/challenges': typeof AuthenticatedChallengesRoute
   '/coach': typeof AuthenticatedCoachRoute
@@ -335,6 +343,7 @@ export interface FileRoutesByTo {
   '/u/$username': typeof UUsernameRoute
   '/api/coach/stream': typeof ApiCoachStreamRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
+  '/arena/zone/$zoneId': typeof AuthenticatedArenaZoneZoneIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -344,7 +353,7 @@ export interface FileRoutesById {
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
   '/_authenticated/aptitude': typeof AuthenticatedAptitudeRoute
-  '/_authenticated/arena': typeof AuthenticatedArenaRoute
+  '/_authenticated/arena': typeof AuthenticatedArenaRouteWithChildren
   '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
   '/_authenticated/challenges': typeof AuthenticatedChallengesRoute
   '/_authenticated/coach': typeof AuthenticatedCoachRoute
@@ -378,6 +387,7 @@ export interface FileRoutesById {
   '/u/$username': typeof UUsernameRoute
   '/api/coach/stream': typeof ApiCoachStreamRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
+  '/_authenticated/arena/zone/$zoneId': typeof AuthenticatedArenaZoneZoneIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -421,6 +431,7 @@ export interface FileRouteTypes {
     | '/u/$username'
     | '/api/coach/stream'
     | '/api/public/razorpay-webhook'
+    | '/arena/zone/$zoneId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -462,6 +473,7 @@ export interface FileRouteTypes {
     | '/u/$username'
     | '/api/coach/stream'
     | '/api/public/razorpay-webhook'
+    | '/arena/zone/$zoneId'
   id:
     | '__root__'
     | '/'
@@ -504,6 +516,7 @@ export interface FileRouteTypes {
     | '/u/$username'
     | '/api/coach/stream'
     | '/api/public/razorpay-webhook'
+    | '/_authenticated/arena/zone/$zoneId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -797,14 +810,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCoachStreamRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/arena/zone/$zoneId': {
+      id: '/_authenticated/arena/zone/$zoneId'
+      path: '/zone/$zoneId'
+      fullPath: '/arena/zone/$zoneId'
+      preLoaderRoute: typeof AuthenticatedArenaZoneZoneIdRouteImport
+      parentRoute: typeof AuthenticatedArenaRoute
+    }
   }
 }
+
+interface AuthenticatedArenaRouteChildren {
+  AuthenticatedArenaZoneZoneIdRoute: typeof AuthenticatedArenaZoneZoneIdRoute
+}
+
+const AuthenticatedArenaRouteChildren: AuthenticatedArenaRouteChildren = {
+  AuthenticatedArenaZoneZoneIdRoute: AuthenticatedArenaZoneZoneIdRoute,
+}
+
+const AuthenticatedArenaRouteWithChildren =
+  AuthenticatedArenaRoute._addFileChildren(AuthenticatedArenaRouteChildren)
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAchievementsRoute: typeof AuthenticatedAchievementsRoute
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
   AuthenticatedAptitudeRoute: typeof AuthenticatedAptitudeRoute
-  AuthenticatedArenaRoute: typeof AuthenticatedArenaRoute
+  AuthenticatedArenaRoute: typeof AuthenticatedArenaRouteWithChildren
   AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
   AuthenticatedChallengesRoute: typeof AuthenticatedChallengesRoute
   AuthenticatedCoachRoute: typeof AuthenticatedCoachRoute
@@ -841,7 +872,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAchievementsRoute: AuthenticatedAchievementsRoute,
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
   AuthenticatedAptitudeRoute: AuthenticatedAptitudeRoute,
-  AuthenticatedArenaRoute: AuthenticatedArenaRoute,
+  AuthenticatedArenaRoute: AuthenticatedArenaRouteWithChildren,
   AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
   AuthenticatedChallengesRoute: AuthenticatedChallengesRoute,
   AuthenticatedCoachRoute: AuthenticatedCoachRoute,
