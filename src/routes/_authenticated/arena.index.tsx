@@ -12,7 +12,7 @@ import { MemoryGame } from "@/components/arena/memory-game";
 import { LogicGrid } from "@/components/arena/logic-grid";
 import { AptitudeDuel } from "@/components/arena/aptitude-duel";
 
-export const Route = createFileRoute("/_authenticated/arena")({ component: ArenaPage });
+export const Route = createFileRoute("/_authenticated/arena/")({ component: ArenaPage });
 
 function ArenaPage() {
   const { user } = useAuth();
