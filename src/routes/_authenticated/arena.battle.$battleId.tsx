@@ -86,7 +86,7 @@ function LiveBattle() {
         explanation: r.explanation,
       }));
       // deterministic shuffle by battleId
-      const seed = battleId.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+      const seed = battleId.split("").reduce((a: number, c: string) => a + c.charCodeAt(0), 0);
       const sorted = pool
         .map((q, i) => ({ q, k: ((i + 1) * 9301 + seed * 49297) % 233280 }))
         .sort((a, b) => a.k - b.k)

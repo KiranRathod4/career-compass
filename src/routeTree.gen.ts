@@ -51,6 +51,7 @@ import { Route as AuthenticatedArenaIndexRouteImport } from './routes/_authentic
 import { Route as ApiPublicRazorpayWebhookRouteImport } from './routes/api/public/razorpay-webhook'
 import { Route as ApiCoachStreamRouteImport } from './routes/api/coach.stream'
 import { Route as AuthenticatedArenaZoneZoneIdRouteImport } from './routes/_authenticated/arena.zone.$zoneId'
+import { Route as AuthenticatedArenaBattleBattleIdRouteImport } from './routes/_authenticated/arena.battle.$battleId'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -266,6 +267,12 @@ const AuthenticatedArenaZoneZoneIdRoute =
     path: '/zone/$zoneId',
     getParentRoute: () => AuthenticatedArenaRoute,
   } as any)
+const AuthenticatedArenaBattleBattleIdRoute =
+  AuthenticatedArenaBattleBattleIdRouteImport.update({
+    id: '/battle/$battleId',
+    path: '/battle/$battleId',
+    getParentRoute: () => AuthenticatedArenaRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -308,6 +315,7 @@ export interface FileRoutesByFullPath {
   '/api/coach/stream': typeof ApiCoachStreamRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/arena/': typeof AuthenticatedArenaIndexRoute
+  '/arena/battle/$battleId': typeof AuthenticatedArenaBattleBattleIdRoute
   '/arena/zone/$zoneId': typeof AuthenticatedArenaZoneZoneIdRoute
 }
 export interface FileRoutesByTo {
@@ -350,6 +358,7 @@ export interface FileRoutesByTo {
   '/api/coach/stream': typeof ApiCoachStreamRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/arena': typeof AuthenticatedArenaIndexRoute
+  '/arena/battle/$battleId': typeof AuthenticatedArenaBattleBattleIdRoute
   '/arena/zone/$zoneId': typeof AuthenticatedArenaZoneZoneIdRoute
 }
 export interface FileRoutesById {
@@ -395,6 +404,7 @@ export interface FileRoutesById {
   '/api/coach/stream': typeof ApiCoachStreamRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/_authenticated/arena/': typeof AuthenticatedArenaIndexRoute
+  '/_authenticated/arena/battle/$battleId': typeof AuthenticatedArenaBattleBattleIdRoute
   '/_authenticated/arena/zone/$zoneId': typeof AuthenticatedArenaZoneZoneIdRoute
 }
 export interface FileRouteTypes {
@@ -440,6 +450,7 @@ export interface FileRouteTypes {
     | '/api/coach/stream'
     | '/api/public/razorpay-webhook'
     | '/arena/'
+    | '/arena/battle/$battleId'
     | '/arena/zone/$zoneId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -482,6 +493,7 @@ export interface FileRouteTypes {
     | '/api/coach/stream'
     | '/api/public/razorpay-webhook'
     | '/arena'
+    | '/arena/battle/$battleId'
     | '/arena/zone/$zoneId'
   id:
     | '__root__'
@@ -526,6 +538,7 @@ export interface FileRouteTypes {
     | '/api/coach/stream'
     | '/api/public/razorpay-webhook'
     | '/_authenticated/arena/'
+    | '/_authenticated/arena/battle/$battleId'
     | '/_authenticated/arena/zone/$zoneId'
   fileRoutesById: FileRoutesById
 }
@@ -834,16 +847,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedArenaZoneZoneIdRouteImport
       parentRoute: typeof AuthenticatedArenaRoute
     }
+    '/_authenticated/arena/battle/$battleId': {
+      id: '/_authenticated/arena/battle/$battleId'
+      path: '/battle/$battleId'
+      fullPath: '/arena/battle/$battleId'
+      preLoaderRoute: typeof AuthenticatedArenaBattleBattleIdRouteImport
+      parentRoute: typeof AuthenticatedArenaRoute
+    }
   }
 }
 
 interface AuthenticatedArenaRouteChildren {
   AuthenticatedArenaIndexRoute: typeof AuthenticatedArenaIndexRoute
+  AuthenticatedArenaBattleBattleIdRoute: typeof AuthenticatedArenaBattleBattleIdRoute
   AuthenticatedArenaZoneZoneIdRoute: typeof AuthenticatedArenaZoneZoneIdRoute
 }
 
 const AuthenticatedArenaRouteChildren: AuthenticatedArenaRouteChildren = {
   AuthenticatedArenaIndexRoute: AuthenticatedArenaIndexRoute,
+  AuthenticatedArenaBattleBattleIdRoute: AuthenticatedArenaBattleBattleIdRoute,
   AuthenticatedArenaZoneZoneIdRoute: AuthenticatedArenaZoneZoneIdRoute,
 }
 
