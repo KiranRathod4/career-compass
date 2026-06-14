@@ -187,13 +187,36 @@ function ZoneWarRoom() {
               ) : (
                 <div className="space-y-2">
                   {live.map((b: any) => (
-                    <BattleRow key={b.id} battle={b} count={counts[b.id] ?? 0} accent={zone.accent} live />
+                    <BattleRow
+                      key={b.id}
+                      battle={b}
+                      count={counts[b.id] ?? 0}
+                      accent={zone.accent}
+                      live
+                      onEnter={() => navigate({ to: "/arena/battle/$battleId", params: { battleId: b.id } })}
+                    />
                   ))}
                 </div>
               )}
             </Section>
 
             <Section title="Upcoming" icon={<Clock className="h-3.5 w-3.5 text-amber-400" />} count={upcoming.length}>
+              {upcoming.length === 0 ? (
+                <Empty text="No battles scheduled. New blitz drops every evening at 8 PM IST." />
+              ) : (
+                <div className="space-y-2">
+                  {upcoming.map((b: any) => (
+                    <BattleRow
+                      key={b.id}
+                      battle={b}
+                      count={counts[b.id] ?? 0}
+                      accent={zone.accent}
+                      onEnter={() => navigate({ to: "/arena/battle/$battleId", params: { battleId: b.id } })}
+                    />
+                  ))}
+                </div>
+              )}
+            </Section>
               {upcoming.length === 0 ? (
                 <Empty text="No battles scheduled. New blitz drops every evening at 8 PM IST." />
               ) : (
