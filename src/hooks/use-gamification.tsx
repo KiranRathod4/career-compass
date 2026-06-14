@@ -49,8 +49,9 @@ export function useXP() {
   // Realtime: refresh on new XP transaction for current user
   useEffect(() => {
     if (!user) return;
+    const topic = `xp-${user.id}-${Math.random().toString(36).slice(2, 10)}`;
     const ch = supabase
-      .channel(`xp-${user.id}`)
+      .channel(topic)
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "xp_transactions", filter: `user_id=eq.${user.id}` },
