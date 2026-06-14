@@ -43,6 +43,7 @@ import { Route as AuthenticatedCompaniesRouteImport } from './routes/_authentica
 import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
 import { Route as AuthenticatedChallengesRouteImport } from './routes/_authenticated/challenges'
 import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
+import { Route as AuthenticatedArenaRouteImport } from './routes/_authenticated/arena'
 import { Route as AuthenticatedAptitudeRouteImport } from './routes/_authenticated/aptitude'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
@@ -222,6 +223,11 @@ const AuthenticatedCalendarRoute = AuthenticatedCalendarRouteImport.update({
   path: '/calendar',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedArenaRoute = AuthenticatedArenaRouteImport.update({
+  id: '/arena',
+  path: '/arena',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedAptitudeRoute = AuthenticatedAptitudeRouteImport.update({
   id: '/aptitude',
   path: '/aptitude',
@@ -239,9 +245,9 @@ const AuthenticatedAchievementsRoute =
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedArenaIndexRoute = AuthenticatedArenaIndexRouteImport.update({
-  id: '/arena/',
-  path: '/arena/',
-  getParentRoute: () => AuthenticatedRoute,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedArenaRoute,
 } as any)
 const ApiPublicRazorpayWebhookRoute =
   ApiPublicRazorpayWebhookRouteImport.update({
@@ -256,9 +262,9 @@ const ApiCoachStreamRoute = ApiCoachStreamRouteImport.update({
 } as any)
 const AuthenticatedArenaZoneZoneIdRoute =
   AuthenticatedArenaZoneZoneIdRouteImport.update({
-    id: '/arena/zone/$zoneId',
-    path: '/arena/zone/$zoneId',
-    getParentRoute: () => AuthenticatedRoute,
+    id: '/zone/$zoneId',
+    path: '/zone/$zoneId',
+    getParentRoute: () => AuthenticatedArenaRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -267,6 +273,7 @@ export interface FileRoutesByFullPath {
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/aptitude': typeof AuthenticatedAptitudeRoute
+  '/arena': typeof AuthenticatedArenaRouteWithChildren
   '/calendar': typeof AuthenticatedCalendarRoute
   '/challenges': typeof AuthenticatedChallengesRoute
   '/coach': typeof AuthenticatedCoachRoute
@@ -353,6 +360,7 @@ export interface FileRoutesById {
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
   '/_authenticated/aptitude': typeof AuthenticatedAptitudeRoute
+  '/_authenticated/arena': typeof AuthenticatedArenaRouteWithChildren
   '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
   '/_authenticated/challenges': typeof AuthenticatedChallengesRoute
   '/_authenticated/coach': typeof AuthenticatedCoachRoute
@@ -397,6 +405,7 @@ export interface FileRouteTypes {
     | '/achievements'
     | '/analytics'
     | '/aptitude'
+    | '/arena'
     | '/calendar'
     | '/challenges'
     | '/coach'
@@ -482,6 +491,7 @@ export interface FileRouteTypes {
     | '/_authenticated/achievements'
     | '/_authenticated/analytics'
     | '/_authenticated/aptitude'
+    | '/_authenticated/arena'
     | '/_authenticated/calendar'
     | '/_authenticated/challenges'
     | '/_authenticated/coach'
@@ -768,6 +778,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCalendarRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/arena': {
+      id: '/_authenticated/arena'
+      path: '/arena'
+      fullPath: '/arena'
+      preLoaderRoute: typeof AuthenticatedArenaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/aptitude': {
       id: '/_authenticated/aptitude'
       path: '/aptitude'
@@ -791,10 +808,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/arena/': {
       id: '/_authenticated/arena/'
-      path: '/arena'
+      path: '/'
       fullPath: '/arena/'
       preLoaderRoute: typeof AuthenticatedArenaIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      parentRoute: typeof AuthenticatedArenaRoute
     }
     '/api/public/razorpay-webhook': {
       id: '/api/public/razorpay-webhook'
@@ -812,18 +829,32 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/arena/zone/$zoneId': {
       id: '/_authenticated/arena/zone/$zoneId'
-      path: '/arena/zone/$zoneId'
+      path: '/zone/$zoneId'
       fullPath: '/arena/zone/$zoneId'
       preLoaderRoute: typeof AuthenticatedArenaZoneZoneIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      parentRoute: typeof AuthenticatedArenaRoute
     }
   }
 }
+
+interface AuthenticatedArenaRouteChildren {
+  AuthenticatedArenaIndexRoute: typeof AuthenticatedArenaIndexRoute
+  AuthenticatedArenaZoneZoneIdRoute: typeof AuthenticatedArenaZoneZoneIdRoute
+}
+
+const AuthenticatedArenaRouteChildren: AuthenticatedArenaRouteChildren = {
+  AuthenticatedArenaIndexRoute: AuthenticatedArenaIndexRoute,
+  AuthenticatedArenaZoneZoneIdRoute: AuthenticatedArenaZoneZoneIdRoute,
+}
+
+const AuthenticatedArenaRouteWithChildren =
+  AuthenticatedArenaRoute._addFileChildren(AuthenticatedArenaRouteChildren)
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAchievementsRoute: typeof AuthenticatedAchievementsRoute
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
   AuthenticatedAptitudeRoute: typeof AuthenticatedAptitudeRoute
+  AuthenticatedArenaRoute: typeof AuthenticatedArenaRouteWithChildren
   AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
   AuthenticatedChallengesRoute: typeof AuthenticatedChallengesRoute
   AuthenticatedCoachRoute: typeof AuthenticatedCoachRoute
@@ -854,14 +885,13 @@ interface AuthenticatedRouteChildren {
   AuthenticatedSystemDesignRoute: typeof AuthenticatedSystemDesignRoute
   AuthenticatedTimerRoute: typeof AuthenticatedTimerRoute
   AuthenticatedTracksRoute: typeof AuthenticatedTracksRoute
-  AuthenticatedArenaIndexRoute: typeof AuthenticatedArenaIndexRoute
-  AuthenticatedArenaZoneZoneIdRoute: typeof AuthenticatedArenaZoneZoneIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAchievementsRoute: AuthenticatedAchievementsRoute,
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
   AuthenticatedAptitudeRoute: AuthenticatedAptitudeRoute,
+  AuthenticatedArenaRoute: AuthenticatedArenaRouteWithChildren,
   AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
   AuthenticatedChallengesRoute: AuthenticatedChallengesRoute,
   AuthenticatedCoachRoute: AuthenticatedCoachRoute,
@@ -892,8 +922,6 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedSystemDesignRoute: AuthenticatedSystemDesignRoute,
   AuthenticatedTimerRoute: AuthenticatedTimerRoute,
   AuthenticatedTracksRoute: AuthenticatedTracksRoute,
-  AuthenticatedArenaIndexRoute: AuthenticatedArenaIndexRoute,
-  AuthenticatedArenaZoneZoneIdRoute: AuthenticatedArenaZoneZoneIdRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
