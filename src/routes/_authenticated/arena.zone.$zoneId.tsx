@@ -217,16 +217,6 @@ function ZoneWarRoom() {
                 </div>
               )}
             </Section>
-              {upcoming.length === 0 ? (
-                <Empty text="No battles scheduled. New blitz drops every evening at 8 PM IST." />
-              ) : (
-                <div className="space-y-2">
-                  {upcoming.map((b: any) => (
-                    <BattleRow key={b.id} battle={b} count={counts[b.id] ?? 0} accent={zone.accent} />
-                  ))}
-                </div>
-              )}
-            </Section>
 
             {/* Zone hopper */}
             <div className="arena-neon-card p-4">
