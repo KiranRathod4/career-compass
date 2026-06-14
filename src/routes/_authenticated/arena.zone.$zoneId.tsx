@@ -387,7 +387,8 @@ function BattleRow({
           size="sm"
           className="mt-1.5 h-7 text-[11px] font-bold"
           style={{ background: accent, color: "#0b0b14" }}
-          disabled={count >= battle.max_participants}
+          disabled={!onEnter || (!live && count >= battle.max_participants)}
+          onClick={onEnter}
         >
           {live ? "Enter" : "Join"}
         </Button>
