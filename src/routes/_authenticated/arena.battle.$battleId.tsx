@@ -336,6 +336,15 @@ function LiveBattle() {
                 onReturn={() => zone ? navigate({ to: "/arena/zone/$zoneId", params: { zoneId: battle.zone } }) : navigate({ to: "/arena" })}
               />
             )}
+
+            {user && joined && (
+              <ScoringTimeline
+                answers={Array.isArray(me?.answers) ? (me!.answers as any[]) : []}
+                totalQuestions={questions.length}
+                accent={accent}
+                runningScore={me?.score ?? 0}
+              />
+            )}
           </div>
 
           {/* RIGHT: live leaderboard */}
