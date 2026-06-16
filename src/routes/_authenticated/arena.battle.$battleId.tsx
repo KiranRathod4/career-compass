@@ -1,12 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { ZONES } from "@/lib/arena-zones";
-import { ArrowLeft, Clock, Crown, Flame, Radio, Trophy, Users, Zap, Check, X, LogIn, TrendingUp, Minus } from "lucide-react";
+import { ArrowLeft, Clock, Crown, Flame, Radio, Trophy, Users, Zap, Check, X, LogIn, TrendingUp, Minus, Accessibility } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useReduceMotion } from "@/hooks/use-reduce-motion";
 
 export const Route = createFileRoute("/_authenticated/arena/battle/$battleId")({
   component: LiveBattle,
@@ -47,6 +48,7 @@ function LiveBattle() {
   const [locked, setLocked] = useState(false);
   const [questionStart, setQuestionStart] = useState<number>(() => Date.now());
   const answeredRef = useRef<Set<number>>(new Set());
+  const { reduceMotion, setReduceMotion } = useReduceMotion();
 
   // tick
   useEffect(() => {
@@ -343,6 +345,8 @@ function LiveBattle() {
                 totalQuestions={questions.length}
                 accent={accent}
                 runningScore={me?.score ?? 0}
+                reduceMotion={reduceMotion}
+                onToggleReduceMotion={() => setReduceMotion(!reduceMotion)}
               />
             )}
           </div>
@@ -352,7 +356,7 @@ function LiveBattle() {
             <div className="flex items-center gap-2 mb-3">
               <Trophy className="h-3.5 w-3.5 text-amber-400" />
               <span className="text-[10px] uppercase tracking-[0.14em] font-bold text-zinc-300">Live Standings</span>
-              <Radio className="h-3 w-3 text-emerald-400 arena-spark ml-auto" />
+              <Radio className={`h-3 w-3 text-emerald-400 ml-auto ${reduceMotion ? "" : "arena-spark"}`} />
             </div>
             {ranked.length === 0 ? (
               <div className="text-[12px] text-zinc-500 leading-relaxed">Waiting for operatives…</div>
@@ -550,9 +554,10 @@ interface AnswerEntry {
 }
 
 function ScoringTimeline({
-  answers, totalQuestions, accent, runningScore,
+  answers, totalQuestions, accent, runningScore, reduceMotion, onToggleReduceMotion,
 }: {
   answers: any[]; totalQuestions: number; accent: string; runningScore: number;
+  reduceMotion?: boolean; onToggleReduceMotion?: () => void;
 }) {
   const entries: AnswerEntry[] = (answers ?? [])
     .filter((a) => a && typeof a === "object")
@@ -568,6 +573,10 @@ function ScoringTimeline({
   const [flashIdx, setFlashIdx] = useState<number | null>(null);
   const prevLenRef = useRef(0);
   useEffect(() => {
+    if (reduceMotion) {
+      prevLenRef.current = entries.length;
+      return;
+    }
     if (entries.length > prevLenRef.current) {
       const last = entries[entries.length - 1];
       setFlashIdx(last.idx);
@@ -576,7 +585,7 @@ function ScoringTimeline({
       return () => clearTimeout(id);
     }
     prevLenRef.current = entries.length;
-  }, [entries.length]);
+  }, [entries.length, reduceMotion]);
 
   const correctCount = entries.filter((e) => e.correct).length;
   const totalGained = entries.reduce((s, e) => s + e.gained, 0);
@@ -596,9 +605,23 @@ function ScoringTimeline({
             Scoring Timeline
           </span>
         </div>
-        <span className="text-[10px] arena-mono text-zinc-500">
-          {entries.length}/{totalQuestions} answered
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="text-[10px] arena-mono text-zinc-500">
+            {entries.length}/{totalQuestions} answered
+          </span>
+          <button
+            onClick={onToggleReduceMotion}
+            title={reduceMotion ? "Motion reduced: timeline flashes are off" : "Reduce motion"}
+            className={`flex items-center gap-1 px-2 py-1 rounded text-[10px] arena-mono border transition ${
+              reduceMotion
+                ? "bg-zinc-800 text-zinc-300 border-white/10"
+                : "text-zinc-500 border-transparent hover:text-zinc-300 hover:bg-zinc-900/60"
+            }`}
+          >
+            <Accessibility className="h-3 w-3" />
+            {reduceMotion ? "Flash off" : "Flash on"}
+          </button>
+        </div>
       </div>
 
       {/* sparkline */}
@@ -634,7 +657,7 @@ function ScoringTimeline({
       ) : (
         <div className="space-y-1.5 max-h-[260px] overflow-y-auto pr-1">
           {entries.slice().reverse().map((e) => {
-            const flashing = flashIdx === e.idx;
+            const flashing = !reduceMotion && flashIdx === e.idx;
             return (
               <div
                 key={e.idx}
