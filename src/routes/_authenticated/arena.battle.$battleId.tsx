@@ -4,9 +4,10 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { ZONES } from "@/lib/arena-zones";
-import { ArrowLeft, Clock, Crown, Flame, Radio, Trophy, Users, Zap, Check, X, LogIn, TrendingUp, Minus } from "lucide-react";
+import { ArrowLeft, Clock, Crown, Flame, Radio, Trophy, Users, Zap, Check, X, LogIn, TrendingUp, Minus, Accessibility } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useReduceMotion } from "@/hooks/use-reduce-motion";
 
 export const Route = createFileRoute("/_authenticated/arena/battle/$battleId")({
   component: LiveBattle,
