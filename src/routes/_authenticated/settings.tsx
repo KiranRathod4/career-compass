@@ -147,6 +147,8 @@ function SettingsPage() {
         initialOrder={profile?.sidebar_section_order as string[] | null}
       />
 
+      <AccessibilitySettings />
+
 
 
       <div className="card-flat p-6">
