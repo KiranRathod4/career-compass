@@ -356,7 +356,7 @@ function LiveBattle() {
             <div className="flex items-center gap-2 mb-3">
               <Trophy className="h-3.5 w-3.5 text-amber-400" />
               <span className="text-[10px] uppercase tracking-[0.14em] font-bold text-zinc-300">Live Standings</span>
-              <Radio className="h-3 w-3 text-emerald-400 arena-spark ml-auto" />
+              <Radio className={`h-3 w-3 text-emerald-400 ml-auto ${reduceMotion ? "" : "arena-spark"}`} />
             </div>
             {ranked.length === 0 ? (
               <div className="text-[12px] text-zinc-500 leading-relaxed">Waiting for operatives…</div>
