@@ -197,7 +197,7 @@ function AccessibilitySettings() {
             Reduce motion in Arena
           </div>
           <p className="text-[11px] text-muted-foreground leading-relaxed max-w-md">
-            Disables flashing timeline rows and bright XP pulses during live battles. Automatically follows your device’s reduced-motion preference unless you override it here.
+            Disables flashing timeline rows in live battles. Automatically follows your device’s reduced-motion preference unless you override it here.
           </p>
           {systemPrefersReduced && (
             <p className="text-[10px] text-amber-500">Your device has reduced motion enabled.</p>
