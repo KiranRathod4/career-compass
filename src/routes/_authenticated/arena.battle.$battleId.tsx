@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { ZONES } from "@/lib/arena-zones";
-import { ArrowLeft, Clock, Crown, Flame, Radio, Trophy, Users, Zap, Check, X, LogIn } from "lucide-react";
+import { ArrowLeft, Clock, Crown, Flame, Radio, Trophy, Users, Zap, Check, X, LogIn, TrendingUp, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -336,6 +336,15 @@ function LiveBattle() {
                 onReturn={() => zone ? navigate({ to: "/arena/zone/$zoneId", params: { zoneId: battle.zone } }) : navigate({ to: "/arena" })}
               />
             )}
+
+            {user && joined && (
+              <ScoringTimeline
+                answers={Array.isArray(me?.answers) ? (me!.answers as any[]) : []}
+                totalQuestions={questions.length}
+                accent={accent}
+                runningScore={me?.score ?? 0}
+              />
+            )}
           </div>
 
           {/* RIGHT: live leaderboard */}
@@ -530,4 +539,155 @@ function fmtMS(ms: number): string {
     return `${h}h ${m % 60}m`;
   }
   return `${m}:${ss.toString().padStart(2, "0")}`;
+}
+
+interface AnswerEntry {
+  idx: number;
+  choice: string | null;
+  correct: boolean;
+  gained: number;
+  t: number;
+}
+
+function ScoringTimeline({
+  answers, totalQuestions, accent, runningScore,
+}: {
+  answers: any[]; totalQuestions: number; accent: string; runningScore: number;
+}) {
+  const entries: AnswerEntry[] = (answers ?? [])
+    .filter((a) => a && typeof a === "object")
+    .map((a) => ({
+      idx: Number(a.idx ?? 0),
+      choice: a.choice ?? null,
+      correct: !!a.correct,
+      gained: Number(a.gained ?? 0),
+      t: Number(a.t ?? 0),
+    }))
+    .sort((a, b) => a.idx - b.idx);
+
+  const [flashIdx, setFlashIdx] = useState<number | null>(null);
+  const prevLenRef = useRef(0);
+  useEffect(() => {
+    if (entries.length > prevLenRef.current) {
+      const last = entries[entries.length - 1];
+      setFlashIdx(last.idx);
+      const id = setTimeout(() => setFlashIdx(null), 1200);
+      prevLenRef.current = entries.length;
+      return () => clearTimeout(id);
+    }
+    prevLenRef.current = entries.length;
+  }, [entries.length]);
+
+  const correctCount = entries.filter((e) => e.correct).length;
+  const totalGained = entries.reduce((s, e) => s + e.gained, 0);
+  const avgPerCorrect = correctCount > 0 ? Math.round(totalGained / correctCount) : 0;
+
+  // running totals for sparkline
+  let running = 0;
+  const points = entries.map((e) => { running += e.gained; return running; });
+  const maxPt = Math.max(1, ...points);
+
+  return (
+    <div className="arena-neon-card p-4 md:p-5" style={{ ["--arena-accent" as any]: `${accent}55` }}>
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <TrendingUp className="h-3.5 w-3.5" style={{ color: accent }} />
+          <span className="text-[10px] uppercase tracking-[0.14em] font-bold text-zinc-300">
+            Scoring Timeline
+          </span>
+        </div>
+        <span className="text-[10px] arena-mono text-zinc-500">
+          {entries.length}/{totalQuestions} answered
+        </span>
+      </div>
+
+      {/* sparkline */}
+      {points.length > 1 && (
+        <div className="mb-3 h-10 flex items-end gap-[3px]">
+          {points.map((v, i) => (
+            <div
+              key={i}
+              className="flex-1 rounded-sm transition-all"
+              style={{
+                height: `${Math.max(6, (v / maxPt) * 100)}%`,
+                background: entries[i].correct ? accent : "rgba(248,113,113,0.45)",
+                opacity: 0.85,
+              }}
+              title={`Q${i + 1}: +${entries[i].gained} XP`}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* stats */}
+      <div className="grid grid-cols-3 gap-2 mb-3">
+        <TimelineStat label="Correct" value={`${correctCount}/${entries.length}`} tone="#34d399" />
+        <TimelineStat label="Total XP" value={`+${totalGained}`} tone={accent} />
+        <TimelineStat label="Avg / hit" value={avgPerCorrect ? `+${avgPerCorrect}` : "—"} tone="#fbbf24" />
+      </div>
+
+      {/* per-question rows */}
+      {entries.length === 0 ? (
+        <div className="text-[11px] text-zinc-500 arena-mono text-center py-3 border border-dashed border-white/5 rounded">
+          Answer your first question to begin the timeline.
+        </div>
+      ) : (
+        <div className="space-y-1.5 max-h-[260px] overflow-y-auto pr-1">
+          {entries.slice().reverse().map((e) => {
+            const flashing = flashIdx === e.idx;
+            return (
+              <div
+                key={e.idx}
+                className="flex items-center gap-3 px-2.5 py-2 rounded-md border bg-zinc-900/40 transition-all"
+                style={{
+                  borderColor: flashing
+                    ? (e.correct ? "#34d399" : "#f87171")
+                    : "rgba(255,255,255,0.06)",
+                  boxShadow: flashing
+                    ? `0 0 0 1px ${e.correct ? "#34d39955" : "#f8717155"}, 0 0 18px ${e.correct ? "#34d39933" : "#f8717133"}`
+                    : "none",
+                }}
+              >
+                <span className="text-[10px] arena-mono font-bold w-9 text-center text-zinc-400">
+                  Q{e.idx + 1}
+                </span>
+                <span
+                  className="h-5 w-5 rounded-sm flex items-center justify-center"
+                  style={{
+                    background: e.correct ? "rgba(52,211,153,0.18)" : "rgba(248,113,113,0.18)",
+                    color: e.correct ? "#34d399" : "#f87171",
+                  }}
+                >
+                  {e.correct ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                </span>
+                <div className="flex-1 min-w-0 text-[11px] text-zinc-400 arena-mono truncate">
+                  {e.choice === null ? "no answer" : `picked: ${String(e.choice).slice(0, 28)}`}
+                </div>
+                <span
+                  className="text-[12px] arena-mono font-bold flex items-center gap-0.5"
+                  style={{ color: e.gained > 0 ? accent : "#71717a" }}
+                >
+                  {e.gained > 0 ? <>+{e.gained}</> : <><Minus className="h-3 w-3" />0</>}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      <div className="mt-3 pt-2 border-t border-white/5 flex items-center justify-between text-[10px] arena-mono text-zinc-500">
+        <span>Running total</span>
+        <span className="text-white font-bold text-[12px]">{runningScore.toLocaleString()} XP</span>
+      </div>
+    </div>
+  );
+}
+
+function TimelineStat({ label, value, tone }: { label: string; value: string; tone: string }) {
+  return (
+    <div className="rounded-md border border-white/10 bg-zinc-900/40 px-2 py-1.5">
+      <div className="text-[9px] uppercase tracking-wider text-zinc-500">{label}</div>
+      <div className="text-[13px] font-bold arena-mono mt-0.5" style={{ color: tone }}>{value}</div>
+    </div>
+  );
 }
