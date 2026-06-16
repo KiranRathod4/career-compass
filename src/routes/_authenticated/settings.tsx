@@ -4,9 +4,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
-import { ExternalLink, Plus, Trash2 } from "lucide-react";
+import { ExternalLink, Plus, Trash2, Accessibility } from "lucide-react";
 
 import { SidebarCustomization } from "@/components/sidebar-customization";
+import { useReduceMotion } from "@/hooks/use-reduce-motion";
 
 export const Route = createFileRoute("/_authenticated/settings")({ component: SettingsPage });
 
