@@ -345,6 +345,8 @@ function LiveBattle() {
                 totalQuestions={questions.length}
                 accent={accent}
                 runningScore={me?.score ?? 0}
+                reduceMotion={reduceMotion}
+                onToggleReduceMotion={() => setReduceMotion(!reduceMotion)}
               />
             )}
           </div>
