@@ -185,6 +185,36 @@ function SettingsPage() {
   );
 }
 
+function AccessibilitySettings() {
+  const { reduceMotion, setReduceMotion, systemPrefersReduced } = useReduceMotion();
+  return (
+    <div className="card-flat p-6">
+      <div className="section-label mb-4">Accessibility</div>
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-sm font-medium">
+            <Accessibility className="h-4 w-4" />
+            Reduce motion in Arena
+          </div>
+          <p className="text-[11px] text-muted-foreground leading-relaxed max-w-md">
+            Disables flashing timeline rows and bright XP pulses during live battles. Automatically follows your device’s reduced-motion preference unless you override it here.
+          </p>
+          {systemPrefersReduced && (
+            <p className="text-[10px] text-amber-500">Your device has reduced motion enabled.</p>
+          )}
+        </div>
+        <button
+          onClick={() => setReduceMotion(!reduceMotion)}
+          className={`h-6 w-10 rounded-full transition relative shrink-0 ${reduceMotion ? "bg-primary" : "bg-muted"}`}
+          aria-pressed={reduceMotion}
+        >
+          <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-background transition-all ${reduceMotion ? "left-[18px]" : "left-0.5"}`} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return <label className="block"><span className="text-[11px] text-muted-foreground">{label}</span><div className="mt-0.5">{children}</div></label>;
 }
