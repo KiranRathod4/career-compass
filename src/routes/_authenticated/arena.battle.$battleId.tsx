@@ -48,6 +48,7 @@ function LiveBattle() {
   const [locked, setLocked] = useState(false);
   const [questionStart, setQuestionStart] = useState<number>(() => Date.now());
   const answeredRef = useRef<Set<number>>(new Set());
+  const { reduceMotion, setReduceMotion } = useReduceMotion();
 
   // tick
   useEffect(() => {
