@@ -461,7 +461,7 @@ function LeaderboardList({
       aria-label={`Live leaderboard, ${ranked.length} participants. Use arrow keys to navigate.`}
       aria-activedescendant={activeUid ? optionId(activeUid) : undefined}
       onKeyDown={onKeyDown}
-      className="space-y-1.5 max-h-[560px] overflow-y-auto pr-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded"
+      className="space-y-1.5 max-h-[560px] overflow-y-auto pr-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 rounded"
     >
       {ranked.map((p, i) => {
         const prof = (profMap as any)[p.user_id];
@@ -478,8 +478,8 @@ function LeaderboardList({
             aria-current={isMe ? "true" : undefined}
             aria-label={`Rank ${i + 1}: ${name}${isMe ? " (you)" : ""}, ${p.score.toLocaleString()} points`}
             onClick={() => setActiveIdx(i)}
-            className={`flex items-center gap-3 px-2.5 py-2 rounded-md border bg-zinc-900/40 transition cursor-pointer ${
-              isActive ? "border-white/40 ring-1 ring-white/30" : "border-white/5"
+            className={`flex items-center gap-3 px-3 py-2.5 min-h-11 rounded-md border bg-zinc-900/40 transition cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 ${
+              isActive ? "border-white/60 ring-2 ring-white/50 bg-white/[0.06]" : "border-white/5"
             }`}
             style={{ borderLeft: `3px solid ${isMe ? accent : tone}` }}
           >
