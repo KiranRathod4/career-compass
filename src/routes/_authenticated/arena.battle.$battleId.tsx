@@ -363,43 +363,14 @@ function LiveBattle() {
             {ranked.length === 0 ? (
               <div className="text-[12px] text-zinc-500 leading-relaxed">Waiting for operatives…</div>
             ) : (
-              <ol
-                className="space-y-1.5 max-h-[560px] overflow-y-auto pr-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded"
-                tabIndex={0}
-                aria-label={`Live leaderboard, ${ranked.length} participants`}
-              >
-                {ranked.map((p, i) => {
-                  const prof = (profMap as any)[p.user_id];
-                  const name = prof?.full_name || prof?.username || "Operative";
-                  const isMe = p.user_id === user?.id;
-                  const tone = i === 0 ? "#f59e0b" : i === 1 ? "#cbd5e1" : i === 2 ? "#cd7f32" : "rgba(255,255,255,0.08)";
-                  return (
-                    <li
-                      key={p.user_id}
-                      className="flex items-center gap-3 px-2.5 py-2 rounded-md border border-white/5 bg-zinc-900/40 transition"
-                      style={{ borderLeft: `3px solid ${isMe ? accent : tone}` }}
-                      aria-label={`Rank ${i + 1}: ${name}${isMe ? " (you)" : ""}, ${p.score.toLocaleString()} points`}
-                      aria-current={isMe ? "true" : undefined}
-                    >
-                      <span aria-hidden="true" className="text-[11px] arena-mono font-bold w-5 text-center"
-                        style={{ color: i < 3 ? tone : "rgba(255,255,255,0.4)" }}>
-                        {i + 1}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-[12px] font-semibold text-zinc-100 truncate flex items-center gap-1.5">
-                          {name}
-                          {isMe && <span className="text-[9px] arena-mono" style={{ color: accent }} aria-hidden="true">· YOU</span>}
-                        </div>
-                        <div className="text-[10px] text-zinc-500 truncate">{prof?.city || "—"}</div>
-                      </div>
-                      <div className="text-[12px] arena-mono font-bold text-zinc-100" aria-hidden="true">
-                        {p.score.toLocaleString()}
-                      </div>
-                    </li>
-                  );
-                })}
-              </ol>
+              <LeaderboardList
+                ranked={ranked}
+                profMap={profMap}
+                userId={user?.id}
+                accent={accent}
+              />
             )}
+
             <div className="mt-4 pt-3 border-t border-white/5 text-[10px] text-zinc-500 arena-mono">
               Updates in real time
             </div>
