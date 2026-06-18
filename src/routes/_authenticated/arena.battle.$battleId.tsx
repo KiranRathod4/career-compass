@@ -246,10 +246,12 @@ function LiveBattle() {
         {/* Top bar */}
         <div className="flex items-center justify-between mb-4">
           <button
+            type="button"
             onClick={() => zone ? navigate({ to: "/arena/zone/$zoneId", params: { zoneId: battle.zone } }) : navigate({ to: "/arena" })}
-            className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.14em] text-zinc-400 hover:text-white"
+            className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.14em] text-zinc-400 hover:text-white rounded-sm px-1 py-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 focus-visible:ring-white/70"
+            aria-label="Back to war room"
           >
-            <ArrowLeft className="h-3.5 w-3.5" /> Back
+            <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" /> Back
           </button>
           <div className="flex items-center gap-3 arena-mono text-[10px]">
             <BattleStatusPill status={battle.status} live={isLive} ended={isEnded} />
