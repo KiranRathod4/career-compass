@@ -389,6 +389,130 @@ function LiveBattle() {
 
 /* ---------------- subcomponents ---------------- */
 
+function LeaderboardList({
+  ranked,
+  profMap,
+  userId,
+  accent,
+}: {
+  ranked: Participant[];
+  profMap: Record<string, any>;
+  userId: string | undefined;
+  accent: string;
+}) {
+  const listId = "live-leaderboard";
+  const [activeIdx, setActiveIdx] = useState(() => {
+    const mine = ranked.findIndex((p) => p.user_id === userId);
+    return mine >= 0 ? mine : 0;
+  });
+  const listRef = useRef<HTMLOListElement | null>(null);
+
+  // keep activeIdx in bounds as ranked changes
+  useEffect(() => {
+    if (activeIdx > ranked.length - 1) setActiveIdx(Math.max(0, ranked.length - 1));
+  }, [ranked.length, activeIdx]);
+
+  const optionId = (uid: string) => `${listId}-opt-${uid}`;
+
+  const moveTo = (next: number) => {
+    const clamped = Math.max(0, Math.min(ranked.length - 1, next));
+    setActiveIdx(clamped);
+    const el = listRef.current?.querySelector<HTMLElement>(`#${CSS.escape(optionId(ranked[clamped].user_id))}`);
+    el?.scrollIntoView({ block: "nearest" });
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLOListElement>) => {
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        moveTo(activeIdx + 1);
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        moveTo(activeIdx - 1);
+        break;
+      case "Home":
+        e.preventDefault();
+        moveTo(0);
+        break;
+      case "End":
+        e.preventDefault();
+        moveTo(ranked.length - 1);
+        break;
+      case "PageDown":
+        e.preventDefault();
+        moveTo(activeIdx + 5);
+        break;
+      case "PageUp":
+        e.preventDefault();
+        moveTo(activeIdx - 5);
+        break;
+    }
+  };
+
+  const activeUid = ranked[activeIdx]?.user_id;
+
+  return (
+    <ol
+      ref={listRef}
+      id={listId}
+      role="listbox"
+      tabIndex={0}
+      aria-label={`Live leaderboard, ${ranked.length} participants. Use arrow keys to navigate.`}
+      aria-activedescendant={activeUid ? optionId(activeUid) : undefined}
+      onKeyDown={onKeyDown}
+      className="space-y-1.5 max-h-[560px] overflow-y-auto pr-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded"
+    >
+      {ranked.map((p, i) => {
+        const prof = (profMap as any)[p.user_id];
+        const name = prof?.full_name || prof?.username || "Operative";
+        const isMe = p.user_id === userId;
+        const isActive = i === activeIdx;
+        const tone = i === 0 ? "#f59e0b" : i === 1 ? "#cbd5e1" : i === 2 ? "#cd7f32" : "rgba(255,255,255,0.08)";
+        return (
+          <li
+            key={p.user_id}
+            id={optionId(p.user_id)}
+            role="option"
+            aria-selected={isActive}
+            aria-current={isMe ? "true" : undefined}
+            aria-label={`Rank ${i + 1}: ${name}${isMe ? " (you)" : ""}, ${p.score.toLocaleString()} points`}
+            onClick={() => setActiveIdx(i)}
+            className={`flex items-center gap-3 px-2.5 py-2 rounded-md border bg-zinc-900/40 transition cursor-pointer ${
+              isActive ? "border-white/40 ring-1 ring-white/30" : "border-white/5"
+            }`}
+            style={{ borderLeft: `3px solid ${isMe ? accent : tone}` }}
+          >
+            <span
+              aria-hidden="true"
+              className="text-[11px] arena-mono font-bold w-5 text-center"
+              style={{ color: i < 3 ? tone : "rgba(255,255,255,0.4)" }}
+            >
+              {i + 1}
+            </span>
+            <div className="flex-1 min-w-0">
+              <div className="text-[12px] font-semibold text-zinc-100 truncate flex items-center gap-1.5">
+                {name}
+                {isMe && (
+                  <span className="text-[9px] arena-mono" style={{ color: accent }} aria-hidden="true">
+                    · YOU
+                  </span>
+                )}
+              </div>
+              <div className="text-[10px] text-zinc-500 truncate">{prof?.city || "—"}</div>
+            </div>
+            <div className="text-[12px] arena-mono font-bold text-zinc-100" aria-hidden="true">
+              {p.score.toLocaleString()}
+            </div>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+
+
 function BattleStatusPill({ status, live, ended }: { status: string; live: boolean; ended: boolean }) {
   const label = ended ? "ENDED" : live ? "LIVE" : status.toUpperCase();
   const color = ended ? "#71717a" : live ? "#34d399" : "#f59e0b";
