@@ -246,10 +246,12 @@ function LiveBattle() {
         {/* Top bar */}
         <div className="flex items-center justify-between mb-4">
           <button
+            type="button"
             onClick={() => zone ? navigate({ to: "/arena/zone/$zoneId", params: { zoneId: battle.zone } }) : navigate({ to: "/arena" })}
-            className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.14em] text-zinc-400 hover:text-white"
+            className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.14em] text-zinc-400 hover:text-white rounded-sm px-1 py-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 focus-visible:ring-white/70"
+            aria-label="Back to war room"
           >
-            <ArrowLeft className="h-3.5 w-3.5" /> Back
+            <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" /> Back
           </button>
           <div className="flex items-center gap-3 arena-mono text-[10px]">
             <BattleStatusPill status={battle.status} live={isLive} ended={isEnded} />
@@ -352,56 +354,62 @@ function LiveBattle() {
           </div>
 
           {/* RIGHT: live leaderboard */}
-          <div className="arena-neon-card p-4 self-start">
+          <section className="arena-neon-card p-4 self-start" aria-labelledby="live-standings-heading">
             <div className="flex items-center gap-2 mb-3">
-              <Trophy className="h-3.5 w-3.5 text-amber-400" />
-              <span className="text-[10px] uppercase tracking-[0.14em] font-bold text-zinc-300">Live Standings</span>
-              <Radio className={`h-3 w-3 text-emerald-400 ml-auto ${reduceMotion ? "" : "arena-spark"}`} />
+              <Trophy className="h-3.5 w-3.5 text-amber-400" aria-hidden="true" />
+              <h2 id="live-standings-heading" className="text-[10px] uppercase tracking-[0.14em] font-bold text-zinc-300">Live Standings</h2>
+              <Radio aria-hidden="true" className={`h-3 w-3 text-emerald-400 ml-auto ${reduceMotion ? "" : "arena-spark"}`} />
             </div>
             {ranked.length === 0 ? (
               <div className="text-[12px] text-zinc-500 leading-relaxed">Waiting for operatives…</div>
             ) : (
-              <div className="space-y-1.5 max-h-[560px] overflow-y-auto pr-1">
+              <ol
+                className="space-y-1.5 max-h-[560px] overflow-y-auto pr-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded"
+                tabIndex={0}
+                aria-label={`Live leaderboard, ${ranked.length} participants`}
+              >
                 {ranked.map((p, i) => {
                   const prof = (profMap as any)[p.user_id];
                   const name = prof?.full_name || prof?.username || "Operative";
                   const isMe = p.user_id === user?.id;
                   const tone = i === 0 ? "#f59e0b" : i === 1 ? "#cbd5e1" : i === 2 ? "#cd7f32" : "rgba(255,255,255,0.08)";
                   return (
-                    <div
+                    <li
                       key={p.user_id}
                       className="flex items-center gap-3 px-2.5 py-2 rounded-md border border-white/5 bg-zinc-900/40 transition"
                       style={{ borderLeft: `3px solid ${isMe ? accent : tone}` }}
+                      aria-label={`Rank ${i + 1}: ${name}${isMe ? " (you)" : ""}, ${p.score.toLocaleString()} points`}
+                      aria-current={isMe ? "true" : undefined}
                     >
-                      <span className="text-[11px] arena-mono font-bold w-5 text-center"
+                      <span aria-hidden="true" className="text-[11px] arena-mono font-bold w-5 text-center"
                         style={{ color: i < 3 ? tone : "rgba(255,255,255,0.4)" }}>
                         {i + 1}
                       </span>
                       <div className="flex-1 min-w-0">
                         <div className="text-[12px] font-semibold text-zinc-100 truncate flex items-center gap-1.5">
                           {name}
-                          {isMe && <span className="text-[9px] arena-mono" style={{ color: accent }}>· YOU</span>}
+                          {isMe && <span className="text-[9px] arena-mono" style={{ color: accent }} aria-hidden="true">· YOU</span>}
                         </div>
                         <div className="text-[10px] text-zinc-500 truncate">{prof?.city || "—"}</div>
                       </div>
-                      <div className="text-[12px] arena-mono font-bold text-zinc-100">
+                      <div className="text-[12px] arena-mono font-bold text-zinc-100" aria-hidden="true">
                         {p.score.toLocaleString()}
                       </div>
-                    </div>
+                    </li>
                   );
                 })}
-              </div>
+              </ol>
             )}
             <div className="mt-4 pt-3 border-t border-white/5 text-[10px] text-zinc-500 arena-mono">
               Updates in real time
             </div>
             <Link
               to="/arena"
-              className="mt-3 block text-[10px] arena-mono text-zinc-500 hover:text-white"
+              className="mt-3 inline-block text-[10px] arena-mono text-zinc-500 hover:text-white rounded-sm px-1 py-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 focus-visible:ring-white/70"
             >
               ← Back to Arena
             </Link>
-          </div>
+          </section>
         </div>
       </div>
     </div>
@@ -610,15 +618,18 @@ function ScoringTimeline({
             {entries.length}/{totalQuestions} answered
           </span>
           <button
+            type="button"
             onClick={onToggleReduceMotion}
+            aria-pressed={reduceMotion}
+            aria-label={reduceMotion ? "Enable timeline flash animations" : "Reduce motion: disable timeline flash animations"}
             title={reduceMotion ? "Motion reduced: timeline flashes are off" : "Reduce motion"}
-            className={`flex items-center gap-1 px-2 py-1 rounded text-[10px] arena-mono border transition ${
+            className={`flex items-center gap-1 px-2 py-1 rounded text-[10px] arena-mono border transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 focus-visible:ring-white/70 ${
               reduceMotion
-                ? "bg-zinc-800 text-zinc-300 border-white/10"
-                : "text-zinc-500 border-transparent hover:text-zinc-300 hover:bg-zinc-900/60"
+                ? "bg-zinc-800 text-zinc-200 border-white/20"
+                : "text-zinc-400 border-white/10 hover:text-zinc-100 hover:bg-zinc-900/60"
             }`}
           >
-            <Accessibility className="h-3 w-3" />
+            <Accessibility className="h-3 w-3" aria-hidden="true" />
             {reduceMotion ? "Flash off" : "Flash on"}
           </button>
         </div>
@@ -655,11 +666,17 @@ function ScoringTimeline({
           Answer your first question to begin the timeline.
         </div>
       ) : (
-        <div className="space-y-1.5 max-h-[260px] overflow-y-auto pr-1">
+        <ol
+          className="space-y-1.5 max-h-[260px] overflow-y-auto pr-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded"
+          tabIndex={0}
+          aria-label="Per-question scoring history, newest first"
+        >
           {entries.slice().reverse().map((e) => {
             const flashing = !reduceMotion && flashIdx === e.idx;
+            const xpLabel = e.gained > 0 ? `+${e.gained} XP` : "0 XP";
+            const choiceLabel = e.choice === null ? "no answer" : `picked ${String(e.choice)}`;
             return (
-              <div
+              <li
                 key={e.idx}
                 className="flex items-center gap-3 px-2.5 py-2 rounded-md border bg-zinc-900/40 transition-all"
                 style={{
@@ -670,11 +687,13 @@ function ScoringTimeline({
                     ? `0 0 0 1px ${e.correct ? "#34d39955" : "#f8717155"}, 0 0 18px ${e.correct ? "#34d39933" : "#f8717133"}`
                     : "none",
                 }}
+                aria-label={`Question ${e.idx + 1}: ${e.correct ? "correct" : "incorrect"}, ${choiceLabel}, ${xpLabel}`}
               >
-                <span className="text-[10px] arena-mono font-bold w-9 text-center text-zinc-400">
+                <span aria-hidden="true" className="text-[10px] arena-mono font-bold w-9 text-center text-zinc-400">
                   Q{e.idx + 1}
                 </span>
                 <span
+                  aria-hidden="true"
                   className="h-5 w-5 rounded-sm flex items-center justify-center"
                   style={{
                     background: e.correct ? "rgba(52,211,153,0.18)" : "rgba(248,113,113,0.18)",
@@ -683,20 +702,21 @@ function ScoringTimeline({
                 >
                   {e.correct ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
                 </span>
-                <div className="flex-1 min-w-0 text-[11px] text-zinc-400 arena-mono truncate">
+                <div aria-hidden="true" className="flex-1 min-w-0 text-[11px] text-zinc-400 arena-mono truncate">
                   {e.choice === null ? "no answer" : `picked: ${String(e.choice).slice(0, 28)}`}
                 </div>
                 <span
+                  aria-hidden="true"
                   className="text-[12px] arena-mono font-bold flex items-center gap-0.5"
                   style={{ color: e.gained > 0 ? accent : "#71717a" }}
                 >
                   {e.gained > 0 ? <>+{e.gained}</> : <><Minus className="h-3 w-3" />0</>}
                 </span>
-              </div>
+              </li>
             );
           })}
-        </div>
-      )}
+        </ol>
+        )}
 
       <div className="mt-3 pt-2 border-t border-white/5 flex items-center justify-between text-[10px] arena-mono text-zinc-500">
         <span>Running total</span>
