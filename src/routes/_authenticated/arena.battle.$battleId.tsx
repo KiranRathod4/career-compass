@@ -666,11 +666,17 @@ function ScoringTimeline({
           Answer your first question to begin the timeline.
         </div>
       ) : (
-        <div className="space-y-1.5 max-h-[260px] overflow-y-auto pr-1">
+        <ol
+          className="space-y-1.5 max-h-[260px] overflow-y-auto pr-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded"
+          tabIndex={0}
+          aria-label="Per-question scoring history, newest first"
+        >
           {entries.slice().reverse().map((e) => {
             const flashing = !reduceMotion && flashIdx === e.idx;
+            const xpLabel = e.gained > 0 ? `+${e.gained} XP` : "0 XP";
+            const choiceLabel = e.choice === null ? "no answer" : `picked ${String(e.choice)}`;
             return (
-              <div
+              <li
                 key={e.idx}
                 className="flex items-center gap-3 px-2.5 py-2 rounded-md border bg-zinc-900/40 transition-all"
                 style={{
@@ -681,11 +687,13 @@ function ScoringTimeline({
                     ? `0 0 0 1px ${e.correct ? "#34d39955" : "#f8717155"}, 0 0 18px ${e.correct ? "#34d39933" : "#f8717133"}`
                     : "none",
                 }}
+                aria-label={`Question ${e.idx + 1}: ${e.correct ? "correct" : "incorrect"}, ${choiceLabel}, ${xpLabel}`}
               >
-                <span className="text-[10px] arena-mono font-bold w-9 text-center text-zinc-400">
+                <span aria-hidden="true" className="text-[10px] arena-mono font-bold w-9 text-center text-zinc-400">
                   Q{e.idx + 1}
                 </span>
                 <span
+                  aria-hidden="true"
                   className="h-5 w-5 rounded-sm flex items-center justify-center"
                   style={{
                     background: e.correct ? "rgba(52,211,153,0.18)" : "rgba(248,113,113,0.18)",
@@ -694,20 +702,21 @@ function ScoringTimeline({
                 >
                   {e.correct ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
                 </span>
-                <div className="flex-1 min-w-0 text-[11px] text-zinc-400 arena-mono truncate">
+                <div aria-hidden="true" className="flex-1 min-w-0 text-[11px] text-zinc-400 arena-mono truncate">
                   {e.choice === null ? "no answer" : `picked: ${String(e.choice).slice(0, 28)}`}
                 </div>
                 <span
+                  aria-hidden="true"
                   className="text-[12px] arena-mono font-bold flex items-center gap-0.5"
                   style={{ color: e.gained > 0 ? accent : "#71717a" }}
                 >
                   {e.gained > 0 ? <>+{e.gained}</> : <><Minus className="h-3 w-3" />0</>}
                 </span>
-              </div>
+              </li>
             );
           })}
-        </div>
-      )}
+        </ol>
+        )}
 
       <div className="mt-3 pt-2 border-t border-white/5 flex items-center justify-between text-[10px] arena-mono text-zinc-500">
         <span>Running total</span>
