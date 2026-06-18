@@ -354,56 +354,62 @@ function LiveBattle() {
           </div>
 
           {/* RIGHT: live leaderboard */}
-          <div className="arena-neon-card p-4 self-start">
+          <section className="arena-neon-card p-4 self-start" aria-labelledby="live-standings-heading">
             <div className="flex items-center gap-2 mb-3">
-              <Trophy className="h-3.5 w-3.5 text-amber-400" />
-              <span className="text-[10px] uppercase tracking-[0.14em] font-bold text-zinc-300">Live Standings</span>
-              <Radio className={`h-3 w-3 text-emerald-400 ml-auto ${reduceMotion ? "" : "arena-spark"}`} />
+              <Trophy className="h-3.5 w-3.5 text-amber-400" aria-hidden="true" />
+              <h2 id="live-standings-heading" className="text-[10px] uppercase tracking-[0.14em] font-bold text-zinc-300">Live Standings</h2>
+              <Radio aria-hidden="true" className={`h-3 w-3 text-emerald-400 ml-auto ${reduceMotion ? "" : "arena-spark"}`} />
             </div>
             {ranked.length === 0 ? (
               <div className="text-[12px] text-zinc-500 leading-relaxed">Waiting for operatives…</div>
             ) : (
-              <div className="space-y-1.5 max-h-[560px] overflow-y-auto pr-1">
+              <ol
+                className="space-y-1.5 max-h-[560px] overflow-y-auto pr-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 rounded"
+                tabIndex={0}
+                aria-label={`Live leaderboard, ${ranked.length} participants`}
+              >
                 {ranked.map((p, i) => {
                   const prof = (profMap as any)[p.user_id];
                   const name = prof?.full_name || prof?.username || "Operative";
                   const isMe = p.user_id === user?.id;
                   const tone = i === 0 ? "#f59e0b" : i === 1 ? "#cbd5e1" : i === 2 ? "#cd7f32" : "rgba(255,255,255,0.08)";
                   return (
-                    <div
+                    <li
                       key={p.user_id}
                       className="flex items-center gap-3 px-2.5 py-2 rounded-md border border-white/5 bg-zinc-900/40 transition"
                       style={{ borderLeft: `3px solid ${isMe ? accent : tone}` }}
+                      aria-label={`Rank ${i + 1}: ${name}${isMe ? " (you)" : ""}, ${p.score.toLocaleString()} points`}
+                      aria-current={isMe ? "true" : undefined}
                     >
-                      <span className="text-[11px] arena-mono font-bold w-5 text-center"
+                      <span aria-hidden="true" className="text-[11px] arena-mono font-bold w-5 text-center"
                         style={{ color: i < 3 ? tone : "rgba(255,255,255,0.4)" }}>
                         {i + 1}
                       </span>
                       <div className="flex-1 min-w-0">
                         <div className="text-[12px] font-semibold text-zinc-100 truncate flex items-center gap-1.5">
                           {name}
-                          {isMe && <span className="text-[9px] arena-mono" style={{ color: accent }}>· YOU</span>}
+                          {isMe && <span className="text-[9px] arena-mono" style={{ color: accent }} aria-hidden="true">· YOU</span>}
                         </div>
                         <div className="text-[10px] text-zinc-500 truncate">{prof?.city || "—"}</div>
                       </div>
-                      <div className="text-[12px] arena-mono font-bold text-zinc-100">
+                      <div className="text-[12px] arena-mono font-bold text-zinc-100" aria-hidden="true">
                         {p.score.toLocaleString()}
                       </div>
-                    </div>
+                    </li>
                   );
                 })}
-              </div>
+              </ol>
             )}
             <div className="mt-4 pt-3 border-t border-white/5 text-[10px] text-zinc-500 arena-mono">
               Updates in real time
             </div>
             <Link
               to="/arena"
-              className="mt-3 block text-[10px] arena-mono text-zinc-500 hover:text-white"
+              className="mt-3 inline-block text-[10px] arena-mono text-zinc-500 hover:text-white rounded-sm px-1 py-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 focus-visible:ring-white/70"
             >
               ← Back to Arena
             </Link>
-          </div>
+          </section>
         </div>
       </div>
     </div>
