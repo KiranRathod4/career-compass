@@ -618,15 +618,18 @@ function ScoringTimeline({
             {entries.length}/{totalQuestions} answered
           </span>
           <button
+            type="button"
             onClick={onToggleReduceMotion}
+            aria-pressed={reduceMotion}
+            aria-label={reduceMotion ? "Enable timeline flash animations" : "Reduce motion: disable timeline flash animations"}
             title={reduceMotion ? "Motion reduced: timeline flashes are off" : "Reduce motion"}
-            className={`flex items-center gap-1 px-2 py-1 rounded text-[10px] arena-mono border transition ${
+            className={`flex items-center gap-1 px-2 py-1 rounded text-[10px] arena-mono border transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950 focus-visible:ring-white/70 ${
               reduceMotion
-                ? "bg-zinc-800 text-zinc-300 border-white/10"
-                : "text-zinc-500 border-transparent hover:text-zinc-300 hover:bg-zinc-900/60"
+                ? "bg-zinc-800 text-zinc-200 border-white/20"
+                : "text-zinc-400 border-white/10 hover:text-zinc-100 hover:bg-zinc-900/60"
             }`}
           >
-            <Accessibility className="h-3 w-3" />
+            <Accessibility className="h-3 w-3" aria-hidden="true" />
             {reduceMotion ? "Flash off" : "Flash on"}
           </button>
         </div>
