@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Plus, Trash2, ExternalLink, Search } from "lucide-react";
+import { Plus, Trash2, ExternalLink, Search, Download } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -92,9 +92,19 @@ function JobsPage() {
           <h1 className="text-xl font-semibold">Job Tracker</h1>
           <p className="text-sm text-muted-foreground">Pipeline for internships and full-time roles.</p>
         </div>
-        <button onClick={() => setShowAdd((s) => !s)} className="h-9 px-3 rounded-md bg-primary text-primary-foreground text-sm font-medium inline-flex items-center gap-1.5">
-          <Plus className="h-4 w-4" />Add job
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => exportJobsCSV(filtered)}
+            disabled={filtered.length === 0}
+            className="h-9 px-3 rounded-md border border-border text-sm font-medium inline-flex items-center gap-1.5 hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Download visible jobs as Excel-compatible CSV"
+          >
+            <Download className="h-4 w-4" />Export Excel
+          </button>
+          <button onClick={() => setShowAdd((s) => !s)} className="h-9 px-3 rounded-md bg-primary text-primary-foreground text-sm font-medium inline-flex items-center gap-1.5">
+            <Plus className="h-4 w-4" />Add job
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -241,3 +251,43 @@ const inp = "mt-0.5 h-9 px-2 w-full rounded border border-border bg-background t
 function Stat({ label, value, accent }: { label: string; value: any; accent?: string }) { return <div className="card-flat p-4"><div className="section-label">{label}</div><div className={`mt-2 text-2xl font-semibold ${accent ?? ""}`}>{value}</div></div>; }
 function F({ label, children }: { label: string; children: React.ReactNode }) { return <label className="block"><span className="text-[11px] text-muted-foreground">{label}</span>{children}</label>; }
 function Th({ children }: { children?: React.ReactNode }) { return <th className="text-left font-medium px-3 py-2">{children}</th>; }
+
+const EXPORT_COLUMNS: { key: string; label: string }[] = [
+  { key: "company", label: "Company" },
+  { key: "role", label: "Role" },
+  { key: "job_type", label: "Type" },
+  { key: "location", label: "Location" },
+  { key: "status", label: "Status" },
+  { key: "source", label: "Source" },
+  { key: "link", label: "Link" },
+  { key: "salary", label: "Salary" },
+  { key: "applied_at", label: "Applied At" },
+  { key: "deadline", label: "Deadline" },
+  { key: "notes", label: "Notes" },
+  { key: "created_at", label: "Created At" },
+  { key: "updated_at", label: "Updated At" },
+];
+
+function csvEscape(v: any): string {
+  if (v === null || v === undefined) return "";
+  const s = typeof v === "string" ? v : typeof v === "object" ? JSON.stringify(v) : String(v);
+  return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+}
+
+function exportJobsCSV(rows: any[]) {
+  if (!rows.length) { toast.error("Nothing to export"); return; }
+  const header = EXPORT_COLUMNS.map((c) => c.label).join(",");
+  const lines = rows.map((r) => EXPORT_COLUMNS.map((c) => csvEscape(r[c.key])).join(","));
+  // BOM for Excel UTF-8 compatibility
+  const csv = "\uFEFF" + [header, ...lines].join("\r\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `job-tracker-${format(new Date(), "yyyy-MM-dd")}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast.success(`Exported ${rows.length} job${rows.length === 1 ? "" : "s"}`);
+}
