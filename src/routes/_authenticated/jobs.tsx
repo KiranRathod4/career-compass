@@ -92,9 +92,19 @@ function JobsPage() {
           <h1 className="text-xl font-semibold">Job Tracker</h1>
           <p className="text-sm text-muted-foreground">Pipeline for internships and full-time roles.</p>
         </div>
-        <button onClick={() => setShowAdd((s) => !s)} className="h-9 px-3 rounded-md bg-primary text-primary-foreground text-sm font-medium inline-flex items-center gap-1.5">
-          <Plus className="h-4 w-4" />Add job
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => exportJobsCSV(filtered)}
+            disabled={filtered.length === 0}
+            className="h-9 px-3 rounded-md border border-border text-sm font-medium inline-flex items-center gap-1.5 hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Download visible jobs as Excel-compatible CSV"
+          >
+            <Download className="h-4 w-4" />Export Excel
+          </button>
+          <button onClick={() => setShowAdd((s) => !s)} className="h-9 px-3 rounded-md bg-primary text-primary-foreground text-sm font-medium inline-flex items-center gap-1.5">
+            <Plus className="h-4 w-4" />Add job
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
