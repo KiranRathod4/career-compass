@@ -6,11 +6,12 @@
 
 @theme inline {
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-serif: "Source Serif 4", "Iowan Old Style", "Apple Garamond", Georgia, serif;
   --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 10px;
-  --radius-xl: 14px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -46,20 +47,20 @@
 }
 
 :root {
-  /* Purple — primary actions, XP, active nav, progress, focus, achievements */
-  --p-9: #3b0764;
-  --p-8: #4c1d95;
-  --p-7: #5b21b6;
-  --p-6: #7c3aed;
-  --p-5: #8b5cf6;
-  --p-4: #a78bfa;
-  --p-3: #c4b5fd;
-  --p-2: #ddd6fe;
-  --p-1: #ede9fe;
-  --p-0: #f5f3ff;
-  --p-alpha-12: rgba(124,58,237,0.12);
-  --p-alpha-08: rgba(124,58,237,0.08);
-  --p-alpha-06: rgba(124,58,237,0.06);
+  /* Midnight Indigo — primary actions, XP, active nav, progress, focus, achievements */
+  --p-9: #07071a;
+  --p-8: #0a0a1a;
+  --p-7: #141432;
+  --p-6: #1e1e5a;
+  --p-5: #3730a3;
+  --p-4: #4f46e5;
+  --p-3: #6366f1;
+  --p-2: #a5b4fc;
+  --p-1: #c7d2fe;
+  --p-0: #eef2ff;
+  --p-alpha-12: rgba(79,70,229,0.12);
+  --p-alpha-08: rgba(79,70,229,0.08);
+  --p-alpha-06: rgba(79,70,229,0.06);
 
   /* Amber — streaks, fire, at-risk */
   --a-6: #d97706;
@@ -112,31 +113,31 @@
   --card-foreground: #09090b;
   --popover: #ffffff;
   --popover-foreground: #09090b;
-  --primary: #7c3aed;
+  --primary: #4f46e5;
   --primary-foreground: #ffffff;
   --secondary: #f4f4f5;
   --secondary-foreground: #09090b;
   --muted: #f4f4f5;
   --muted-foreground: #52525b;
-  --accent: #f4f4f5;
-  --accent-foreground: #09090b;
+  --accent: #eef2ff;
+  --accent-foreground: #1e1e5a;
   --destructive: #dc2626;
   --destructive-foreground: #ffffff;
   --border: #e4e4e7;
   --input: #e4e4e7;
-  --ring: #7c3aed;
+  --ring: #4f46e5;
   --sidebar: #ffffff;
   --sidebar-foreground: #09090b;
   --sidebar-border: #e4e4e7;
-  --sidebar-accent: #f4f4f5;
-  --sidebar-accent-foreground: #09090b;
+  --sidebar-accent: #eef2ff;
+  --sidebar-accent-foreground: #1e1e5a;
 
   --success: #059669;
   --success-foreground: #059669;
   --warning: #d97706;
   --warning-foreground: #d97706;
-  --info: #7c3aed;
-  --info-foreground: #7c3aed;
+  --info: #4f46e5;
+  --info-foreground: #4f46e5;
   --neutral: #52525b;
   --neutral-foreground: #52525b;
 
@@ -164,37 +165,37 @@
   --text-3:       var(--n-7);
   --text-disabled:var(--n-8);
 
-  --background: #09090b;
+  --background: #07071a;
   --foreground: #fafafa;
-  --card: #111113;
+  --card: #0a0a1a;
   --card-foreground: #fafafa;
-  --popover: #111113;
+  --popover: #0a0a1a;
   --popover-foreground: #fafafa;
-  --primary: #8b5cf6;
+  --primary: #6366f1;
   --primary-foreground: #ffffff;
-  --secondary: #18181b;
+  --secondary: #141432;
   --secondary-foreground: #fafafa;
-  --muted: #18181b;
-  --muted-foreground: #a1a1aa;
-  --accent: #27272a;
-  --accent-foreground: #fafafa;
+  --muted: #141432;
+  --muted-foreground: #a5b4fc;
+  --accent: #1e1e5a;
+  --accent-foreground: #eef2ff;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: #18181b;
-  --input: #27272a;
-  --ring: #8b5cf6;
-  --sidebar: #111113;
+  --border: #1e1e5a;
+  --input: #141432;
+  --ring: #6366f1;
+  --sidebar: #0a0a1a;
   --sidebar-foreground: #fafafa;
-  --sidebar-border: #18181b;
-  --sidebar-accent: #18181b;
-  --sidebar-accent-foreground: #fafafa;
+  --sidebar-border: #141432;
+  --sidebar-accent: #1e1e5a;
+  --sidebar-accent-foreground: #eef2ff;
 
   --success: #10b981;
   --success-foreground: #10b981;
   --warning: #f59e0b;
   --warning-foreground: #f59e0b;
-  --info: #8b5cf6;
-  --info-foreground: #8b5cf6;
+  --info: #6366f1;
+  --info-foreground: #a5b4fc;
   --neutral: #a1a1aa;
   --neutral-foreground: #a1a1aa;
 
@@ -230,8 +231,9 @@
 }
 
 @layer components {
-  .t-display { font-size: 30px; font-weight: 600; line-height: 1.2; letter-spacing: -0.6px; color: var(--text-1); }
-  .t-h1 { font-size: 22px; font-weight: 600; line-height: 1.3; letter-spacing: -0.3px; color: var(--text-1); }
+  .t-display { font-family: var(--font-serif); font-size: 34px; font-weight: 500; line-height: 1.15; letter-spacing: -0.6px; color: var(--text-1); }
+  .t-serif { font-family: var(--font-serif); font-weight: 500; letter-spacing: -0.2px; color: var(--text-1); }
+  .t-h1 { font-family: var(--font-serif); font-size: 24px; font-weight: 500; line-height: 1.25; letter-spacing: -0.3px; color: var(--text-1); }
   .t-h2 { font-size: 16px; font-weight: 600; line-height: 1.4; letter-spacing: -0.1px; color: var(--text-1); }
   .t-h3 { font-size: 14px; font-weight: 500; line-height: 1.5; color: var(--text-1); }
   .t-body { font-size: 14px; font-weight: 400; line-height: 1.6; color: var(--text-2); }
