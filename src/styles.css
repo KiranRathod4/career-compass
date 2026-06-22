@@ -47,20 +47,20 @@
 }
 
 :root {
-  /* Purple — primary actions, XP, active nav, progress, focus, achievements */
-  --p-9: #3b0764;
-  --p-8: #4c1d95;
-  --p-7: #5b21b6;
-  --p-6: #7c3aed;
-  --p-5: #8b5cf6;
-  --p-4: #a78bfa;
-  --p-3: #c4b5fd;
-  --p-2: #ddd6fe;
-  --p-1: #ede9fe;
-  --p-0: #f5f3ff;
-  --p-alpha-12: rgba(124,58,237,0.12);
-  --p-alpha-08: rgba(124,58,237,0.08);
-  --p-alpha-06: rgba(124,58,237,0.06);
+  /* Midnight Indigo — primary actions, XP, active nav, progress, focus, achievements */
+  --p-9: #07071a;
+  --p-8: #0a0a1a;
+  --p-7: #141432;
+  --p-6: #1e1e5a;
+  --p-5: #3730a3;
+  --p-4: #4f46e5;
+  --p-3: #6366f1;
+  --p-2: #a5b4fc;
+  --p-1: #c7d2fe;
+  --p-0: #eef2ff;
+  --p-alpha-12: rgba(79,70,229,0.12);
+  --p-alpha-08: rgba(79,70,229,0.08);
+  --p-alpha-06: rgba(79,70,229,0.06);
 
   /* Amber — streaks, fire, at-risk */
   --a-6: #d97706;
