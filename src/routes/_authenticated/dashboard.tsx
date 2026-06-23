@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { format, startOfWeek, addDays, differenceInDays } from "date-fns";
@@ -55,7 +55,7 @@ function Dashboard() {
     queryFn: async () => {
       const start = format(addDays(new Date(), -83), "yyyy-MM-dd");
       const { data } = await supabase.from("daily_tracker")
-        .select("date,dsa_done,aptitude_done,sql_done,devops_done,qa_done,mock_done,revision_done,linkedin_post")
+        .select("date,dsa_done,aptitude_done,sql_done,devops_done,qa_done,mock_done,revision_done,linkedin_post,applications_count,mood,notes")
         .eq("user_id", user!.id).gte("date", start);
       return data ?? [];
     },
@@ -123,23 +123,46 @@ function Dashboard() {
 
   const monthlyApps = weekEntries.reduce((s: number, e: any) => s + (e.applications_count ?? 0), 0);
 
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
+
   // 84-day GitHub-style heatmap (12 weeks × 7 days, Mon-start)
+  type DayEntry = {
+    dsa_done: boolean; aptitude_done: boolean; sql_done: boolean; devops_done: boolean;
+    qa_done: boolean; mock_done: boolean; revision_done: boolean; linkedin_post: boolean;
+    applications_count: number; mood: string | null; notes: string | null;
+  };
   const heatmap = useMemo(() => {
-    const map = new Map<string, number>();
+    const entryMap = new Map<string, DayEntry>();
     for (const e of heatmapEntries as any[]) {
-      const done = CHECK_FIELDS.filter((f) => (e as any)[f]).length;
-      map.set(e.date, Math.round((done / CHECK_FIELDS.length) * 100));
+      const prev = entryMap.get(e.date);
+      const merged: DayEntry = {
+        dsa_done: !!(prev?.dsa_done || e.dsa_done),
+        aptitude_done: !!(prev?.aptitude_done || e.aptitude_done),
+        sql_done: !!(prev?.sql_done || e.sql_done),
+        devops_done: !!(prev?.devops_done || e.devops_done),
+        qa_done: !!(prev?.qa_done || e.qa_done),
+        mock_done: !!(prev?.mock_done || e.mock_done),
+        revision_done: !!(prev?.revision_done || e.revision_done),
+        linkedin_post: !!(prev?.linkedin_post || e.linkedin_post),
+        applications_count: (prev?.applications_count ?? 0) + (e.applications_count ?? 0),
+        mood: e.mood ?? prev?.mood ?? null,
+        notes: e.notes ?? prev?.notes ?? null,
+      };
+      entryMap.set(e.date, merged);
     }
+    const pctOf = (e?: DayEntry) =>
+      e ? Math.round((CHECK_FIELDS.filter((f) => (e as any)[f]).length / CHECK_FIELDS.length) * 100) : 0;
     const today = new Date();
     const lastMonday = startOfWeek(today, { weekStartsOn: 1 });
     const firstMonday = addDays(lastMonday, -11 * 7);
-    const weeks: { date: string; pct: number; future: boolean }[][] = [];
+    const weeks: { date: string; pct: number; future: boolean; entry?: DayEntry }[][] = [];
     for (let w = 0; w < 12; w++) {
-      const col: { date: string; pct: number; future: boolean }[] = [];
+      const col: { date: string; pct: number; future: boolean; entry?: DayEntry }[] = [];
       for (let d = 0; d < 7; d++) {
         const day = addDays(firstMonday, w * 7 + d);
         const key = format(day, "yyyy-MM-dd");
-        col.push({ date: key, pct: map.get(key) ?? 0, future: day > today });
+        const entry = entryMap.get(key);
+        col.push({ date: key, pct: pctOf(entry), future: day > today, entry });
       }
       weeks.push(col);
     }
@@ -147,13 +170,24 @@ function Dashboard() {
     let streak = 0;
     for (let i = 0; i < 84; i++) {
       const key = format(addDays(today, -i), "yyyy-MM-dd");
-      if ((map.get(key) ?? 0) > 0) streak++;
+      if (pctOf(entryMap.get(key)) > 0) streak++;
       else if (i > 0) break;
       else break;
     }
-    const activeDays = Array.from(map.values()).filter((v) => v > 0).length;
-    return { weeks, streak, activeDays };
+    let activeDays = 0;
+    entryMap.forEach((e) => { if (pctOf(e) > 0) activeDays++; });
+    return { weeks, streak, activeDays, entryMap };
   }, [heatmapEntries]);
+
+  const selectedEntry = selectedDay ? heatmap.entryMap.get(selectedDay) : undefined;
+  const selectedPct = selectedEntry
+    ? Math.round((CHECK_FIELDS.filter((f) => (selectedEntry as any)[f]).length / CHECK_FIELDS.length) * 100)
+    : 0;
+  const CHECK_LABELS: Record<string, string> = {
+    dsa_done: "DSA", aptitude_done: "Aptitude", sql_done: "SQL", devops_done: "DevOps",
+    qa_done: "QA", mock_done: "Mock interview", revision_done: "Revision", linkedin_post: "LinkedIn post",
+  };
+
 
 
   return (
@@ -246,11 +280,24 @@ function Dashboard() {
                       bucket === 2 ? "bg-success/50" :
                       bucket === 3 ? "bg-success/75" :
                       "bg-success";
+                    const isSelected = selectedDay === cell.date;
+                    const dateLabel = format(new Date(cell.date), "EEE, MMM d, yyyy");
+                    const tip = cell.future
+                      ? `${dateLabel} — upcoming`
+                      : cell.pct === 0
+                      ? `${dateLabel} — no activity`
+                      : `${dateLabel} — active · ${cell.pct}% done`;
                     return (
-                      <div
+                      <button
                         key={cell.date}
-                        className={`h-[11px] w-[11px] rounded-[3px] ${cls}`}
-                        title={`${cell.date} — ${cell.future ? "—" : `${cell.pct}% done`}`}
+                        type="button"
+                        disabled={cell.future}
+                        onClick={() => setSelectedDay(isSelected ? null : cell.date)}
+                        title={tip}
+                        aria-label={tip}
+                        className={`h-[11px] w-[11px] rounded-[3px] ${cls} transition outline-none ${
+                          cell.future ? "cursor-default" : "hover:ring-1 hover:ring-foreground/40 cursor-pointer"
+                        } ${isSelected ? "ring-2 ring-primary ring-offset-1 ring-offset-card" : ""}`}
                       />
                     );
                   })}
@@ -269,6 +316,53 @@ function Dashboard() {
                 <span>More</span>
               </div>
             </div>
+
+            {selectedDay && (
+              <div className="mt-4 pt-3 border-t border-border">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-xs font-medium">
+                    {format(new Date(selectedDay), "EEEE, MMM d, yyyy")}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedDay(null)}
+                    className="text-[10px] text-muted-foreground hover:text-foreground"
+                  >
+                    Close
+                  </button>
+                </div>
+                {!selectedEntry ? (
+                  <p className="text-xs text-muted-foreground">No activity logged on this day.</p>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-[11px]">
+                      <Pill tone={selectedPct >= 75 ? "success" : selectedPct >= 25 ? "info" : "neutral"}>
+                        {selectedPct}% done
+                      </Pill>
+                      {selectedEntry.applications_count > 0 && (
+                        <Pill tone="info">{selectedEntry.applications_count} application{selectedEntry.applications_count === 1 ? "" : "s"}</Pill>
+                      )}
+                      {selectedEntry.mood && <Pill tone="neutral">Mood: {selectedEntry.mood}</Pill>}
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {CHECK_FIELDS.filter((f) => (selectedEntry as any)[f]).map((f) => (
+                        <span key={f} className="inline-flex items-center gap-1 px-2 h-5 rounded-full text-[11px] bg-success/15 text-success">
+                          <CheckCircle2 className="h-3 w-3" /> {CHECK_LABELS[f]}
+                        </span>
+                      ))}
+                      {CHECK_FIELDS.every((f) => !(selectedEntry as any)[f]) && (
+                        <span className="text-[11px] text-muted-foreground">No tasks ticked.</span>
+                      )}
+                    </div>
+                    {selectedEntry.notes && (
+                      <p className="text-xs text-muted-foreground italic border-l-2 border-border pl-2">
+                        “{selectedEntry.notes}”
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </Section>
         </div>
       </div>
