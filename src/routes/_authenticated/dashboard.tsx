@@ -123,6 +123,39 @@ function Dashboard() {
 
   const monthlyApps = weekEntries.reduce((s: number, e: any) => s + (e.applications_count ?? 0), 0);
 
+  // 84-day GitHub-style heatmap (12 weeks × 7 days, Mon-start)
+  const heatmap = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const e of heatmapEntries as any[]) {
+      const done = CHECK_FIELDS.filter((f) => (e as any)[f]).length;
+      map.set(e.date, Math.round((done / CHECK_FIELDS.length) * 100));
+    }
+    const today = new Date();
+    const lastMonday = startOfWeek(today, { weekStartsOn: 1 });
+    const firstMonday = addDays(lastMonday, -11 * 7);
+    const weeks: { date: string; pct: number; future: boolean }[][] = [];
+    for (let w = 0; w < 12; w++) {
+      const col: { date: string; pct: number; future: boolean }[] = [];
+      for (let d = 0; d < 7; d++) {
+        const day = addDays(firstMonday, w * 7 + d);
+        const key = format(day, "yyyy-MM-dd");
+        col.push({ date: key, pct: map.get(key) ?? 0, future: day > today });
+      }
+      weeks.push(col);
+    }
+    // current streak: consecutive days back from today with pct > 0
+    let streak = 0;
+    for (let i = 0; i < 84; i++) {
+      const key = format(addDays(today, -i), "yyyy-MM-dd");
+      if ((map.get(key) ?? 0) > 0) streak++;
+      else if (i > 0) break;
+      else break;
+    }
+    const activeDays = Array.from(map.values()).filter((v) => v > 0).length;
+    return { weeks, streak, activeDays };
+  }, [heatmapEntries]);
+
+
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       <BadgeUnlockModal badge={unlocked} onClose={closeUnlock} />
