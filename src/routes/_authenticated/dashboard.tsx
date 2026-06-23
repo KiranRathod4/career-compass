@@ -50,6 +50,17 @@ function Dashboard() {
     },
   });
 
+  const { data: heatmapEntries = [] } = useQuery({
+    queryKey: ["daily-heatmap", user!.id],
+    queryFn: async () => {
+      const start = format(addDays(new Date(), -83), "yyyy-MM-dd");
+      const { data } = await supabase.from("daily_tracker")
+        .select("date,dsa_done,aptitude_done,sql_done,devops_done,qa_done,mock_done,revision_done,linkedin_post")
+        .eq("user_id", user!.id).gte("date", start);
+      return data ?? [];
+    },
+  });
+
   const { data: todayBlocks = [] } = useQuery({
     queryKey: ["blocks", user!.id, today],
     queryFn: async () => {
@@ -111,6 +122,39 @@ function Dashboard() {
   });
 
   const monthlyApps = weekEntries.reduce((s: number, e: any) => s + (e.applications_count ?? 0), 0);
+
+  // 84-day GitHub-style heatmap (12 weeks × 7 days, Mon-start)
+  const heatmap = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const e of heatmapEntries as any[]) {
+      const done = CHECK_FIELDS.filter((f) => (e as any)[f]).length;
+      map.set(e.date, Math.round((done / CHECK_FIELDS.length) * 100));
+    }
+    const today = new Date();
+    const lastMonday = startOfWeek(today, { weekStartsOn: 1 });
+    const firstMonday = addDays(lastMonday, -11 * 7);
+    const weeks: { date: string; pct: number; future: boolean }[][] = [];
+    for (let w = 0; w < 12; w++) {
+      const col: { date: string; pct: number; future: boolean }[] = [];
+      for (let d = 0; d < 7; d++) {
+        const day = addDays(firstMonday, w * 7 + d);
+        const key = format(day, "yyyy-MM-dd");
+        col.push({ date: key, pct: map.get(key) ?? 0, future: day > today });
+      }
+      weeks.push(col);
+    }
+    // current streak: consecutive days back from today with pct > 0
+    let streak = 0;
+    for (let i = 0; i < 84; i++) {
+      const key = format(addDays(today, -i), "yyyy-MM-dd");
+      if ((map.get(key) ?? 0) > 0) streak++;
+      else if (i > 0) break;
+      else break;
+    }
+    const activeDays = Array.from(map.values()).filter((v) => v > 0).length;
+    return { weeks, streak, activeDays };
+  }, [heatmapEntries]);
+
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
@@ -178,6 +222,52 @@ function Dashboard() {
               <QuickButton label="DSA done" onClick={() => upsertDaily.mutate({ dsa_done: true })} />
               <QuickButton label="SQL done" onClick={() => upsertDaily.mutate({ sql_done: true })} />
               <QuickButton label="LinkedIn post" onClick={() => upsertDaily.mutate({ linkedin_post: true })} />
+            </div>
+          </Section>
+
+          <Section
+            title="Daily Streak"
+            action={
+              <span className="text-xs text-muted-foreground inline-flex items-center gap-1">
+                <Flame className="h-3.5 w-3.5 text-success" />
+                <span className="font-medium text-foreground">{heatmap.streak}</span> day{heatmap.streak === 1 ? "" : "s"}
+              </span>
+            }
+          >
+            <div className="flex gap-[3px]" aria-label="Last 84 days of activity">
+              {heatmap.weeks.map((col, ci) => (
+                <div key={ci} className="flex flex-col gap-[3px]">
+                  {col.map((cell) => {
+                    const bucket = cell.future ? -1 : cell.pct === 0 ? 0 : cell.pct < 25 ? 1 : cell.pct < 50 ? 2 : cell.pct < 75 ? 3 : 4;
+                    const cls =
+                      bucket === -1 ? "bg-transparent" :
+                      bucket === 0 ? "bg-muted/60" :
+                      bucket === 1 ? "bg-success/25" :
+                      bucket === 2 ? "bg-success/50" :
+                      bucket === 3 ? "bg-success/75" :
+                      "bg-success";
+                    return (
+                      <div
+                        key={cell.date}
+                        className={`h-[11px] w-[11px] rounded-[3px] ${cls}`}
+                        title={`${cell.date} — ${cell.future ? "—" : `${cell.pct}% done`}`}
+                      />
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+            <div className="mt-3 flex items-center justify-between text-[10px] text-muted-foreground">
+              <span>{heatmap.activeDays} active days · last 12 weeks</span>
+              <div className="inline-flex items-center gap-1">
+                <span>Less</span>
+                <span className="h-[11px] w-[11px] rounded-[3px] bg-muted/60" />
+                <span className="h-[11px] w-[11px] rounded-[3px] bg-success/25" />
+                <span className="h-[11px] w-[11px] rounded-[3px] bg-success/50" />
+                <span className="h-[11px] w-[11px] rounded-[3px] bg-success/75" />
+                <span className="h-[11px] w-[11px] rounded-[3px] bg-success" />
+                <span>More</span>
+              </div>
             </div>
           </Section>
         </div>
