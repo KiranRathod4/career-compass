@@ -224,6 +224,52 @@ function Dashboard() {
               <QuickButton label="LinkedIn post" onClick={() => upsertDaily.mutate({ linkedin_post: true })} />
             </div>
           </Section>
+
+          <Section
+            title="Daily Streak"
+            action={
+              <span className="text-xs text-muted-foreground inline-flex items-center gap-1">
+                <Flame className="h-3.5 w-3.5 text-success" />
+                <span className="font-medium text-foreground">{heatmap.streak}</span> day{heatmap.streak === 1 ? "" : "s"}
+              </span>
+            }
+          >
+            <div className="flex gap-[3px]" aria-label="Last 84 days of activity">
+              {heatmap.weeks.map((col, ci) => (
+                <div key={ci} className="flex flex-col gap-[3px]">
+                  {col.map((cell) => {
+                    const bucket = cell.future ? -1 : cell.pct === 0 ? 0 : cell.pct < 25 ? 1 : cell.pct < 50 ? 2 : cell.pct < 75 ? 3 : 4;
+                    const cls =
+                      bucket === -1 ? "bg-transparent" :
+                      bucket === 0 ? "bg-muted/60" :
+                      bucket === 1 ? "bg-success/25" :
+                      bucket === 2 ? "bg-success/50" :
+                      bucket === 3 ? "bg-success/75" :
+                      "bg-success";
+                    return (
+                      <div
+                        key={cell.date}
+                        className={`h-[11px] w-[11px] rounded-[3px] ${cls}`}
+                        title={`${cell.date} — ${cell.future ? "—" : `${cell.pct}% done`}`}
+                      />
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+            <div className="mt-3 flex items-center justify-between text-[10px] text-muted-foreground">
+              <span>{heatmap.activeDays} active days · last 12 weeks</span>
+              <div className="inline-flex items-center gap-1">
+                <span>Less</span>
+                <span className="h-[11px] w-[11px] rounded-[3px] bg-muted/60" />
+                <span className="h-[11px] w-[11px] rounded-[3px] bg-success/25" />
+                <span className="h-[11px] w-[11px] rounded-[3px] bg-success/50" />
+                <span className="h-[11px] w-[11px] rounded-[3px] bg-success/75" />
+                <span className="h-[11px] w-[11px] rounded-[3px] bg-success" />
+                <span>More</span>
+              </div>
+            </div>
+          </Section>
         </div>
       </div>
 
