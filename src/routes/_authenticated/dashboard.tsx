@@ -55,7 +55,7 @@ function Dashboard() {
     queryFn: async () => {
       const start = format(addDays(new Date(), -83), "yyyy-MM-dd");
       const { data } = await supabase.from("daily_tracker")
-        .select("date,dsa_done,aptitude_done,sql_done,devops_done,qa_done,mock_done,revision_done,linkedin_post")
+        .select("date,dsa_done,aptitude_done,sql_done,devops_done,qa_done,mock_done,revision_done,linkedin_post,applications_count,mood,notes")
         .eq("user_id", user!.id).gte("date", start);
       return data ?? [];
     },
