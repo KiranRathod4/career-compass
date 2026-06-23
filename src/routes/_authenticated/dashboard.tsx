@@ -280,11 +280,24 @@ function Dashboard() {
                       bucket === 2 ? "bg-success/50" :
                       bucket === 3 ? "bg-success/75" :
                       "bg-success";
+                    const isSelected = selectedDay === cell.date;
+                    const dateLabel = format(new Date(cell.date), "EEE, MMM d, yyyy");
+                    const tip = cell.future
+                      ? `${dateLabel} — upcoming`
+                      : cell.pct === 0
+                      ? `${dateLabel} — no activity`
+                      : `${dateLabel} — active · ${cell.pct}% done`;
                     return (
-                      <div
+                      <button
                         key={cell.date}
-                        className={`h-[11px] w-[11px] rounded-[3px] ${cls}`}
-                        title={`${cell.date} — ${cell.future ? "—" : `${cell.pct}% done`}`}
+                        type="button"
+                        disabled={cell.future}
+                        onClick={() => setSelectedDay(isSelected ? null : cell.date)}
+                        title={tip}
+                        aria-label={tip}
+                        className={`h-[11px] w-[11px] rounded-[3px] ${cls} transition outline-none ${
+                          cell.future ? "cursor-default" : "hover:ring-1 hover:ring-foreground/40 cursor-pointer"
+                        } ${isSelected ? "ring-2 ring-primary ring-offset-1 ring-offset-card" : ""}`}
                       />
                     );
                   })}
@@ -303,6 +316,53 @@ function Dashboard() {
                 <span>More</span>
               </div>
             </div>
+
+            {selectedDay && (
+              <div className="mt-4 pt-3 border-t border-border">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-xs font-medium">
+                    {format(new Date(selectedDay), "EEEE, MMM d, yyyy")}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedDay(null)}
+                    className="text-[10px] text-muted-foreground hover:text-foreground"
+                  >
+                    Close
+                  </button>
+                </div>
+                {!selectedEntry ? (
+                  <p className="text-xs text-muted-foreground">No activity logged on this day.</p>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-[11px]">
+                      <Pill tone={selectedPct >= 75 ? "success" : selectedPct >= 25 ? "info" : "neutral"}>
+                        {selectedPct}% done
+                      </Pill>
+                      {selectedEntry.applications_count > 0 && (
+                        <Pill tone="info">{selectedEntry.applications_count} application{selectedEntry.applications_count === 1 ? "" : "s"}</Pill>
+                      )}
+                      {selectedEntry.mood && <Pill tone="neutral">Mood: {selectedEntry.mood}</Pill>}
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {CHECK_FIELDS.filter((f) => (selectedEntry as any)[f]).map((f) => (
+                        <span key={f} className="inline-flex items-center gap-1 px-2 h-5 rounded-full text-[11px] bg-success/15 text-success">
+                          <CheckCircle2 className="h-3 w-3" /> {CHECK_LABELS[f]}
+                        </span>
+                      ))}
+                      {CHECK_FIELDS.every((f) => !(selectedEntry as any)[f]) && (
+                        <span className="text-[11px] text-muted-foreground">No tasks ticked.</span>
+                      )}
+                    </div>
+                    {selectedEntry.notes && (
+                      <p className="text-xs text-muted-foreground italic border-l-2 border-border pl-2">
+                        “{selectedEntry.notes}”
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </Section>
         </div>
       </div>
