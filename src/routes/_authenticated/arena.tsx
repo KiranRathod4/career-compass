@@ -59,7 +59,9 @@ type PresenceState = {
 
 function ArenaLobby() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [online, setOnline] = useState<PresenceState[]>([]);
+  const [matchmaking, setMatchmaking] = useState(false);
 
   // arena profile (lazy-create on first visit)
   const profileQ = useQuery({
