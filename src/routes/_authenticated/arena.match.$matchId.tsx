@@ -95,6 +95,21 @@ function ArenaWaitingRoom() {
     return sec;
   }, [m?.started_at, m?.status, now]);
 
+  // Auto-start: when countdown hits 0, any participant flips status -> active (idempotent server-side).
+  const [starting, setStarting] = useState(false);
+  useEffect(() => {
+    if (!user || !m || starting) return;
+    if (m.status !== "countdown" || !m.started_at) return;
+    if (!players.some((p) => p.user_id === user.id)) return;
+    if (new Date(m.started_at).getTime() > now) return;
+    setStarting(true);
+    supabase.rpc("arena_start_match", { p_match_id: matchId }).finally(() => {
+      // realtime will pull the new status; release lock after a beat
+      setTimeout(() => setStarting(false), 1500);
+    });
+  }, [m?.status, m?.started_at, now, user, players, matchId, starting, m]);
+
+
   const isMember = !!user && players.some((p) => p.user_id === user.id);
 
   const handleLeave = async () => {
