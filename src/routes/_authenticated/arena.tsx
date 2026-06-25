@@ -1,5 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import {
   ArrowLeft,
@@ -58,7 +59,9 @@ type PresenceState = {
 
 function ArenaLobby() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [online, setOnline] = useState<PresenceState[]>([]);
+  const [matchmaking, setMatchmaking] = useState(false);
 
   // arena profile (lazy-create on first visit)
   const profileQ = useQuery({
@@ -200,6 +203,68 @@ function ArenaLobby() {
   const xpInto = arenaXp - curRank.xp;
   const xpSpan = Math.max(1, nextRank.xp - curRank.xp);
   const xpPct = Math.min(100, (xpInto / xpSpan) * 100);
+
+  // ---- matchmaking helpers ----
+  type ModeKey = "battle_sprint" | "battle_royale" | "squad_wars" | "blitz";
+  const MODE_DEFAULTS: Record<ModeKey, { max: number; q: number; dur: number }> = {
+    battle_sprint: { max: 4, q: 10, dur: 300 },
+    battle_royale: { max: 8, q: 15, dur: 600 },
+    squad_wars: { max: 10, q: 12, dur: 600 },
+    blitz: { max: 2, q: 10, dur: 180 },
+  };
+
+  async function findOrCreateMatch(mode: ModeKey) {
+    if (!user || matchmaking) return;
+    setMatchmaking(true);
+    try {
+      // 1) try to join an open waiting match
+      const { data: open } = await supabase
+        .from("arena_matches")
+        .select("id, current_players, max_players")
+        .eq("match_type", mode)
+        .eq("status", "waiting")
+        .eq("is_public", true)
+        .order("created_at", { ascending: true })
+        .limit(5);
+
+      const joinable = (open || []).find((m) => m.current_players < m.max_players);
+      if (joinable) {
+        const { error } = await supabase.rpc("arena_join_match", { p_match_id: joinable.id });
+        if (!error) {
+          navigate({ to: "/arena/match/$matchId", params: { matchId: joinable.id } });
+          return;
+        }
+      }
+
+      // 2) create a fresh one
+      const def = MODE_DEFAULTS[mode];
+      const { data: newId, error: cErr } = await supabase.rpc("arena_create_match", {
+        p_match_type: mode,
+        p_max_players: def.max,
+        p_topic: "mixed",
+        p_difficulty: "mixed",
+        p_question_count: def.q,
+        p_duration_seconds: def.dur,
+      });
+      if (cErr || !newId) {
+        toast.error(cErr?.message || "Could not create match");
+        return;
+      }
+      navigate({ to: "/arena/match/$matchId", params: { matchId: newId as string } });
+    } finally {
+      setMatchmaking(false);
+    }
+  }
+
+  async function joinExistingMatch(matchId: string) {
+    if (!user) return;
+    const { error } = await supabase.rpc("arena_join_match", { p_match_id: matchId });
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    navigate({ to: "/arena/match/$matchId", params: { matchId } });
+  }
 
   return (
     <div className="arena-root arena-scanlines">
@@ -362,14 +427,18 @@ function ArenaLobby() {
                 accent="#7c3aed"
                 bg="linear-gradient(135deg, #1a0a35, #0d0620)"
                 icon={<Zap className="w-12 h-12 arena-spin-slow" style={{ color: "#a78bfa" }} />}
+                onPlay={() => findOrCreateMatch("battle_sprint")}
+                disabled={matchmaking || !!locked}
               />
               <ModeCard
                 title="Battle Royale"
                 sub="One wrong answer. You're out. Last one standing wins."
-                meta="4–16 players · sudden death"
+                meta="4–8 players · sudden death"
                 accent="#f59e0b"
                 bg="linear-gradient(135deg, #1a0805, #0d0a00)"
                 icon={<Crown className="w-12 h-12" style={{ color: "#fbbf24" }} />}
+                onPlay={() => findOrCreateMatch("battle_royale")}
+                disabled={matchmaking || !!locked}
               />
               <ModeCard
                 title="Squad Wars"
@@ -378,6 +447,8 @@ function ArenaLobby() {
                 accent="#10b981"
                 bg="linear-gradient(135deg, #0a1a0d, #050d08)"
                 icon={<Users className="w-12 h-12" style={{ color: "#34d399" }} />}
+                onPlay={() => findOrCreateMatch("squad_wars")}
+                disabled={matchmaking || !!locked}
               />
               <ModeCard
                 title="Blitz"
@@ -386,6 +457,8 @@ function ArenaLobby() {
                 accent="#ef4444"
                 bg="linear-gradient(135deg, #1a0505, #0d0000)"
                 icon={<Swords className="w-12 h-12" style={{ color: "#f87171" }} />}
+                onPlay={() => findOrCreateMatch("blitz")}
+                disabled={matchmaking || !!locked}
               />
               <ModeCard
                 title="Daily Challenges"
@@ -407,19 +480,17 @@ function ArenaLobby() {
 
             {/* Quick match CTA */}
             <button
-              disabled
-              className="w-full h-12 rounded-xl flex items-center justify-center gap-2 font-semibold text-white transition disabled:opacity-60 disabled:cursor-not-allowed"
+              disabled={matchmaking || !!locked}
+              onClick={() => findOrCreateMatch("battle_sprint")}
+              className="w-full h-12 rounded-xl flex items-center justify-center gap-2 font-semibold text-white transition disabled:opacity-60 disabled:cursor-not-allowed hover:brightness-110"
               style={{ background: "var(--neon-purple)", boxShadow: "0 0 24px rgba(124,58,237,0.35)" }}
-              title="Matchmaking ships in Phase 2"
             >
               <Zap className="w-4 h-4" />
-              FIND MATCH — Battle Sprint · Mixed · Any
+              {matchmaking ? "Finding match…" : "FIND MATCH — Battle Sprint · Mixed · Any"}
               <Settings className="w-4 h-4 ml-2 opacity-60" />
             </button>
-            <div className="text-center text-[11px] text-white/30 -mt-2">
-              Matchmaking and live matches ship in Phase 2. Lobby + presence are live.
-            </div>
           </main>
+
 
           {/* -------- RIGHT: LIVE FEED + ONLINE -------- */}
           <aside className="space-y-3">
@@ -438,22 +509,31 @@ function ArenaLobby() {
                     No matches running. Be the first to drop in.
                   </div>
                 )}
-                {(matchesQ.data || []).map((m) => (
-                  <div key={m.id} className="rounded-lg p-2.5"
-                    style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" }}>
-                    <div className="flex items-center gap-2 text-[12px]">
-                      <span className="w-1.5 h-1.5 rounded-full bg-rose-500 arena-live-dot" />
-                      <span className="text-white/85 capitalize">{m.match_type.replace("_", " ")}</span>
-                      <span className="ml-auto text-[10px] uppercase tracking-wider text-white/40">
-                        {m.status}
-                      </span>
-                    </div>
-                    <div className="mt-1 text-[11px] text-white/40 arena-mono">
-                      {m.current_players}/{m.max_players} players
-                      {m.status === "active" && ` · Q${m.current_question_index + 1}/${m.question_count}`}
-                    </div>
-                  </div>
-                ))}
+                {(matchesQ.data || []).map((m) => {
+                  const joinable = m.status === "waiting" && m.current_players < m.max_players;
+                  return (
+                    <button
+                      key={m.id}
+                      type="button"
+                      onClick={() => (joinable ? joinExistingMatch(m.id) : navigate({ to: "/arena/match/$matchId", params: { matchId: m.id } }))}
+                      className="w-full text-left rounded-lg p-2.5 hover:bg-white/[0.04] transition"
+                      style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" }}
+                    >
+                      <div className="flex items-center gap-2 text-[12px]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-rose-500 arena-live-dot" />
+                        <span className="text-white/85 capitalize">{m.match_type.replace("_", " ")}</span>
+                        <span className="ml-auto text-[10px] uppercase tracking-wider" style={{ color: joinable ? "#34d399" : "rgba(255,255,255,0.4)" }}>
+                          {joinable ? "Join" : m.status}
+                        </span>
+                      </div>
+                      <div className="mt-1 text-[11px] text-white/40 arena-mono">
+                        {m.current_players}/{m.max_players} players
+                        {m.status === "active" && ` · Q${m.current_question_index + 1}/${m.question_count}`}
+                      </div>
+                    </button>
+                  );
+                })}
+
               </div>
             </div>
 
@@ -543,6 +623,8 @@ function ModeCard({
   accent,
   bg,
   icon,
+  onPlay,
+  disabled,
 }: {
   title: string;
   sub: string;
@@ -550,17 +632,22 @@ function ModeCard({
   accent: string;
   bg: string;
   icon: React.ReactNode;
+  onPlay?: () => void;
+  disabled?: boolean;
 }) {
   return (
     <button
       type="button"
-      className="group relative text-left rounded-2xl overflow-hidden transition-all duration-200 hover:-translate-y-1"
+      onClick={onPlay}
+      disabled={disabled || !onPlay}
+      className="group relative text-left rounded-2xl overflow-hidden transition-all duration-200 hover:-translate-y-1 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
       style={{
         background: "var(--arena-card)",
         border: "1px solid rgba(124,58,237,0.15)",
         height: 180,
       }}
       onMouseEnter={(e) => {
+        if (disabled) return;
         e.currentTarget.style.borderColor = "rgba(124,58,237,0.5)";
         e.currentTarget.style.boxShadow = `0 8px 32px ${accent}25`;
       }}

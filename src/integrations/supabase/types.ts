@@ -2379,6 +2379,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      arena_create_match: {
+        Args: {
+          p_difficulty?: string
+          p_duration_seconds?: number
+          p_match_type: string
+          p_max_players?: number
+          p_question_count?: number
+          p_topic?: string
+        }
+        Returns: string
+      }
+      arena_join_match: { Args: { p_match_id: string }; Returns: Json }
       get_user_level: { Args: { p_xp: number }; Returns: Json }
       get_user_xp: { Args: { p_user_id: string }; Returns: number }
     }
