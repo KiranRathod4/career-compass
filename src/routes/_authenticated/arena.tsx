@@ -22,7 +22,8 @@ export const Route = createFileRoute("/_authenticated/arena")({
 });
 
 // ---------- rank ladder ----------
-const RANKS = [
+type Rank = { name: string; xp: number; color: string };
+const RANKS: Rank[] = [
   { name: "Recruit", xp: 0, color: "var(--rank-recruit)" },
   { name: "Contender", xp: 500, color: "var(--rank-contender)" },
   { name: "Challenger", xp: 1500, color: "var(--rank-challenger)" },
@@ -31,11 +32,11 @@ const RANKS = [
   { name: "Master", xp: 13000, color: "var(--rank-master)" },
   { name: "Grandmaster", xp: 21000, color: "#f59e0b" },
   { name: "Legend", xp: 35000, color: "var(--rank-legend)" },
-] as const;
+];
 
-function rankFromXp(xp: number) {
-  let current = RANKS[0];
-  let next = RANKS[1];
+function rankFromXp(xp: number): { current: Rank; next: Rank } {
+  let current: Rank = RANKS[0];
+  let next: Rank = RANKS[1];
   for (let i = 0; i < RANKS.length; i++) {
     if (xp >= RANKS[i].xp) {
       current = RANKS[i];
@@ -44,6 +45,7 @@ function rankFromXp(xp: number) {
   }
   return { current, next };
 }
+
 
 // ---------- presence types ----------
 type PresenceState = {
