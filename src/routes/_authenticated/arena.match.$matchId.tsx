@@ -1,10 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Users, Copy, Check, LogOut, Zap } from "lucide-react";
+import { ArrowLeft, Users, Copy, Check, LogOut, Zap, Trophy, Flame, Hash } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
+
+function roomCodeFromId(id: string) {
+  return id.replace(/-/g, "").slice(0, 6).toUpperCase();
+}
 
 export const Route = createFileRoute("/_authenticated/arena/match/$matchId")({
   component: ArenaWaitingRoom,
@@ -30,6 +34,12 @@ type Player = {
   username: string;
   arena_rank: string;
   joined_at: string;
+  score: number;
+  correct_answers: number;
+  wrong_answers: number;
+  current_streak: number;
+  rank_in_match: number | null;
+  eliminated: boolean;
 };
 
 function ArenaWaitingRoom() {
@@ -37,6 +47,7 @@ function ArenaWaitingRoom() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
+  const [codeCopied, setCodeCopied] = useState(false);
   const [now, setNow] = useState(() => Date.now());
   // Offset = serverNow - clientNow. Applied to every tick so all clients
   // converge on the same remaining-seconds value regardless of local clock skew.
@@ -88,7 +99,7 @@ function ArenaWaitingRoom() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("match_players")
-        .select("id, user_id, username, arena_rank, joined_at")
+        .select("id, user_id, username, arena_rank, joined_at, score, correct_answers, wrong_answers, current_streak, rank_in_match, eliminated")
         .eq("match_id", matchId)
         .order("joined_at", { ascending: true });
       if (error) throw error;
@@ -158,12 +169,31 @@ function ArenaWaitingRoom() {
     navigate({ to: "/arena" });
   };
 
+  const roomCode = roomCodeFromId(matchId);
+
   const handleCopy = () => {
     navigator.clipboard.writeText(window.location.href);
     setCopied(true);
     toast.success("Invite link copied");
     setTimeout(() => setCopied(false), 1500);
   };
+
+  const handleCopyCode = () => {
+    navigator.clipboard.writeText(roomCode);
+    setCodeCopied(true);
+    toast.success(`Room code ${roomCode} copied`);
+    setTimeout(() => setCodeCopied(false), 1500);
+  };
+
+  // Live-sorted leaderboard: by score desc, then streak, then fewer wrongs
+  const leaderboard = useMemo(() => {
+    return [...players].sort((a, b) => {
+      if ((b.score ?? 0) !== (a.score ?? 0)) return (b.score ?? 0) - (a.score ?? 0);
+      if ((b.current_streak ?? 0) !== (a.current_streak ?? 0))
+        return (b.current_streak ?? 0) - (a.current_streak ?? 0);
+      return (a.wrong_answers ?? 0) - (b.wrong_answers ?? 0);
+    });
+  }, [players]);
 
   if (matchQ.isLoading) {
     return (
@@ -208,12 +238,22 @@ function ArenaWaitingRoom() {
           </div>
           <div className="flex-1" />
           <button
+            onClick={handleCopyCode}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] text-white/80 hover:text-white transition arena-mono"
+            style={{ background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.35)" }}
+            title="Click to copy room code"
+          >
+            <Hash className="w-3.5 h-3.5" style={{ color: "var(--neon-purple)" }} />
+            {roomCode}
+            {codeCopied && <Check className="w-3 h-3 text-emerald-400" />}
+          </button>
+          <button
             onClick={handleCopy}
             className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] text-white/70 hover:text-white transition"
             style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
           >
             {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-            Invite
+            Invite link
           </button>
           {isMember && (
             <button
@@ -236,6 +276,9 @@ function ArenaWaitingRoom() {
             </div>
             <div className="text-white/50 mt-1 text-sm arena-mono">
               {m.question_count} questions · {Math.round(m.duration_seconds / 60)} min
+            </div>
+            <div className="mt-3 inline-flex items-center gap-2 text-[11px] text-white/40">
+              Share room code <span className="arena-mono text-white/80 px-1.5 py-0.5 rounded" style={{ background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.3)" }}>{roomCode}</span> or the invite link
             </div>
           </div>
 
@@ -301,6 +344,21 @@ function ArenaWaitingRoom() {
                           {p.username}{isMe && <span className="text-white/40"> (you)</span>}
                         </div>
                         <div className="text-[11px] text-white/40">{p.arena_rank}</div>
+                        {(p.score > 0 || m.status === "active") && (
+                          <div className="mt-2 flex items-center gap-2">
+                            <span className="arena-mono text-[14px] font-bold text-white" style={{ textShadow: "0 0 12px rgba(124,58,237,0.6)" }}>
+                              {p.score}
+                            </span>
+                            {p.current_streak > 1 && (
+                              <span className="flex items-center gap-0.5 text-[10px] text-amber-400">
+                                <Flame className="w-3 h-3" />{p.current_streak}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                        {p.eliminated && (
+                          <div className="mt-1 text-[10px] text-rose-400 uppercase tracking-wider">Out</div>
+                        )}
                       </>
                     ) : (
                       <>
@@ -316,6 +374,57 @@ function ArenaWaitingRoom() {
               })}
             </div>
           </div>
+
+          {/* Live leaderboard */}
+          {players.length > 0 && (
+            <div className="w-full max-w-3xl">
+              <div className="flex items-center gap-2 mb-3">
+                <Trophy className="w-3.5 h-3.5" style={{ color: "#fbbf24" }} />
+                <span className="arena-label">Live Standings</span>
+                <span className="ml-auto inline-flex items-center gap-1 text-[10px] text-emerald-400/80">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 arena-live-dot" /> realtime
+                </span>
+              </div>
+              <ol className="rounded-xl overflow-hidden" style={{ background: "var(--arena-card)", border: "1px solid var(--arena-border)" }}>
+                {leaderboard.map((p, idx) => {
+                  const isMe = p.user_id === user?.id;
+                  const medal = idx === 0 ? "#fbbf24" : idx === 1 ? "#d1d5db" : idx === 2 ? "#f97316" : "rgba(255,255,255,0.3)";
+                  return (
+                    <li
+                      key={p.id}
+                      className="flex items-center gap-3 px-4 py-2.5 border-b last:border-b-0 transition-all"
+                      style={{
+                        borderColor: "rgba(255,255,255,0.05)",
+                        background: isMe ? "rgba(124,58,237,0.08)" : "transparent",
+                      }}
+                    >
+                      <span className="arena-mono text-[14px] font-bold w-6 text-right" style={{ color: medal }}>
+                        {idx + 1}
+                      </span>
+                      <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
+                        style={{ background: "rgba(124,58,237,0.2)", border: "1px solid rgba(124,58,237,0.4)" }}>
+                        {p.username.slice(0, 2).toUpperCase()}
+                      </div>
+                      <span className={`text-[13px] flex-1 truncate ${p.eliminated ? "line-through text-white/30" : "text-white/90"}`}>
+                        {p.username}{isMe && <span className="text-white/40"> (you)</span>}
+                      </span>
+                      {p.current_streak > 1 && (
+                        <span className="flex items-center gap-0.5 text-[11px] text-amber-400">
+                          <Flame className="w-3 h-3" />{p.current_streak}
+                        </span>
+                      )}
+                      <span className="text-[10px] text-white/30 arena-mono w-14 text-right">
+                        {p.correct_answers}✓ {p.wrong_answers}✗
+                      </span>
+                      <span className="arena-mono text-[15px] font-bold text-white w-12 text-right">
+                        {p.score}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
+          )}
 
           {!isMember && m.status === "waiting" && (
             <div className="text-[12px] text-white/40">

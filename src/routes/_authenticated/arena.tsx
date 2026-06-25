@@ -62,6 +62,8 @@ function ArenaLobby() {
   const navigate = useNavigate();
   const [online, setOnline] = useState<PresenceState[]>([]);
   const [matchmaking, setMatchmaking] = useState(false);
+  const [joinCode, setJoinCode] = useState("");
+  const [joiningCode, setJoiningCode] = useState(false);
 
   // arena profile (lazy-create on first visit)
   const profileQ = useQuery({
@@ -264,6 +266,46 @@ function ArenaLobby() {
       return;
     }
     navigate({ to: "/arena/match/$matchId", params: { matchId } });
+  }
+
+  async function joinByRoomCode() {
+    const raw = joinCode.trim().toLowerCase().replace(/[^a-f0-9]/g, "");
+    if (raw.length < 4) {
+      toast.error("Enter a 6-character room code");
+      return;
+    }
+    setJoiningCode(true);
+    try {
+      const { data, error } = await supabase
+        .from("arena_matches")
+        .select("id, status, current_players, max_players")
+        .ilike("id", `${raw}%`)
+        .in("status", ["waiting", "countdown", "active"])
+        .limit(2);
+      if (error) throw error;
+      const list = data || [];
+      if (list.length === 0) {
+        toast.error("Room not found");
+        return;
+      }
+      if (list.length > 1) {
+        toast.error("Code ambiguous — ask for a longer code");
+        return;
+      }
+      const match = list[0];
+      if (match.status === "waiting" && match.current_players < match.max_players) {
+        const { error: jErr } = await supabase.rpc("arena_join_match", { p_match_id: match.id });
+        if (jErr) {
+          toast.error(jErr.message);
+          return;
+        }
+      }
+      navigate({ to: "/arena/match/$matchId", params: { matchId: match.id } });
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Could not join room");
+    } finally {
+      setJoiningCode(false);
+    }
   }
 
   return (
@@ -489,6 +531,31 @@ function ArenaLobby() {
               {matchmaking ? "Finding match…" : "FIND MATCH — Battle Sprint · Mixed · Any"}
               <Settings className="w-4 h-4 ml-2 opacity-60" />
             </button>
+
+            {/* Join by room code */}
+            <div className="rounded-xl p-3 flex items-center gap-2"
+              style={{ background: "var(--arena-card)", border: "1px solid var(--arena-border)" }}>
+              <span className="arena-label whitespace-nowrap pl-1">Have a room code?</span>
+              <input
+                value={joinCode}
+                onChange={(e) => setJoinCode(e.target.value.toUpperCase().slice(0, 8))}
+                onKeyDown={(e) => { if (e.key === "Enter") joinByRoomCode(); }}
+                placeholder="ABC123"
+                spellCheck={false}
+                className="arena-mono flex-1 bg-transparent text-white text-[14px] tracking-[0.2em] px-3 py-2 rounded-md outline-none focus:ring-2 focus:ring-violet-500/40"
+                style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}
+                disabled={joiningCode || !!locked}
+                aria-label="Room code"
+              />
+              <button
+                onClick={joinByRoomCode}
+                disabled={joiningCode || !!locked || joinCode.trim().length < 4}
+                className="px-3 py-2 rounded-md text-[12px] font-semibold text-white transition disabled:opacity-50"
+                style={{ background: "rgba(124,58,237,0.2)", border: "1px solid rgba(124,58,237,0.4)" }}
+              >
+                {joiningCode ? "Joining…" : "Join"}
+              </button>
+            </div>
           </main>
 
 
