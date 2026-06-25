@@ -266,6 +266,7 @@ function ArenaLobby() {
     navigate({ to: "/arena/match/$matchId", params: { matchId } });
   }
 
+  return (
     <div className="arena-root arena-scanlines">
       <div className="arena-ambient min-h-screen flex flex-col">
         {/* ============ TOP BAR ============ */}
