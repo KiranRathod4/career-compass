@@ -614,6 +614,8 @@ function ModeCard({
   accent,
   bg,
   icon,
+  onPlay,
+  disabled,
 }: {
   title: string;
   sub: string;
@@ -621,17 +623,22 @@ function ModeCard({
   accent: string;
   bg: string;
   icon: React.ReactNode;
+  onPlay?: () => void;
+  disabled?: boolean;
 }) {
   return (
     <button
       type="button"
-      className="group relative text-left rounded-2xl overflow-hidden transition-all duration-200 hover:-translate-y-1"
+      onClick={onPlay}
+      disabled={disabled || !onPlay}
+      className="group relative text-left rounded-2xl overflow-hidden transition-all duration-200 hover:-translate-y-1 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
       style={{
         background: "var(--arena-card)",
         border: "1px solid rgba(124,58,237,0.15)",
         height: 180,
       }}
       onMouseEnter={(e) => {
+        if (disabled) return;
         e.currentTarget.style.borderColor = "rgba(124,58,237,0.5)";
         e.currentTarget.style.boxShadow = `0 8px 32px ${accent}25`;
       }}
