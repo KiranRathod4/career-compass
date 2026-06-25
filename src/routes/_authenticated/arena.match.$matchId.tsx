@@ -122,9 +122,10 @@ function ArenaWaitingRoom() {
   const countdown = useMemo(() => {
     if (!m?.started_at || m.status !== "countdown") return null;
     const t = new Date(m.started_at).getTime();
-    const sec = Math.max(0, Math.ceil((t - now) / 1000));
+    const serverNow = now + serverOffset;
+    const sec = Math.max(0, Math.ceil((t - serverNow) / 1000));
     return sec;
-  }, [m?.started_at, m?.status, now]);
+  }, [m?.started_at, m?.status, now, serverOffset]);
 
   // Auto-start: when countdown hits 0, any participant flips status -> active (idempotent server-side).
   const [starting, setStarting] = useState(false);
