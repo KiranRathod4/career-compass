@@ -204,7 +204,68 @@ function ArenaLobby() {
   const xpSpan = Math.max(1, nextRank.xp - curRank.xp);
   const xpPct = Math.min(100, (xpInto / xpSpan) * 100);
 
-  return (
+  // ---- matchmaking helpers ----
+  type ModeKey = "battle_sprint" | "battle_royale" | "squad_wars" | "blitz";
+  const MODE_DEFAULTS: Record<ModeKey, { max: number; q: number; dur: number }> = {
+    battle_sprint: { max: 4, q: 10, dur: 300 },
+    battle_royale: { max: 8, q: 15, dur: 600 },
+    squad_wars: { max: 10, q: 12, dur: 600 },
+    blitz: { max: 2, q: 10, dur: 180 },
+  };
+
+  async function findOrCreateMatch(mode: ModeKey) {
+    if (!user || matchmaking) return;
+    setMatchmaking(true);
+    try {
+      // 1) try to join an open waiting match
+      const { data: open } = await supabase
+        .from("arena_matches")
+        .select("id, current_players, max_players")
+        .eq("match_type", mode)
+        .eq("status", "waiting")
+        .eq("is_public", true)
+        .order("created_at", { ascending: true })
+        .limit(5);
+
+      const joinable = (open || []).find((m) => m.current_players < m.max_players);
+      if (joinable) {
+        const { error } = await supabase.rpc("arena_join_match", { p_match_id: joinable.id });
+        if (!error) {
+          navigate({ to: "/arena/match/$matchId", params: { matchId: joinable.id } });
+          return;
+        }
+      }
+
+      // 2) create a fresh one
+      const def = MODE_DEFAULTS[mode];
+      const { data: newId, error: cErr } = await supabase.rpc("arena_create_match", {
+        p_match_type: mode,
+        p_max_players: def.max,
+        p_topic: "mixed",
+        p_difficulty: "mixed",
+        p_question_count: def.q,
+        p_duration_seconds: def.dur,
+      });
+      if (cErr || !newId) {
+        toast.error(cErr?.message || "Could not create match");
+        return;
+      }
+      navigate({ to: "/arena/match/$matchId", params: { matchId: newId as string } });
+    } finally {
+      setMatchmaking(false);
+    }
+  }
+
+  async function joinExistingMatch(matchId: string) {
+    if (!user) return;
+    const { error } = await supabase.rpc("arena_join_match", { p_match_id: matchId });
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    navigate({ to: "/arena/match/$matchId", params: { matchId } });
+  }
+
     <div className="arena-root arena-scanlines">
       <div className="arena-ambient min-h-screen flex flex-col">
         {/* ============ TOP BAR ============ */}
