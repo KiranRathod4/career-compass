@@ -169,12 +169,31 @@ function ArenaWaitingRoom() {
     navigate({ to: "/arena" });
   };
 
+  const roomCode = roomCodeFromId(matchId);
+
   const handleCopy = () => {
     navigator.clipboard.writeText(window.location.href);
     setCopied(true);
     toast.success("Invite link copied");
     setTimeout(() => setCopied(false), 1500);
   };
+
+  const handleCopyCode = () => {
+    navigator.clipboard.writeText(roomCode);
+    setCodeCopied(true);
+    toast.success(`Room code ${roomCode} copied`);
+    setTimeout(() => setCodeCopied(false), 1500);
+  };
+
+  // Live-sorted leaderboard: by score desc, then streak, then fewer wrongs
+  const leaderboard = useMemo(() => {
+    return [...players].sort((a, b) => {
+      if ((b.score ?? 0) !== (a.score ?? 0)) return (b.score ?? 0) - (a.score ?? 0);
+      if ((b.current_streak ?? 0) !== (a.current_streak ?? 0))
+        return (b.current_streak ?? 0) - (a.current_streak ?? 0);
+      return (a.wrong_answers ?? 0) - (b.wrong_answers ?? 0);
+    });
+  }, [players]);
 
   if (matchQ.isLoading) {
     return (
