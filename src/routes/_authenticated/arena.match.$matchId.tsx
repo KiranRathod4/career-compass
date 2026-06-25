@@ -103,10 +103,14 @@ function ArenaWaitingRoom() {
     if (!players.some((p) => p.user_id === user.id)) return;
     if (new Date(m.started_at).getTime() > now) return;
     setStarting(true);
-    supabase.rpc("arena_start_match", { p_match_id: matchId }).finally(() => {
-      // realtime will pull the new status; release lock after a beat
-      setTimeout(() => setStarting(false), 1500);
-    });
+    (async () => {
+      try {
+        await supabase.rpc("arena_start_match", { p_match_id: matchId });
+      } finally {
+        setTimeout(() => setStarting(false), 1500);
+      }
+    })();
+
   }, [m?.status, m?.started_at, now, user, players, matchId, starting, m]);
 
 
