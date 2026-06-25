@@ -238,12 +238,22 @@ function ArenaWaitingRoom() {
           </div>
           <div className="flex-1" />
           <button
+            onClick={handleCopyCode}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] text-white/80 hover:text-white transition arena-mono"
+            style={{ background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.35)" }}
+            title="Click to copy room code"
+          >
+            <Hash className="w-3.5 h-3.5" style={{ color: "var(--neon-purple)" }} />
+            {roomCode}
+            {codeCopied && <Check className="w-3 h-3 text-emerald-400" />}
+          </button>
+          <button
             onClick={handleCopy}
             className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] text-white/70 hover:text-white transition"
             style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
           >
             {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-            Invite
+            Invite link
           </button>
           {isMember && (
             <button
@@ -258,6 +268,19 @@ function ArenaWaitingRoom() {
         </header>
 
         <main className="flex-1 flex flex-col items-center px-6 py-10 gap-8">
+          {/* Mode card */}
+          <div className="text-center">
+            <div className="arena-label text-white/40 mb-2">{m.match_type.replace(/_/g, " ").toUpperCase()}</div>
+            <div className="text-[34px] font-extrabold text-white tracking-tight">
+              {m.topic === "mixed" ? "Mixed Topics" : m.topic} · {m.difficulty === "mixed" ? "Any Difficulty" : m.difficulty}
+            </div>
+            <div className="text-white/50 mt-1 text-sm arena-mono">
+              {m.question_count} questions · {Math.round(m.duration_seconds / 60)} min
+            </div>
+            <div className="mt-3 inline-flex items-center gap-2 text-[11px] text-white/40">
+              Share room code <span className="arena-mono text-white/80 px-1.5 py-0.5 rounded" style={{ background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.3)" }}>{roomCode}</span> or the invite link
+            </div>
+          </div>
           {/* Mode card */}
           <div className="text-center">
             <div className="arena-label text-white/40 mb-2">{m.match_type.replace(/_/g, " ").toUpperCase()}</div>
