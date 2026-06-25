@@ -427,14 +427,18 @@ function ArenaLobby() {
                 accent="#7c3aed"
                 bg="linear-gradient(135deg, #1a0a35, #0d0620)"
                 icon={<Zap className="w-12 h-12 arena-spin-slow" style={{ color: "#a78bfa" }} />}
+                onPlay={() => findOrCreateMatch("battle_sprint")}
+                disabled={matchmaking || !!locked}
               />
               <ModeCard
                 title="Battle Royale"
                 sub="One wrong answer. You're out. Last one standing wins."
-                meta="4–16 players · sudden death"
+                meta="4–8 players · sudden death"
                 accent="#f59e0b"
                 bg="linear-gradient(135deg, #1a0805, #0d0a00)"
                 icon={<Crown className="w-12 h-12" style={{ color: "#fbbf24" }} />}
+                onPlay={() => findOrCreateMatch("battle_royale")}
+                disabled={matchmaking || !!locked}
               />
               <ModeCard
                 title="Squad Wars"
@@ -443,6 +447,8 @@ function ArenaLobby() {
                 accent="#10b981"
                 bg="linear-gradient(135deg, #0a1a0d, #050d08)"
                 icon={<Users className="w-12 h-12" style={{ color: "#34d399" }} />}
+                onPlay={() => findOrCreateMatch("squad_wars")}
+                disabled={matchmaking || !!locked}
               />
               <ModeCard
                 title="Blitz"
@@ -451,6 +457,8 @@ function ArenaLobby() {
                 accent="#ef4444"
                 bg="linear-gradient(135deg, #1a0505, #0d0000)"
                 icon={<Swords className="w-12 h-12" style={{ color: "#f87171" }} />}
+                onPlay={() => findOrCreateMatch("blitz")}
+                disabled={matchmaking || !!locked}
               />
               <ModeCard
                 title="Daily Challenges"
@@ -472,19 +480,17 @@ function ArenaLobby() {
 
             {/* Quick match CTA */}
             <button
-              disabled
-              className="w-full h-12 rounded-xl flex items-center justify-center gap-2 font-semibold text-white transition disabled:opacity-60 disabled:cursor-not-allowed"
+              disabled={matchmaking || !!locked}
+              onClick={() => findOrCreateMatch("battle_sprint")}
+              className="w-full h-12 rounded-xl flex items-center justify-center gap-2 font-semibold text-white transition disabled:opacity-60 disabled:cursor-not-allowed hover:brightness-110"
               style={{ background: "var(--neon-purple)", boxShadow: "0 0 24px rgba(124,58,237,0.35)" }}
-              title="Matchmaking ships in Phase 2"
             >
               <Zap className="w-4 h-4" />
-              FIND MATCH — Battle Sprint · Mixed · Any
+              {matchmaking ? "Finding match…" : "FIND MATCH — Battle Sprint · Mixed · Any"}
               <Settings className="w-4 h-4 ml-2 opacity-60" />
             </button>
-            <div className="text-center text-[11px] text-white/30 -mt-2">
-              Matchmaking and live matches ship in Phase 2. Lobby + presence are live.
-            </div>
           </main>
+
 
           {/* -------- RIGHT: LIVE FEED + ONLINE -------- */}
           <aside className="space-y-3">
