@@ -344,6 +344,21 @@ function ArenaWaitingRoom() {
                           {p.username}{isMe && <span className="text-white/40"> (you)</span>}
                         </div>
                         <div className="text-[11px] text-white/40">{p.arena_rank}</div>
+                        {(p.score > 0 || m.status === "active") && (
+                          <div className="mt-2 flex items-center gap-2">
+                            <span className="arena-mono text-[14px] font-bold text-white" style={{ textShadow: "0 0 12px rgba(124,58,237,0.6)" }}>
+                              {p.score}
+                            </span>
+                            {p.current_streak > 1 && (
+                              <span className="flex items-center gap-0.5 text-[10px] text-amber-400">
+                                <Flame className="w-3 h-3" />{p.current_streak}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                        {p.eliminated && (
+                          <div className="mt-1 text-[10px] text-rose-400 uppercase tracking-wider">Out</div>
+                        )}
                       </>
                     ) : (
                       <>
@@ -359,6 +374,57 @@ function ArenaWaitingRoom() {
               })}
             </div>
           </div>
+
+          {/* Live leaderboard */}
+          {players.length > 0 && (
+            <div className="w-full max-w-3xl">
+              <div className="flex items-center gap-2 mb-3">
+                <Trophy className="w-3.5 h-3.5" style={{ color: "#fbbf24" }} />
+                <span className="arena-label">Live Standings</span>
+                <span className="ml-auto inline-flex items-center gap-1 text-[10px] text-emerald-400/80">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 arena-live-dot" /> realtime
+                </span>
+              </div>
+              <ol className="rounded-xl overflow-hidden" style={{ background: "var(--arena-card)", border: "1px solid var(--arena-border)" }}>
+                {leaderboard.map((p, idx) => {
+                  const isMe = p.user_id === user?.id;
+                  const medal = idx === 0 ? "#fbbf24" : idx === 1 ? "#d1d5db" : idx === 2 ? "#f97316" : "rgba(255,255,255,0.3)";
+                  return (
+                    <li
+                      key={p.id}
+                      className="flex items-center gap-3 px-4 py-2.5 border-b last:border-b-0 transition-all"
+                      style={{
+                        borderColor: "rgba(255,255,255,0.05)",
+                        background: isMe ? "rgba(124,58,237,0.08)" : "transparent",
+                      }}
+                    >
+                      <span className="arena-mono text-[14px] font-bold w-6 text-right" style={{ color: medal }}>
+                        {idx + 1}
+                      </span>
+                      <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
+                        style={{ background: "rgba(124,58,237,0.2)", border: "1px solid rgba(124,58,237,0.4)" }}>
+                        {p.username.slice(0, 2).toUpperCase()}
+                      </div>
+                      <span className={`text-[13px] flex-1 truncate ${p.eliminated ? "line-through text-white/30" : "text-white/90"}`}>
+                        {p.username}{isMe && <span className="text-white/40"> (you)</span>}
+                      </span>
+                      {p.current_streak > 1 && (
+                        <span className="flex items-center gap-0.5 text-[11px] text-amber-400">
+                          <Flame className="w-3 h-3" />{p.current_streak}
+                        </span>
+                      )}
+                      <span className="text-[10px] text-white/30 arena-mono w-14 text-right">
+                        {p.correct_answers}✓ {p.wrong_answers}✗
+                      </span>
+                      <span className="arena-mono text-[15px] font-bold text-white w-12 text-right">
+                        {p.score}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
+          )}
 
           {!isMember && m.status === "waiting" && (
             <div className="text-[12px] text-white/40">
