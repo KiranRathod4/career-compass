@@ -133,7 +133,7 @@ function ArenaWaitingRoom() {
     if (!user || !m || starting) return;
     if (m.status !== "countdown" || !m.started_at) return;
     if (!players.some((p) => p.user_id === user.id)) return;
-    if (new Date(m.started_at).getTime() > now) return;
+    if (new Date(m.started_at).getTime() > now + serverOffset) return;
     setStarting(true);
     (async () => {
       try {
