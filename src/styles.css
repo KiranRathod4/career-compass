@@ -446,3 +446,82 @@ body { overflow-x: hidden; }
 }
 .table-scroll > table { min-width: 640px; }
 
+/* =========================================================
+   ARENA DESIGN SYSTEM — always dark, always alive.
+   Scoped under .arena-root so it never bleeds into the app.
+   ========================================================= */
+.arena-root {
+  --arena-bg: #06060f;
+  --arena-surface: #0d0d1a;
+  --arena-card: #111122;
+  --arena-border: rgba(124, 58, 237, 0.12);
+  --arena-border-glow: rgba(124, 58, 237, 0.4);
+  --arena-glow: rgba(124, 58, 237, 0.15);
+
+  --neon-purple: #7c3aed;
+  --neon-amber: #f59e0b;
+  --neon-green: #10b981;
+  --neon-red: #ef4444;
+
+  --rank-recruit: #6b7280;
+  --rank-contender: #3b82f6;
+  --rank-challenger: #06b6d4;
+  --rank-expert: #10b981;
+  --rank-elite: #7c3aed;
+  --rank-master: #f59e0b;
+  --rank-legend: #ffffff;
+
+  color: rgba(255, 255, 255, 0.85);
+  background: var(--arena-bg);
+  min-height: 100vh;
+  font-feature-settings: "ss01", "cv11";
+}
+
+.arena-ambient {
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 50%, rgba(124, 58, 237, 0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 80% 30%, rgba(124, 58, 237, 0.05) 0%, transparent 70%),
+    radial-gradient(ellipse 80% 50% at 50% 100%, rgba(245, 158, 11, 0.03) 0%, transparent 70%),
+    #06060f;
+}
+
+.arena-scanlines::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.04) 0px,
+    rgba(0, 0, 0, 0.04) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  pointer-events: none;
+  z-index: 50;
+}
+
+.arena-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+}
+.arena-mono { font-family: var(--font-mono), ui-monospace, monospace; }
+
+@keyframes arena-neon-pulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(124, 58, 237, 0.3), 0 0 16px rgba(124, 58, 237, 0.1); }
+  50% { box-shadow: 0 0 16px rgba(124, 58, 237, 0.6), 0 0 32px rgba(124, 58, 237, 0.2); }
+}
+.arena-neon { animation: arena-neon-pulse 2.4s ease-in-out infinite; }
+
+@keyframes arena-dot-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+.arena-live-dot { animation: arena-dot-pulse 1.4s ease-in-out infinite; }
+
+@keyframes arena-spin-slow { to { transform: rotate(360deg); } }
+.arena-spin-slow { animation: arena-spin-slow 8s linear infinite; }
+
+
