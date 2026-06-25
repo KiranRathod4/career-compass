@@ -1,10 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Users, Copy, Check, LogOut, Zap } from "lucide-react";
+import { ArrowLeft, Users, Copy, Check, LogOut, Zap, Trophy, Flame, Hash } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
+
+function roomCodeFromId(id: string) {
+  return id.replace(/-/g, "").slice(0, 6).toUpperCase();
+}
 
 export const Route = createFileRoute("/_authenticated/arena/match/$matchId")({
   component: ArenaWaitingRoom,
