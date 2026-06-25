@@ -34,6 +34,12 @@ type Player = {
   username: string;
   arena_rank: string;
   joined_at: string;
+  score: number;
+  correct_answers: number;
+  wrong_answers: number;
+  current_streak: number;
+  rank_in_match: number | null;
+  eliminated: boolean;
 };
 
 function ArenaWaitingRoom() {
@@ -41,6 +47,7 @@ function ArenaWaitingRoom() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
+  const [codeCopied, setCodeCopied] = useState(false);
   const [now, setNow] = useState(() => Date.now());
   // Offset = serverNow - clientNow. Applied to every tick so all clients
   // converge on the same remaining-seconds value regardless of local clock skew.
