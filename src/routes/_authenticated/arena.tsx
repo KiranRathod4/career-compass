@@ -509,22 +509,31 @@ function ArenaLobby() {
                     No matches running. Be the first to drop in.
                   </div>
                 )}
-                {(matchesQ.data || []).map((m) => (
-                  <div key={m.id} className="rounded-lg p-2.5"
-                    style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" }}>
-                    <div className="flex items-center gap-2 text-[12px]">
-                      <span className="w-1.5 h-1.5 rounded-full bg-rose-500 arena-live-dot" />
-                      <span className="text-white/85 capitalize">{m.match_type.replace("_", " ")}</span>
-                      <span className="ml-auto text-[10px] uppercase tracking-wider text-white/40">
-                        {m.status}
-                      </span>
-                    </div>
-                    <div className="mt-1 text-[11px] text-white/40 arena-mono">
-                      {m.current_players}/{m.max_players} players
-                      {m.status === "active" && ` · Q${m.current_question_index + 1}/${m.question_count}`}
-                    </div>
-                  </div>
-                ))}
+                {(matchesQ.data || []).map((m) => {
+                  const joinable = m.status === "waiting" && m.current_players < m.max_players;
+                  return (
+                    <button
+                      key={m.id}
+                      type="button"
+                      onClick={() => (joinable ? joinExistingMatch(m.id) : navigate({ to: "/arena/match/$matchId", params: { matchId: m.id } }))}
+                      className="w-full text-left rounded-lg p-2.5 hover:bg-white/[0.04] transition"
+                      style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" }}
+                    >
+                      <div className="flex items-center gap-2 text-[12px]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-rose-500 arena-live-dot" />
+                        <span className="text-white/85 capitalize">{m.match_type.replace("_", " ")}</span>
+                        <span className="ml-auto text-[10px] uppercase tracking-wider" style={{ color: joinable ? "#34d399" : "rgba(255,255,255,0.4)" }}>
+                          {joinable ? "Join" : m.status}
+                        </span>
+                      </div>
+                      <div className="mt-1 text-[11px] text-white/40 arena-mono">
+                        {m.current_players}/{m.max_players} players
+                        {m.status === "active" && ` · Q${m.current_question_index + 1}/${m.question_count}`}
+                      </div>
+                    </button>
+                  );
+                })}
+
               </div>
             </div>
 
