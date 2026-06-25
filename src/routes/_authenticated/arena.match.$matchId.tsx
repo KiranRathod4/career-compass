@@ -38,6 +38,37 @@ function ArenaWaitingRoom() {
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
   const [now, setNow] = useState(() => Date.now());
+  // Offset = serverNow - clientNow. Applied to every tick so all clients
+  // converge on the same remaining-seconds value regardless of local clock skew.
+  const [serverOffset, setServerOffset] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    const sync = async () => {
+      try {
+        const url = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/`;
+        const t0 = Date.now();
+        const res = await fetch(url, { method: "HEAD", cache: "no-store" });
+        const t1 = Date.now();
+        const dateHeader = res.headers.get("date");
+        if (!dateHeader) return;
+        const serverMs = new Date(dateHeader).getTime();
+        if (!Number.isFinite(serverMs)) return;
+        // Account for network latency: assume header stamped mid-flight.
+        const rtt = t1 - t0;
+        const estimatedClientAtServerStamp = t0 + rtt / 2;
+        if (!cancelled) setServerOffset(serverMs - estimatedClientAtServerStamp);
+      } catch {
+        /* keep prior offset */
+      }
+    };
+    sync();
+    const id = setInterval(sync, 30000);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
+  }, []);
 
   const matchQ = useQuery({
     queryKey: ["arena-match", matchId],
@@ -91,9 +122,10 @@ function ArenaWaitingRoom() {
   const countdown = useMemo(() => {
     if (!m?.started_at || m.status !== "countdown") return null;
     const t = new Date(m.started_at).getTime();
-    const sec = Math.max(0, Math.ceil((t - now) / 1000));
+    const serverNow = now + serverOffset;
+    const sec = Math.max(0, Math.ceil((t - serverNow) / 1000));
     return sec;
-  }, [m?.started_at, m?.status, now]);
+  }, [m?.started_at, m?.status, now, serverOffset]);
 
   // Auto-start: when countdown hits 0, any participant flips status -> active (idempotent server-side).
   const [starting, setStarting] = useState(false);
@@ -101,7 +133,7 @@ function ArenaWaitingRoom() {
     if (!user || !m || starting) return;
     if (m.status !== "countdown" || !m.started_at) return;
     if (!players.some((p) => p.user_id === user.id)) return;
-    if (new Date(m.started_at).getTime() > now) return;
+    if (new Date(m.started_at).getTime() > now + serverOffset) return;
     setStarting(true);
     (async () => {
       try {
