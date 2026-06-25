@@ -281,16 +281,6 @@ function ArenaWaitingRoom() {
               Share room code <span className="arena-mono text-white/80 px-1.5 py-0.5 rounded" style={{ background: "rgba(124,58,237,0.15)", border: "1px solid rgba(124,58,237,0.3)" }}>{roomCode}</span> or the invite link
             </div>
           </div>
-          {/* Mode card */}
-          <div className="text-center">
-            <div className="arena-label text-white/40 mb-2">{m.match_type.replace(/_/g, " ").toUpperCase()}</div>
-            <div className="text-[34px] font-extrabold text-white tracking-tight">
-              {m.topic === "mixed" ? "Mixed Topics" : m.topic} · {m.difficulty === "mixed" ? "Any Difficulty" : m.difficulty}
-            </div>
-            <div className="text-white/50 mt-1 text-sm arena-mono">
-              {m.question_count} questions · {Math.round(m.duration_seconds / 60)} min
-            </div>
-          </div>
 
           {/* Status / countdown */}
           <div className="rounded-2xl px-10 py-8 text-center min-w-[360px]"
