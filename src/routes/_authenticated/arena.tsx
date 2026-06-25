@@ -62,6 +62,8 @@ function ArenaLobby() {
   const navigate = useNavigate();
   const [online, setOnline] = useState<PresenceState[]>([]);
   const [matchmaking, setMatchmaking] = useState(false);
+  const [joinCode, setJoinCode] = useState("");
+  const [joiningCode, setJoiningCode] = useState(false);
 
   // arena profile (lazy-create on first visit)
   const profileQ = useQuery({
