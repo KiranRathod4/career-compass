@@ -2391,6 +2391,7 @@ export type Database = {
         Returns: string
       }
       arena_join_match: { Args: { p_match_id: string }; Returns: Json }
+      arena_start_match: { Args: { p_match_id: string }; Returns: Json }
       get_user_level: { Args: { p_xp: number }; Returns: Json }
       get_user_xp: { Args: { p_user_id: string }; Returns: number }
     }
