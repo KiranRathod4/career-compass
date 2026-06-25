@@ -74,7 +74,7 @@ function ArenaLobby() {
       if (existing) return existing;
       const { data: prof } = await supabase
         .from("profiles")
-        .select("full_name, college")
+        .select("full_name")
         .eq("id", uid)
         .maybeSingle();
       const username = prof?.full_name?.split(" ")[0] || user!.email?.split("@")[0] || "Player";
