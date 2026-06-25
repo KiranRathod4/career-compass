@@ -202,10 +202,139 @@ export type Database = {
         }
         Relationships: []
       }
+      arena_matches: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          current_players: number
+          current_question_index: number
+          difficulty: string
+          duration_seconds: number
+          ended_at: string | null
+          id: string
+          invite_code: string | null
+          is_public: boolean
+          match_type: string
+          max_players: number
+          question_count: number
+          question_started_at: string | null
+          questions: Json
+          started_at: string | null
+          status: string
+          topic: string
+          xp_pool: number
+          zone: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          current_players?: number
+          current_question_index?: number
+          difficulty?: string
+          duration_seconds?: number
+          ended_at?: string | null
+          id?: string
+          invite_code?: string | null
+          is_public?: boolean
+          match_type: string
+          max_players: number
+          question_count?: number
+          question_started_at?: string | null
+          questions?: Json
+          started_at?: string | null
+          status?: string
+          topic?: string
+          xp_pool?: number
+          zone?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          current_players?: number
+          current_question_index?: number
+          difficulty?: string
+          duration_seconds?: number
+          ended_at?: string | null
+          id?: string
+          invite_code?: string | null
+          is_public?: boolean
+          match_type?: string
+          max_players?: number
+          question_count?: number
+          question_started_at?: string | null
+          questions?: Json
+          started_at?: string | null
+          status?: string
+          topic?: string
+          xp_pool?: number
+          zone?: string | null
+        }
+        Relationships: []
+      }
+      arena_profiles: {
+        Row: {
+          arena_rank: string
+          arena_xp: number
+          best_score: number
+          created_at: string
+          current_win_streak: number
+          id: string
+          longest_win_streak: number
+          season_rank: number | null
+          season_xp: number
+          total_matches: number
+          total_wins: number
+          updated_at: string
+          user_id: string
+          username: string
+          win_rate: number
+          zone: string | null
+        }
+        Insert: {
+          arena_rank?: string
+          arena_xp?: number
+          best_score?: number
+          created_at?: string
+          current_win_streak?: number
+          id?: string
+          longest_win_streak?: number
+          season_rank?: number | null
+          season_xp?: number
+          total_matches?: number
+          total_wins?: number
+          updated_at?: string
+          user_id: string
+          username: string
+          win_rate?: number
+          zone?: string | null
+        }
+        Update: {
+          arena_rank?: string
+          arena_xp?: number
+          best_score?: number
+          created_at?: string
+          current_win_streak?: number
+          id?: string
+          longest_win_streak?: number
+          season_rank?: number | null
+          season_xp?: number
+          total_matches?: number
+          total_wins?: number
+          updated_at?: string
+          user_id?: string
+          username?: string
+          win_rate?: number
+          zone?: string | null
+        }
+        Relationships: []
+      }
       arena_questions: {
         Row: {
+          avg_response_ms: number
+          battle_eligible: boolean
           category: string
           correct_answer: string
+          correct_rate: number
           created_at: string
           difficulty: string
           explanation: string | null
@@ -216,8 +345,11 @@ export type Database = {
           type: string
         }
         Insert: {
+          avg_response_ms?: number
+          battle_eligible?: boolean
           category: string
           correct_answer: string
+          correct_rate?: number
           created_at?: string
           difficulty?: string
           explanation?: string | null
@@ -228,8 +360,11 @@ export type Database = {
           type: string
         }
         Update: {
+          avg_response_ms?: number
+          battle_eligible?: boolean
           category?: string
           correct_answer?: string
+          correct_rate?: number
           created_at?: string
           difficulty?: string
           explanation?: string | null
@@ -238,6 +373,36 @@ export type Database = {
           question?: string
           topic?: string | null
           type?: string
+        }
+        Relationships: []
+      }
+      arena_seasons: {
+        Row: {
+          created_at: string
+          ends_at: string
+          id: string
+          is_active: boolean
+          name: string
+          season_number: number
+          starts_at: string
+        }
+        Insert: {
+          created_at?: string
+          ends_at: string
+          id?: string
+          is_active?: boolean
+          name: string
+          season_number: number
+          starts_at: string
+        }
+        Update: {
+          created_at?: string
+          ends_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          season_number?: number
+          starts_at?: string
         }
         Relationships: []
       }
@@ -1085,6 +1250,125 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      match_answers: {
+        Row: {
+          answered_at: string
+          id: string
+          is_correct: boolean
+          match_id: string
+          question_id: string | null
+          question_index: number
+          response_ms: number
+          score_delta: number
+          selected_answer: string
+          user_id: string
+        }
+        Insert: {
+          answered_at?: string
+          id?: string
+          is_correct: boolean
+          match_id: string
+          question_id?: string | null
+          question_index: number
+          response_ms: number
+          score_delta?: number
+          selected_answer: string
+          user_id: string
+        }
+        Update: {
+          answered_at?: string
+          id?: string
+          is_correct?: boolean
+          match_id?: string
+          question_id?: string | null
+          question_index?: number
+          response_ms?: number
+          score_delta?: number
+          selected_answer?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_answers_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "arena_matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "arena_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      match_players: {
+        Row: {
+          arena_rank: string
+          avg_response_ms: number
+          correct_answers: number
+          current_streak: number
+          eliminated: boolean
+          eliminated_at: string | null
+          id: string
+          joined_at: string
+          last_answer_at: string | null
+          match_id: string
+          rank_in_match: number | null
+          score: number
+          user_id: string
+          username: string
+          wrong_answers: number
+          xp_earned: number
+        }
+        Insert: {
+          arena_rank?: string
+          avg_response_ms?: number
+          correct_answers?: number
+          current_streak?: number
+          eliminated?: boolean
+          eliminated_at?: string | null
+          id?: string
+          joined_at?: string
+          last_answer_at?: string | null
+          match_id: string
+          rank_in_match?: number | null
+          score?: number
+          user_id: string
+          username: string
+          wrong_answers?: number
+          xp_earned?: number
+        }
+        Update: {
+          arena_rank?: string
+          avg_response_ms?: number
+          correct_answers?: number
+          current_streak?: number
+          eliminated?: boolean
+          eliminated_at?: string | null
+          id?: string
+          joined_at?: string
+          last_answer_at?: string | null
+          match_id?: string
+          rank_in_match?: number | null
+          score?: number
+          user_id?: string
+          username?: string
+          wrong_answers?: number
+          xp_earned?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_players_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "arena_matches"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       placement_events: {
         Row: {
