@@ -145,8 +145,9 @@ function ArenaLobby() {
         if (status === "SUBSCRIBED") {
           await channel.track({
             user_id: user.id,
-            username: profileQ.data.username,
-            arena_rank: profileQ.data.arena_rank,
+            username: profileQ.data!.username,
+            arena_rank: profileQ.data!.arena_rank,
+
             status: "lobby",
             joined_at: new Date().toISOString(),
           });
