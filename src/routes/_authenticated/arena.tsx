@@ -268,6 +268,46 @@ function ArenaLobby() {
     navigate({ to: "/arena/match/$matchId", params: { matchId } });
   }
 
+  async function joinByRoomCode() {
+    const raw = joinCode.trim().toLowerCase().replace(/[^a-f0-9]/g, "");
+    if (raw.length < 4) {
+      toast.error("Enter a 6-character room code");
+      return;
+    }
+    setJoiningCode(true);
+    try {
+      const { data, error } = await supabase
+        .from("arena_matches")
+        .select("id, status, current_players, max_players")
+        .ilike("id", `${raw}%`)
+        .in("status", ["waiting", "countdown", "active"])
+        .limit(2);
+      if (error) throw error;
+      const list = data || [];
+      if (list.length === 0) {
+        toast.error("Room not found");
+        return;
+      }
+      if (list.length > 1) {
+        toast.error("Code ambiguous — ask for a longer code");
+        return;
+      }
+      const match = list[0];
+      if (match.status === "waiting" && match.current_players < match.max_players) {
+        const { error: jErr } = await supabase.rpc("arena_join_match", { p_match_id: match.id });
+        if (jErr) {
+          toast.error(jErr.message);
+          return;
+        }
+      }
+      navigate({ to: "/arena/match/$matchId", params: { matchId: match.id } });
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Could not join room");
+    } finally {
+      setJoiningCode(false);
+    }
+  }
+
   return (
     <div className="arena-root arena-scanlines">
       <div className="arena-ambient min-h-screen flex flex-col">
