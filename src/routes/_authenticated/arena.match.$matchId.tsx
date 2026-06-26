@@ -340,6 +340,27 @@ function ArenaWaitingRoom() {
                 <div className="text-white text-[24px] font-bold mt-2">Match in progress</div>
                 <div className="text-[12px] text-white/40 mt-1">Live gameplay ships in the next phase.</div>
               </>
+            ) : m.status === "completed" || m.status === "ended" ? (
+              <>
+                <div className="arena-label text-amber-400">MATCH COMPLETE</div>
+                <div className="text-white text-[24px] font-bold mt-2">
+                  {leaderboard[0]?.username ? `${leaderboard[0].username} wins` : "Good game"}
+                </div>
+                <div className="text-[12px] text-white/40 mt-1 mb-5">Ready for another round?</div>
+                {isMember ? (
+                  <button
+                    onClick={handleRematch}
+                    disabled={rematching}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md text-[13px] font-semibold text-white transition disabled:opacity-50"
+                    style={{ background: "var(--neon-purple)", boxShadow: "0 0 24px rgba(124,58,237,0.45)" }}
+                  >
+                    <Swords className="w-4 h-4" />
+                    {rematching ? "Creating new room…" : "Rematch"}
+                  </button>
+                ) : (
+                  <div className="text-[12px] text-white/40">Waiting for players to start a rematch…</div>
+                )}
+              </>
             ) : (
               <>
                 <div className="arena-label text-white/40">STATUS</div>
