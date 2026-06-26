@@ -107,18 +107,26 @@ function ArenaWaitingRoom() {
     },
   });
 
-  // realtime: match updates + players join/leave
+  // realtime: match updates + players join/leave + rematch broadcast
   useEffect(() => {
     const ch = supabase
-      .channel(`arena:match:${matchId}`)
+      .channel(`arena:match:${matchId}`, { config: { broadcast: { self: false } } })
       .on("postgres_changes", { event: "*", schema: "public", table: "arena_matches", filter: `id=eq.${matchId}` }, () => matchQ.refetch())
       .on("postgres_changes", { event: "*", schema: "public", table: "match_players", filter: `match_id=eq.${matchId}` }, () => playersQ.refetch())
+      .on("broadcast", { event: "rematch" }, async (payload) => {
+        const newId = (payload?.payload as { match_id?: string } | undefined)?.match_id;
+        if (!newId || !user) return;
+        toast.message("Rematch starting…", { description: "Joining new room" });
+        // best-effort auto-join; if full or already in, RPC is idempotent
+        await supabase.rpc("arena_join_match", { p_match_id: newId }).catch(() => {});
+        navigate({ to: "/arena/match/$matchId", params: { matchId: newId } });
+      })
       .subscribe();
     return () => {
       supabase.removeChannel(ch);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [matchId]);
+  }, [matchId, user?.id]);
 
   // 1s ticker for countdown
   useEffect(() => {
