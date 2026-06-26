@@ -162,6 +162,27 @@ export function IndiaWarMap({ players: incomingPlayers }: { players: LivePlayer[
   const maxCount = Math.max(1, ...Array.from(zoneCounts.values()));
   const totalInMatch = players.filter((p) => p.status === "in_match").length;
 
+  // Split markers into a small animated set + a large static set so the
+  // framer-motion / SVG <animate> cost stays bounded under heavy player counts.
+  const { animated, staticRest, heartbeatIds } = useMemo(() => {
+    const priority = (p: PlacedPlayer) => {
+      let score = 0;
+      if (p.status === "in_match") score += 4;
+      if (recentlyJoined.has(p.user_id)) score += 3;
+      if (statusChanged.has(p.user_id)) score += 2;
+      if (hover && p.zoneId === hover) score += 1;
+      return score;
+    };
+    const ranked = [...placed].sort((a, b) => priority(b) - priority(a));
+    const animated = ranked.slice(0, MAX_ANIMATED);
+    const staticRest = ranked.slice(MAX_ANIMATED);
+    const heartbeatIds = new Set(
+      animated.filter((p) => p.status === "in_match").slice(0, MAX_HEARTBEATS).map((p) => p.user_id),
+    );
+    return { animated, staticRest, heartbeatIds };
+  }, [placed, recentlyJoined, statusChanged, hover]);
+
+
   return (
     <div
       className="relative rounded-xl overflow-hidden"
