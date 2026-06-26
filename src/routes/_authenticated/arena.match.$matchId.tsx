@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Users, Copy, Check, LogOut, Zap, Trophy, Flame, Hash } from "lucide-react";
+import { ArrowLeft, Users, Copy, Check, LogOut, Zap, Trophy, Flame, Hash, Swords } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
@@ -107,18 +107,26 @@ function ArenaWaitingRoom() {
     },
   });
 
-  // realtime: match updates + players join/leave
+  // realtime: match updates + players join/leave + rematch broadcast
   useEffect(() => {
     const ch = supabase
-      .channel(`arena:match:${matchId}`)
+      .channel(`arena:match:${matchId}`, { config: { broadcast: { self: false } } })
       .on("postgres_changes", { event: "*", schema: "public", table: "arena_matches", filter: `id=eq.${matchId}` }, () => matchQ.refetch())
       .on("postgres_changes", { event: "*", schema: "public", table: "match_players", filter: `match_id=eq.${matchId}` }, () => playersQ.refetch())
+      .on("broadcast", { event: "rematch" }, async (payload) => {
+        const newId = (payload?.payload as { match_id?: string } | undefined)?.match_id;
+        if (!newId || !user) return;
+        toast.message("Rematch starting…", { description: "Joining new room" });
+        // best-effort auto-join; if full or already in, RPC is idempotent
+        try { await supabase.rpc("arena_join_match", { p_match_id: newId }); } catch { /* idempotent */ }
+        navigate({ to: "/arena/match/$matchId", params: { matchId: newId } });
+      })
       .subscribe();
     return () => {
       supabase.removeChannel(ch);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [matchId]);
+  }, [matchId, user?.id]);
 
   // 1s ticker for countdown
   useEffect(() => {
@@ -194,6 +202,38 @@ function ArenaWaitingRoom() {
       return (a.wrong_answers ?? 0) - (b.wrong_answers ?? 0);
     });
   }, [players]);
+
+  const [rematching, setRematching] = useState(false);
+  const handleRematch = async () => {
+    if (!user || !m || rematching) return;
+    setRematching(true);
+    try {
+      const { data, error } = await supabase.rpc("arena_create_match", {
+        p_match_type: m.match_type,
+        p_max_players: m.max_players,
+        p_topic: m.topic,
+        p_difficulty: m.difficulty,
+        p_question_count: m.question_count,
+        p_duration_seconds: m.duration_seconds,
+      });
+      if (error) throw error;
+      const newId = data as unknown as string;
+      // Broadcast to opponents on the old channel so they auto-join.
+      const ch = supabase.channel(`arena:match:${matchId}`);
+      await new Promise<void>((resolve) => {
+        ch.subscribe((status) => { if (status === "SUBSCRIBED") resolve(); });
+        setTimeout(resolve, 600);
+      });
+      await ch.send({ type: "broadcast", event: "rematch", payload: { match_id: newId } });
+      supabase.removeChannel(ch);
+      toast.success(`New room ${roomCodeFromId(newId)} created`);
+      navigate({ to: "/arena/match/$matchId", params: { matchId: newId } });
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Could not start rematch");
+    } finally {
+      setRematching(false);
+    }
+  };
 
   if (matchQ.isLoading) {
     return (
@@ -299,6 +339,27 @@ function ArenaWaitingRoom() {
                 <div className="arena-label text-emerald-400">LIVE</div>
                 <div className="text-white text-[24px] font-bold mt-2">Match in progress</div>
                 <div className="text-[12px] text-white/40 mt-1">Live gameplay ships in the next phase.</div>
+              </>
+            ) : m.status === "completed" || m.status === "ended" ? (
+              <>
+                <div className="arena-label text-amber-400">MATCH COMPLETE</div>
+                <div className="text-white text-[24px] font-bold mt-2">
+                  {leaderboard[0]?.username ? `${leaderboard[0].username} wins` : "Good game"}
+                </div>
+                <div className="text-[12px] text-white/40 mt-1 mb-5">Ready for another round?</div>
+                {isMember ? (
+                  <button
+                    onClick={handleRematch}
+                    disabled={rematching}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md text-[13px] font-semibold text-white transition disabled:opacity-50"
+                    style={{ background: "var(--neon-purple)", boxShadow: "0 0 24px rgba(124,58,237,0.45)" }}
+                  >
+                    <Swords className="w-4 h-4" />
+                    {rematching ? "Creating new room…" : "Rematch"}
+                  </button>
+                ) : (
+                  <div className="text-[12px] text-white/40">Waiting for players to start a rematch…</div>
+                )}
               </>
             ) : (
               <>
