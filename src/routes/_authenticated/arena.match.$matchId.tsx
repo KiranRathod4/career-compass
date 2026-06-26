@@ -11,8 +11,16 @@ function roomCodeFromId(id: string) {
 }
 
 export const Route = createFileRoute("/_authenticated/arena/match/$matchId")({
-  component: ArenaWaitingRoom,
+  component: ArenaWaitingRoomRoute,
 });
+
+function ArenaWaitingRoomRoute() {
+  const { matchId } = Route.useParams();
+  // Remount on matchId change so every useState (copied, starting, rematching,
+  // serverOffset, now) and every realtime subscription resets cleanly — no
+  // stale scores, streaks, or countdown carry over from the previous match.
+  return <ArenaWaitingRoom key={matchId} />;
+}
 
 type Match = {
   id: string;
