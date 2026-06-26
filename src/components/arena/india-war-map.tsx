@@ -328,13 +328,31 @@ export function IndiaWarMap({ players: incomingPlayers }: { players: LivePlayer[
           );
         })}
 
-        {/* Animated per-player markers (orbiting each zone center) */}
+        {/* Static markers: cheap SVG dots for the long tail (no spring, no JS animation) */}
+        <g>
+          {staticRest.map((p) => {
+            const fill = p.status === "in_match" ? "#fbbf24" : "#34d399";
+            return (
+              <circle
+                key={p.user_id}
+                cx={p.ox}
+                cy={p.oy}
+                r={p.status === "in_match" ? 2.6 : 2.2}
+                fill={fill}
+                opacity={0.85}
+              />
+            );
+          })}
+        </g>
+
+        {/* Animated per-player markers — capped to MAX_ANIMATED */}
         <AnimatePresence>
-          {placed.map((p) => {
+          {animated.map((p) => {
             const isJoin = recentlyJoined.has(p.user_id);
             const isChange = statusChanged.has(p.user_id);
             const fill = p.status === "in_match" ? "url(#combatDot)" : "url(#lobbyDot)";
             const glow = p.status === "in_match" ? "#fbbf24" : "#34d399";
+            const showHeartbeat = heartbeatIds.has(p.user_id);
             return (
               <motion.g
                 key={p.user_id}
@@ -343,7 +361,6 @@ export function IndiaWarMap({ players: incomingPlayers }: { players: LivePlayer[
                 exit={{ opacity: 0, scale: 0 }}
                 transition={{ type: "spring", stiffness: 260, damping: 22 }}
               >
-                {/* Joined burst */}
                 {isJoin && (
                   <motion.circle
                     cx={p.ox}
@@ -356,7 +373,6 @@ export function IndiaWarMap({ players: incomingPlayers }: { players: LivePlayer[
                     strokeWidth={1.5}
                   />
                 )}
-                {/* Status-change flash */}
                 {isChange && (
                   <motion.circle
                     cx={p.ox}
@@ -368,7 +384,6 @@ export function IndiaWarMap({ players: incomingPlayers }: { players: LivePlayer[
                     opacity={0.5}
                   />
                 )}
-                {/* Smooth move between zones/status */}
                 <motion.circle
                   animate={{ cx: p.ox, cy: p.oy }}
                   transition={{ type: "spring", stiffness: 120, damping: 18 }}
@@ -376,8 +391,7 @@ export function IndiaWarMap({ players: incomingPlayers }: { players: LivePlayer[
                   fill={fill}
                   style={{ filter: `drop-shadow(0 0 4px ${glow})` }}
                 />
-                {/* Heartbeat for in-match players */}
-                {p.status === "in_match" && (
+                {showHeartbeat && (
                   <motion.circle
                     animate={{ cx: p.ox, cy: p.oy }}
                     transition={{ type: "spring", stiffness: 120, damping: 18 }}
@@ -395,6 +409,7 @@ export function IndiaWarMap({ players: incomingPlayers }: { players: LivePlayer[
             );
           })}
         </AnimatePresence>
+
 
         {/* Corner brackets */}
         <g stroke="rgba(8,217,214,0.7)" strokeWidth="2" fill="none">
