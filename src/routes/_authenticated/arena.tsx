@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { IndiaWarMap } from "@/components/arena/india-war-map";
 
 export const Route = createFileRoute("/_authenticated/arena")({
   component: ArenaLobby,
@@ -431,34 +432,26 @@ function ArenaLobby() {
 
           {/* -------- CENTER: MODES -------- */}
           <main className="space-y-4">
-            {/* Online players strip */}
-            <div className="rounded-xl px-4 py-3 flex items-center gap-4"
-              style={{ background: "var(--arena-card)", border: "1px solid var(--arena-border)" }}>
-              <div className="arena-label whitespace-nowrap">
-                {online.length} Players Online
-              </div>
-              <div className="flex-1 flex gap-2 overflow-x-auto">
-                {online.length === 0 && (
-                  <div className="text-[12px] text-white/30 italic py-3">
-                    No other players in the lobby yet. Be the first wave.
-                  </div>
-                )}
-                {online.slice(0, 30).map((p) => (
-                  <div key={p.user_id} className="flex flex-col items-center gap-1 min-w-[44px]">
-                    <div className="w-9 h-9 rounded-full flex items-center justify-center text-[12px] font-bold text-white"
-                      style={{
-                        background: "rgba(124,58,237,0.15)",
-                        border: p.status === "in_match"
-                          ? "2px solid var(--neon-amber)"
-                          : "2px solid var(--neon-purple)",
-                      }}>
-                      {p.username.slice(0, 2).toUpperCase()}
-                    </div>
-                    <span className="text-[10px] text-white/50 truncate max-w-[48px]">{p.username}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            {/* India tactical war map — realtime players bucketed by zone */}
+            <IndiaWarMap
+              players={(() => {
+                const list = online.map((p) => ({
+                  user_id: p.user_id,
+                  username: p.username,
+                  arena_rank: p.arena_rank,
+                  status: p.status,
+                }));
+                if (user && profileQ.data && !list.some((p) => p.user_id === user.id)) {
+                  list.push({
+                    user_id: user.id,
+                    username: profileQ.data.username,
+                    arena_rank: profileQ.data.arena_rank,
+                    status: "lobby" as const,
+                  });
+                }
+                return list;
+              })()}
+            />
 
             {/* Mode cards grid */}
             <div className="grid grid-cols-2 gap-4">
