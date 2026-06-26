@@ -203,6 +203,38 @@ function ArenaWaitingRoom() {
     });
   }, [players]);
 
+  const [rematching, setRematching] = useState(false);
+  const handleRematch = async () => {
+    if (!user || !m || rematching) return;
+    setRematching(true);
+    try {
+      const { data, error } = await supabase.rpc("arena_create_match", {
+        p_match_type: m.match_type,
+        p_max_players: m.max_players,
+        p_topic: m.topic,
+        p_difficulty: m.difficulty,
+        p_question_count: m.question_count,
+        p_duration_seconds: m.duration_seconds,
+      });
+      if (error) throw error;
+      const newId = data as unknown as string;
+      // Broadcast to opponents on the old channel so they auto-join.
+      const ch = supabase.channel(`arena:match:${matchId}`);
+      await new Promise<void>((resolve) => {
+        ch.subscribe((status) => { if (status === "SUBSCRIBED") resolve(); });
+        setTimeout(resolve, 600);
+      });
+      await ch.send({ type: "broadcast", event: "rematch", payload: { match_id: newId } });
+      supabase.removeChannel(ch);
+      toast.success(`New room ${roomCodeFromId(newId)} created`);
+      navigate({ to: "/arena/match/$matchId", params: { matchId: newId } });
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Could not start rematch");
+    } finally {
+      setRematching(false);
+    }
+  };
+
   if (matchQ.isLoading) {
     return (
       <div className="arena-root arena-scanlines">
