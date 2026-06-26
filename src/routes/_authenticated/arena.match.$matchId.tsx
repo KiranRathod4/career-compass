@@ -118,7 +118,7 @@ function ArenaWaitingRoom() {
         if (!newId || !user) return;
         toast.message("Rematch starting…", { description: "Joining new room" });
         // best-effort auto-join; if full or already in, RPC is idempotent
-        await supabase.rpc("arena_join_match", { p_match_id: newId }).catch(() => {});
+        try { await supabase.rpc("arena_join_match", { p_match_id: newId }); } catch { /* idempotent */ }
         navigate({ to: "/arena/match/$matchId", params: { matchId: newId } });
       })
       .subscribe();
