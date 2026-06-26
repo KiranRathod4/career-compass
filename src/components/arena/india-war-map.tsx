@@ -54,10 +54,45 @@ type PlacedPlayer = LivePlayer & {
   oy: number;
 };
 
-export function IndiaWarMap({ players }: { players: LivePlayer[] }) {
+// Performance caps — tune here.
+const THROTTLE_MS = 250;            // min ms between marker re-layouts
+const MAX_ANIMATED = 60;            // markers using framer-motion springs
+const MAX_HEARTBEATS = 12;          // pulsing rings for in-combat players
+const MAX_JOIN_BURSTS = 8;          // simultaneous join-ring FX
+
+export function IndiaWarMap({ players: incomingPlayers }: { players: LivePlayer[] }) {
   const [hover, setHover] = useState<string | null>(null);
 
-  // Detect joins/leaves/status-change for transient FX
+  // Throttle incoming presence updates: coalesce bursts into at most one
+  // layout pass per THROTTLE_MS, but always honor the latest snapshot.
+  const [players, setPlayers] = useState<LivePlayer[]>(incomingPlayers);
+  const lastApplied = useRef<number>(0);
+  const pendingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const latest = useRef<LivePlayer[]>(incomingPlayers);
+
+  useEffect(() => {
+    latest.current = incomingPlayers;
+    const now = typeof performance !== "undefined" ? performance.now() : Date.now();
+    const elapsed = now - lastApplied.current;
+    const apply = () => {
+      lastApplied.current = typeof performance !== "undefined" ? performance.now() : Date.now();
+      pendingTimer.current = null;
+      setPlayers(latest.current);
+    };
+    if (elapsed >= THROTTLE_MS) {
+      apply();
+    } else if (!pendingTimer.current) {
+      pendingTimer.current = setTimeout(apply, THROTTLE_MS - elapsed);
+    }
+    return () => {
+      if (pendingTimer.current) {
+        clearTimeout(pendingTimer.current);
+        pendingTimer.current = null;
+      }
+    };
+  }, [incomingPlayers]);
+
+  // Detect joins/leaves/status-change for transient FX (capped per tick)
   const prevIds = useRef<Map<string, LivePlayer["status"]>>(new Map());
   const [recentlyJoined, setRecentlyJoined] = useState<Set<string>>(new Set());
   const [statusChanged, setStatusChanged] = useState<Set<string>>(new Set());
@@ -68,8 +103,11 @@ export function IndiaWarMap({ players }: { players: LivePlayer[] }) {
     const changed = new Set<string>();
     for (const [id, status] of next) {
       const prev = prevIds.current.get(id);
-      if (prev === undefined) joined.add(id);
-      else if (prev !== status) changed.add(id);
+      if (prev === undefined) {
+        if (joined.size < MAX_JOIN_BURSTS) joined.add(id);
+      } else if (prev !== status) {
+        if (changed.size < MAX_JOIN_BURSTS) changed.add(id);
+      }
     }
     prevIds.current = next;
     if (joined.size) {
@@ -123,6 +161,27 @@ export function IndiaWarMap({ players }: { players: LivePlayer[] }) {
 
   const maxCount = Math.max(1, ...Array.from(zoneCounts.values()));
   const totalInMatch = players.filter((p) => p.status === "in_match").length;
+
+  // Split markers into a small animated set + a large static set so the
+  // framer-motion / SVG <animate> cost stays bounded under heavy player counts.
+  const { animated, staticRest, heartbeatIds } = useMemo(() => {
+    const priority = (p: PlacedPlayer) => {
+      let score = 0;
+      if (p.status === "in_match") score += 4;
+      if (recentlyJoined.has(p.user_id)) score += 3;
+      if (statusChanged.has(p.user_id)) score += 2;
+      if (hover && p.zoneId === hover) score += 1;
+      return score;
+    };
+    const ranked = [...placed].sort((a, b) => priority(b) - priority(a));
+    const animated = ranked.slice(0, MAX_ANIMATED);
+    const staticRest = ranked.slice(MAX_ANIMATED);
+    const heartbeatIds = new Set(
+      animated.filter((p) => p.status === "in_match").slice(0, MAX_HEARTBEATS).map((p) => p.user_id),
+    );
+    return { animated, staticRest, heartbeatIds };
+  }, [placed, recentlyJoined, statusChanged, hover]);
+
 
   return (
     <div
@@ -269,13 +328,31 @@ export function IndiaWarMap({ players }: { players: LivePlayer[] }) {
           );
         })}
 
-        {/* Animated per-player markers (orbiting each zone center) */}
+        {/* Static markers: cheap SVG dots for the long tail (no spring, no JS animation) */}
+        <g>
+          {staticRest.map((p) => {
+            const fill = p.status === "in_match" ? "#fbbf24" : "#34d399";
+            return (
+              <circle
+                key={p.user_id}
+                cx={p.ox}
+                cy={p.oy}
+                r={p.status === "in_match" ? 2.6 : 2.2}
+                fill={fill}
+                opacity={0.85}
+              />
+            );
+          })}
+        </g>
+
+        {/* Animated per-player markers — capped to MAX_ANIMATED */}
         <AnimatePresence>
-          {placed.map((p) => {
+          {animated.map((p) => {
             const isJoin = recentlyJoined.has(p.user_id);
             const isChange = statusChanged.has(p.user_id);
             const fill = p.status === "in_match" ? "url(#combatDot)" : "url(#lobbyDot)";
             const glow = p.status === "in_match" ? "#fbbf24" : "#34d399";
+            const showHeartbeat = heartbeatIds.has(p.user_id);
             return (
               <motion.g
                 key={p.user_id}
@@ -284,7 +361,6 @@ export function IndiaWarMap({ players }: { players: LivePlayer[] }) {
                 exit={{ opacity: 0, scale: 0 }}
                 transition={{ type: "spring", stiffness: 260, damping: 22 }}
               >
-                {/* Joined burst */}
                 {isJoin && (
                   <motion.circle
                     cx={p.ox}
@@ -297,7 +373,6 @@ export function IndiaWarMap({ players }: { players: LivePlayer[] }) {
                     strokeWidth={1.5}
                   />
                 )}
-                {/* Status-change flash */}
                 {isChange && (
                   <motion.circle
                     cx={p.ox}
@@ -309,7 +384,6 @@ export function IndiaWarMap({ players }: { players: LivePlayer[] }) {
                     opacity={0.5}
                   />
                 )}
-                {/* Smooth move between zones/status */}
                 <motion.circle
                   animate={{ cx: p.ox, cy: p.oy }}
                   transition={{ type: "spring", stiffness: 120, damping: 18 }}
@@ -317,8 +391,7 @@ export function IndiaWarMap({ players }: { players: LivePlayer[] }) {
                   fill={fill}
                   style={{ filter: `drop-shadow(0 0 4px ${glow})` }}
                 />
-                {/* Heartbeat for in-match players */}
-                {p.status === "in_match" && (
+                {showHeartbeat && (
                   <motion.circle
                     animate={{ cx: p.ox, cy: p.oy }}
                     transition={{ type: "spring", stiffness: 120, damping: 18 }}
@@ -336,6 +409,7 @@ export function IndiaWarMap({ players }: { players: LivePlayer[] }) {
             );
           })}
         </AnimatePresence>
+
 
         {/* Corner brackets */}
         <g stroke="rgba(8,217,214,0.7)" strokeWidth="2" fill="none">
