@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { IndiaWarMap } from "@/components/arena/india-war-map";
 
 export const Route = createFileRoute("/_authenticated/arena")({
   component: ArenaLobby,
