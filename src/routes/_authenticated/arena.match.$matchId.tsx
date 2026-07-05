@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Users, Copy, Check, LogOut, Zap, Trophy, Flame, Hash, Swords } from "lucide-react";
+import { ArrowLeft, Users, Copy, Check, LogOut, Zap, Trophy, Flame, Hash, Swords, CheckCircle2, Circle, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
@@ -48,6 +48,7 @@ type Player = {
   current_streak: number;
   rank_in_match: number | null;
   eliminated: boolean;
+  is_ready: boolean;
 };
 
 function ArenaWaitingRoom() {
@@ -107,7 +108,7 @@ function ArenaWaitingRoom() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("match_players")
-        .select("id, user_id, username, arena_rank, joined_at, score, correct_answers, wrong_answers, current_streak, rank_in_match, eliminated")
+        .select("id, user_id, username, arena_rank, joined_at, score, correct_answers, wrong_answers, current_streak, rank_in_match, eliminated, is_ready")
         .eq("match_id", matchId)
         .order("joined_at", { ascending: true });
       if (error) throw error;
@@ -199,6 +200,25 @@ function ArenaWaitingRoom() {
     setCodeCopied(true);
     toast.success(`Room code ${roomCode} copied`);
     setTimeout(() => setCodeCopied(false), 1500);
+  };
+
+  const me = useMemo(() => players.find((p) => p.user_id === user?.id) ?? null, [players, user?.id]);
+  const readyCount = useMemo(() => players.filter((p) => p.is_ready).length, [players]);
+  const allReady = players.length >= 2 && readyCount === players.length;
+
+  const [togglingReady, setTogglingReady] = useState(false);
+  const handleToggleReady = async () => {
+    if (!user || !me || togglingReady || !m || m.status !== "waiting") return;
+    setTogglingReady(true);
+    const next = !me.is_ready;
+    try {
+      const { error } = await supabase.rpc("arena_toggle_ready", { p_match_id: matchId, p_ready: next });
+      if (error) throw error;
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Could not update ready state");
+    } finally {
+      setTogglingReady(false);
+    }
   };
 
   // Live-sorted leaderboard: by score desc, then streak, then fewer wrongs
@@ -374,8 +394,58 @@ function ArenaWaitingRoom() {
                 <div className="arena-label text-white/40">STATUS</div>
                 <div className="text-white text-[22px] font-bold mt-2">{statusLabel}</div>
                 <div className="text-[12px] text-white/40 mt-2">
-                  Match auto-starts when {m.max_players} players have joined.
+                  Countdown starts when the room is full, or when everyone hits Ready (min 2 players).
                 </div>
+
+                {/* Ready progress bar */}
+                {players.length > 0 && (
+                  <div className="mt-5 max-w-[300px] mx-auto">
+                    <div className="flex items-center justify-between text-[11px] mb-1.5">
+                      <span className="arena-label text-white/50">READY</span>
+                      <span className="arena-mono text-white/70">{readyCount}/{players.length}</span>
+                    </div>
+                    <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
+                      <div
+                        className="h-full transition-all duration-300"
+                        style={{
+                          width: `${players.length ? (readyCount / players.length) * 100 : 0}%`,
+                          background: allReady ? "#10b981" : "var(--neon-purple)",
+                          boxShadow: allReady ? "0 0 12px rgba(16,185,129,0.6)" : "0 0 12px rgba(124,58,237,0.5)",
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {isMember && me && (
+                  <button
+                    onClick={handleToggleReady}
+                    disabled={togglingReady}
+                    className="mt-5 inline-flex items-center gap-2 px-6 py-2.5 rounded-md text-[13px] font-bold uppercase tracking-wider text-white transition disabled:opacity-60"
+                    style={
+                      me.is_ready
+                        ? {
+                            background: "rgba(16,185,129,0.15)",
+                            border: "1px solid rgba(16,185,129,0.5)",
+                            color: "#6ee7b7",
+                            boxShadow: "0 0 20px rgba(16,185,129,0.25)",
+                          }
+                        : {
+                            background: "var(--neon-purple)",
+                            boxShadow: "0 0 28px rgba(124,58,237,0.55)",
+                          }
+                    }
+                  >
+                    {togglingReady ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : me.is_ready ? (
+                      <CheckCircle2 className="w-4 h-4" />
+                    ) : (
+                      <Circle className="w-4 h-4" />
+                    )}
+                    {me.is_ready ? "Ready — tap to cancel" : "I'm Ready"}
+                  </button>
+                )}
               </>
             )}
           </div>
@@ -395,18 +465,28 @@ function ArenaWaitingRoom() {
                 const isMe = !!p && p.user_id === user?.id;
                 return (
                   <div key={i}
-                    className="rounded-xl p-4 flex flex-col items-center text-center transition"
+                    className="relative rounded-xl p-4 flex flex-col items-center text-center transition"
                     style={{
-                      background: p ? "rgba(124,58,237,0.08)" : "rgba(255,255,255,0.02)",
+                      background: p ? (p.is_ready && m.status === "waiting" ? "rgba(16,185,129,0.08)" : "rgba(124,58,237,0.08)") : "rgba(255,255,255,0.02)",
                       border: p
-                        ? `1px solid ${isMe ? "var(--neon-purple)" : "rgba(124,58,237,0.3)"}`
+                        ? `1px solid ${p.is_ready && m.status === "waiting" ? "rgba(16,185,129,0.5)" : isMe ? "var(--neon-purple)" : "rgba(124,58,237,0.3)"}`
                         : "1px dashed rgba(255,255,255,0.08)",
                       minHeight: 128,
+                      boxShadow: p?.is_ready && m.status === "waiting" ? "0 0 20px rgba(16,185,129,0.2)" : undefined,
                     }}>
                     {p ? (
                       <>
+                        {p.is_ready && m.status === "waiting" && (
+                          <div className="absolute top-2 right-2 flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider"
+                            style={{ background: "rgba(16,185,129,0.2)", color: "#6ee7b7", border: "1px solid rgba(16,185,129,0.4)" }}>
+                            <CheckCircle2 className="w-2.5 h-2.5" /> Ready
+                          </div>
+                        )}
                         <div className="w-12 h-12 rounded-full flex items-center justify-center text-[14px] font-bold text-white"
-                          style={{ background: "var(--arena-glow)", border: "2px solid var(--neon-purple)" }}>
+                          style={{
+                            background: "var(--arena-glow)",
+                            border: `2px solid ${p.is_ready && m.status === "waiting" ? "#10b981" : "var(--neon-purple)"}`,
+                          }}>
                           {p.username.slice(0, 2).toUpperCase()}
                         </div>
                         <div className="mt-2 text-[13px] font-semibold text-white truncate max-w-full">
