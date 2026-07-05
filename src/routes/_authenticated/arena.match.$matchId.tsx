@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { LobbyChat } from "@/components/arena/lobby-chat";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Users, Copy, Check, LogOut, Zap, Trophy, Flame, Hash, Swords, CheckCircle2, Circle, Loader2 } from "lucide-react";
@@ -523,6 +524,18 @@ function ArenaWaitingRoom() {
               })}
             </div>
           </div>
+
+          {/* Lobby chat */}
+          <div className="w-full max-w-3xl">
+            <LobbyChat
+              matchId={matchId}
+              userId={user?.id ?? null}
+              username={me?.username ?? null}
+              disabled={m.status === "active" || m.status === "completed" || m.status === "ended"}
+            />
+          </div>
+
+
 
           {/* Live leaderboard */}
           {players.length > 0 && (
