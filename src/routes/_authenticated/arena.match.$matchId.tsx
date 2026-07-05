@@ -48,6 +48,7 @@ type Player = {
   current_streak: number;
   rank_in_match: number | null;
   eliminated: boolean;
+  is_ready: boolean;
 };
 
 function ArenaWaitingRoom() {
