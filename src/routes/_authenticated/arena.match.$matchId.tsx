@@ -108,7 +108,7 @@ function ArenaWaitingRoom() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("match_players")
-        .select("id, user_id, username, arena_rank, joined_at, score, correct_answers, wrong_answers, current_streak, rank_in_match, eliminated")
+        .select("id, user_id, username, arena_rank, joined_at, score, correct_answers, wrong_answers, current_streak, rank_in_match, eliminated, is_ready")
         .eq("match_id", matchId)
         .order("joined_at", { ascending: true });
       if (error) throw error;
