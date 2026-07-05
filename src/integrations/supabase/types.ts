@@ -1314,10 +1314,12 @@ export type Database = {
           eliminated: boolean
           eliminated_at: string | null
           id: string
+          is_ready: boolean
           joined_at: string
           last_answer_at: string | null
           match_id: string
           rank_in_match: number | null
+          ready_at: string | null
           score: number
           user_id: string
           username: string
@@ -1332,10 +1334,12 @@ export type Database = {
           eliminated?: boolean
           eliminated_at?: string | null
           id?: string
+          is_ready?: boolean
           joined_at?: string
           last_answer_at?: string | null
           match_id: string
           rank_in_match?: number | null
+          ready_at?: string | null
           score?: number
           user_id: string
           username: string
@@ -1350,10 +1354,12 @@ export type Database = {
           eliminated?: boolean
           eliminated_at?: string | null
           id?: string
+          is_ready?: boolean
           joined_at?: string
           last_answer_at?: string | null
           match_id?: string
           rank_in_match?: number | null
+          ready_at?: string | null
           score?: number
           user_id?: string
           username?: string
@@ -2392,6 +2398,10 @@ export type Database = {
       }
       arena_join_match: { Args: { p_match_id: string }; Returns: Json }
       arena_start_match: { Args: { p_match_id: string }; Returns: Json }
+      arena_toggle_ready: {
+        Args: { p_match_id: string; p_ready: boolean }
+        Returns: Json
+      }
       get_user_level: { Args: { p_xp: number }; Returns: Json }
       get_user_xp: { Args: { p_user_id: string }; Returns: number }
     }
