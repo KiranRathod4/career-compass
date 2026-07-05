@@ -465,18 +465,28 @@ function ArenaWaitingRoom() {
                 const isMe = !!p && p.user_id === user?.id;
                 return (
                   <div key={i}
-                    className="rounded-xl p-4 flex flex-col items-center text-center transition"
+                    className="relative rounded-xl p-4 flex flex-col items-center text-center transition"
                     style={{
-                      background: p ? "rgba(124,58,237,0.08)" : "rgba(255,255,255,0.02)",
+                      background: p ? (p.is_ready && m.status === "waiting" ? "rgba(16,185,129,0.08)" : "rgba(124,58,237,0.08)") : "rgba(255,255,255,0.02)",
                       border: p
-                        ? `1px solid ${isMe ? "var(--neon-purple)" : "rgba(124,58,237,0.3)"}`
+                        ? `1px solid ${p.is_ready && m.status === "waiting" ? "rgba(16,185,129,0.5)" : isMe ? "var(--neon-purple)" : "rgba(124,58,237,0.3)"}`
                         : "1px dashed rgba(255,255,255,0.08)",
                       minHeight: 128,
+                      boxShadow: p?.is_ready && m.status === "waiting" ? "0 0 20px rgba(16,185,129,0.2)" : undefined,
                     }}>
                     {p ? (
                       <>
+                        {p.is_ready && m.status === "waiting" && (
+                          <div className="absolute top-2 right-2 flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider"
+                            style={{ background: "rgba(16,185,129,0.2)", color: "#6ee7b7", border: "1px solid rgba(16,185,129,0.4)" }}>
+                            <CheckCircle2 className="w-2.5 h-2.5" /> Ready
+                          </div>
+                        )}
                         <div className="w-12 h-12 rounded-full flex items-center justify-center text-[14px] font-bold text-white"
-                          style={{ background: "var(--arena-glow)", border: "2px solid var(--neon-purple)" }}>
+                          style={{
+                            background: "var(--arena-glow)",
+                            border: `2px solid ${p.is_ready && m.status === "waiting" ? "#10b981" : "var(--neon-purple)"}`,
+                          }}>
                           {p.username.slice(0, 2).toUpperCase()}
                         </div>
                         <div className="mt-2 text-[13px] font-semibold text-white truncate max-w-full">
