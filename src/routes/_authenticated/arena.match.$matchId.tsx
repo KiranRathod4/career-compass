@@ -394,8 +394,58 @@ function ArenaWaitingRoom() {
                 <div className="arena-label text-white/40">STATUS</div>
                 <div className="text-white text-[22px] font-bold mt-2">{statusLabel}</div>
                 <div className="text-[12px] text-white/40 mt-2">
-                  Match auto-starts when {m.max_players} players have joined.
+                  Countdown starts when the room is full, or when everyone hits Ready (min 2 players).
                 </div>
+
+                {/* Ready progress bar */}
+                {players.length > 0 && (
+                  <div className="mt-5 max-w-[300px] mx-auto">
+                    <div className="flex items-center justify-between text-[11px] mb-1.5">
+                      <span className="arena-label text-white/50">READY</span>
+                      <span className="arena-mono text-white/70">{readyCount}/{players.length}</span>
+                    </div>
+                    <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
+                      <div
+                        className="h-full transition-all duration-300"
+                        style={{
+                          width: `${players.length ? (readyCount / players.length) * 100 : 0}%`,
+                          background: allReady ? "#10b981" : "var(--neon-purple)",
+                          boxShadow: allReady ? "0 0 12px rgba(16,185,129,0.6)" : "0 0 12px rgba(124,58,237,0.5)",
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {isMember && me && (
+                  <button
+                    onClick={handleToggleReady}
+                    disabled={togglingReady}
+                    className="mt-5 inline-flex items-center gap-2 px-6 py-2.5 rounded-md text-[13px] font-bold uppercase tracking-wider text-white transition disabled:opacity-60"
+                    style={
+                      me.is_ready
+                        ? {
+                            background: "rgba(16,185,129,0.15)",
+                            border: "1px solid rgba(16,185,129,0.5)",
+                            color: "#6ee7b7",
+                            boxShadow: "0 0 20px rgba(16,185,129,0.25)",
+                          }
+                        : {
+                            background: "var(--neon-purple)",
+                            boxShadow: "0 0 28px rgba(124,58,237,0.55)",
+                          }
+                    }
+                  >
+                    {togglingReady ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : me.is_ready ? (
+                      <CheckCircle2 className="w-4 h-4" />
+                    ) : (
+                      <Circle className="w-4 h-4" />
+                    )}
+                    {me.is_ready ? "Ready — tap to cancel" : "I'm Ready"}
+                  </button>
+                )}
               </>
             )}
           </div>
