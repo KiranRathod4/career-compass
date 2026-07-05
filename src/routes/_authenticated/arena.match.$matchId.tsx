@@ -525,6 +525,18 @@ function ArenaWaitingRoom() {
             </div>
           </div>
 
+          {/* Lobby chat */}
+          <div className="w-full max-w-3xl">
+            <LobbyChat
+              matchId={matchId}
+              userId={user?.id ?? null}
+              username={me?.username ?? null}
+              disabled={m.status === "active" || m.status === "completed" || m.status === "ended"}
+            />
+          </div>
+
+
+
           {/* Live leaderboard */}
           {players.length > 0 && (
             <div className="w-full max-w-3xl">
