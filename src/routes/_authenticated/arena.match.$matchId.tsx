@@ -202,6 +202,25 @@ function ArenaWaitingRoom() {
     setTimeout(() => setCodeCopied(false), 1500);
   };
 
+  const me = useMemo(() => players.find((p) => p.user_id === user?.id) ?? null, [players, user?.id]);
+  const readyCount = useMemo(() => players.filter((p) => p.is_ready).length, [players]);
+  const allReady = players.length >= 2 && readyCount === players.length;
+
+  const [togglingReady, setTogglingReady] = useState(false);
+  const handleToggleReady = async () => {
+    if (!user || !me || togglingReady || !m || m.status !== "waiting") return;
+    setTogglingReady(true);
+    const next = !me.is_ready;
+    try {
+      const { error } = await supabase.rpc("arena_toggle_ready", { p_match_id: matchId, p_ready: next });
+      if (error) throw error;
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Could not update ready state");
+    } finally {
+      setTogglingReady(false);
+    }
+  };
+
   // Live-sorted leaderboard: by score desc, then streak, then fewer wrongs
   const leaderboard = useMemo(() => {
     return [...players].sort((a, b) => {
