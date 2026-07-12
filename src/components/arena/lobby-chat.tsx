@@ -84,12 +84,19 @@ export function LobbyChat({ matchId, userId, username, disabled }: Props) {
     ch.on("broadcast", { event: "msg" }, (payload) => {
       const m = payload?.payload as ChatMessage | undefined;
       if (!m || !m.text) return;
+      let added = false;
       setMessages((prev) => {
         if (prev.some((p) => p.id === m.id)) return prev;
+        added = true;
         const next = [...prev, m];
         if (next.length > MAX_MESSAGES) next.splice(0, next.length - MAX_MESSAGES);
         return next;
       });
+      if (!added) return;
+      const isSelf = !!selfIdRef.current && m.user_id === selfIdRef.current;
+      const shouldCount =
+        !m.system && !isSelf && (collapsedRef.current || !focusedRef.current || !atBottomRef.current);
+      if (shouldCount) setUnread((u) => Math.min(u + 1, 99));
     });
 
     ch.on("broadcast", { event: "react" }, (payload) => {
