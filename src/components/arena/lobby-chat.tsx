@@ -407,6 +407,7 @@ export function LobbyChat({ matchId, userId, username, disabled }: Props) {
           <Send className="w-4 h-4" />
         </button>
       </div>
+      )}
     </div>
   );
 }
