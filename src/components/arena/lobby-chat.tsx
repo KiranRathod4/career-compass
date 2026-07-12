@@ -222,20 +222,53 @@ export function LobbyChat({ matchId, userId, username, disabled }: Props) {
   return (
     <div
       className="rounded-xl overflow-hidden flex flex-col"
-      style={{ background: "var(--arena-card)", border: "1px solid var(--arena-border)", height: 320 }}
+      style={{
+        background: "var(--arena-card)",
+        border: "1px solid var(--arena-border)",
+        height: collapsed ? "auto" : 320,
+      }}
     >
-      <div
-        className="flex items-center gap-2 px-4 py-2.5 border-b"
-        style={{ borderColor: "rgba(255,255,255,0.06)" }}
+      <button
+        type="button"
+        onClick={toggleCollapsed}
+        className="flex items-center gap-2 px-4 py-2.5 border-b w-full text-left hover:bg-white/[0.02] transition"
+        style={{ borderColor: collapsed ? "transparent" : "rgba(255,255,255,0.06)" }}
+        aria-expanded={!collapsed}
       >
         <MessageCircle className="w-3.5 h-3.5" style={{ color: "var(--neon-purple)" }} />
         <span className="arena-label">Lobby Chat</span>
-        <span className="ml-auto inline-flex items-center gap-1 text-[10px] text-emerald-400/80">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 arena-live-dot" /> live
+        {unread > 0 && (
+          <span
+            className="inline-flex items-center justify-center px-1.5 min-w-[18px] h-[18px] rounded-full text-[10px] font-semibold arena-mono"
+            style={{
+              background: "var(--neon-purple)",
+              color: "white",
+              boxShadow: "0 0 10px rgba(124,58,237,0.55)",
+            }}
+            aria-label={`${unread} unread messages`}
+          >
+            {unread > 99 ? "99+" : unread}
+          </span>
+        )}
+        <span className="ml-auto inline-flex items-center gap-2">
+          <span className="inline-flex items-center gap-1 text-[10px] text-emerald-400/80">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 arena-live-dot" /> live
+          </span>
+          {collapsed ? (
+            <ChevronUp className="w-3.5 h-3.5 text-white/50" />
+          ) : (
+            <ChevronDown className="w-3.5 h-3.5 text-white/50" />
+          )}
         </span>
-      </div>
+      </button>
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-2 space-y-1.5">
+      {!collapsed && (
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto px-4 py-2 space-y-1.5"
+      >
+
         {messages.length === 0 ? (
           <div className="h-full flex items-center justify-center text-[11px] text-white/30 italic">
             No messages yet. Say hi to your opponents.
