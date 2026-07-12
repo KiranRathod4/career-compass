@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MessageCircle, Send, SmilePlus } from "lucide-react";
+import { ChevronDown, ChevronUp, MessageCircle, Send, SmilePlus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 type ChatMessage = {
@@ -37,9 +37,42 @@ export function LobbyChat({ matchId, userId, username, disabled }: Props) {
   const [pickerFor, setPickerFor] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+  const [unread, setUnread] = useState(0);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const seenJoin = useRef(false);
+  const atBottomRef = useRef(true);
+  const focusedRef = useRef(true);
+  const collapsedRef = useRef(false);
+  const selfIdRef = useRef<string | null>(userId);
+
+  // Keep refs in sync with reactive state / props.
+  useEffect(() => {
+    collapsedRef.current = collapsed;
+  }, [collapsed]);
+  useEffect(() => {
+    selfIdRef.current = userId;
+  }, [userId]);
+
+  // Track window/tab focus & visibility.
+  useEffect(() => {
+    const update = () => {
+      focusedRef.current = document.visibilityState === "visible" && document.hasFocus();
+      if (focusedRef.current && !collapsedRef.current && atBottomRef.current) {
+        setUnread(0);
+      }
+    };
+    update();
+    window.addEventListener("focus", update);
+    window.addEventListener("blur", update);
+    document.addEventListener("visibilitychange", update);
+    return () => {
+      window.removeEventListener("focus", update);
+      window.removeEventListener("blur", update);
+      document.removeEventListener("visibilitychange", update);
+    };
+  }, []);
 
   // Subscribe to chat channel for this match.
   useEffect(() => {
@@ -51,12 +84,19 @@ export function LobbyChat({ matchId, userId, username, disabled }: Props) {
     ch.on("broadcast", { event: "msg" }, (payload) => {
       const m = payload?.payload as ChatMessage | undefined;
       if (!m || !m.text) return;
+      let added = false;
       setMessages((prev) => {
         if (prev.some((p) => p.id === m.id)) return prev;
+        added = true;
         const next = [...prev, m];
         if (next.length > MAX_MESSAGES) next.splice(0, next.length - MAX_MESSAGES);
         return next;
       });
+      if (!added) return;
+      const isSelf = !!selfIdRef.current && m.user_id === selfIdRef.current;
+      const shouldCount =
+        !m.system && !isSelf && (collapsedRef.current || !focusedRef.current || !atBottomRef.current);
+      if (shouldCount) setUnread((u) => Math.min(u + 1, 99));
     });
 
     ch.on("broadcast", { event: "react" }, (payload) => {
@@ -98,12 +138,41 @@ export function LobbyChat({ matchId, userId, username, disabled }: Props) {
     };
   }, [matchId, userId, username]);
 
-  // Auto-scroll to bottom on new message.
+  // Auto-scroll to bottom when new messages arrive and user is at bottom.
   useEffect(() => {
     const el = scrollRef.current;
+    if (!el || collapsed) return;
+    if (atBottomRef.current) {
+      el.scrollTop = el.scrollHeight;
+    }
+  }, [messages.length, collapsed]);
+
+  // Track scroll position; clear unread when scrolled to bottom & focused.
+  const handleScroll = () => {
+    const el = scrollRef.current;
     if (!el) return;
-    el.scrollTop = el.scrollHeight;
-  }, [messages.length]);
+    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 24;
+    atBottomRef.current = nearBottom;
+    if (nearBottom && focusedRef.current && !collapsedRef.current) {
+      setUnread(0);
+    }
+  };
+
+  const toggleCollapsed = () => {
+    setCollapsed((c) => {
+      const next = !c;
+      if (!next) {
+        // expanding — clear unread and jump to bottom on next paint
+        setUnread(0);
+        requestAnimationFrame(() => {
+          const el = scrollRef.current;
+          if (el) el.scrollTop = el.scrollHeight;
+          atBottomRef.current = true;
+        });
+      }
+      return next;
+    });
+  };
 
   // Close picker on outside click.
   useEffect(() => {
@@ -153,20 +222,53 @@ export function LobbyChat({ matchId, userId, username, disabled }: Props) {
   return (
     <div
       className="rounded-xl overflow-hidden flex flex-col"
-      style={{ background: "var(--arena-card)", border: "1px solid var(--arena-border)", height: 320 }}
+      style={{
+        background: "var(--arena-card)",
+        border: "1px solid var(--arena-border)",
+        height: collapsed ? "auto" : 320,
+      }}
     >
-      <div
-        className="flex items-center gap-2 px-4 py-2.5 border-b"
-        style={{ borderColor: "rgba(255,255,255,0.06)" }}
+      <button
+        type="button"
+        onClick={toggleCollapsed}
+        className="flex items-center gap-2 px-4 py-2.5 border-b w-full text-left hover:bg-white/[0.02] transition"
+        style={{ borderColor: collapsed ? "transparent" : "rgba(255,255,255,0.06)" }}
+        aria-expanded={!collapsed}
       >
         <MessageCircle className="w-3.5 h-3.5" style={{ color: "var(--neon-purple)" }} />
         <span className="arena-label">Lobby Chat</span>
-        <span className="ml-auto inline-flex items-center gap-1 text-[10px] text-emerald-400/80">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 arena-live-dot" /> live
+        {unread > 0 && (
+          <span
+            className="inline-flex items-center justify-center px-1.5 min-w-[18px] h-[18px] rounded-full text-[10px] font-semibold arena-mono"
+            style={{
+              background: "var(--neon-purple)",
+              color: "white",
+              boxShadow: "0 0 10px rgba(124,58,237,0.55)",
+            }}
+            aria-label={`${unread} unread messages`}
+          >
+            {unread > 99 ? "99+" : unread}
+          </span>
+        )}
+        <span className="ml-auto inline-flex items-center gap-2">
+          <span className="inline-flex items-center gap-1 text-[10px] text-emerald-400/80">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 arena-live-dot" /> live
+          </span>
+          {collapsed ? (
+            <ChevronUp className="w-3.5 h-3.5 text-white/50" />
+          ) : (
+            <ChevronDown className="w-3.5 h-3.5 text-white/50" />
+          )}
         </span>
-      </div>
+      </button>
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-2 space-y-1.5">
+      {!collapsed && (
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto px-4 py-2 space-y-1.5"
+      >
+
         {messages.length === 0 ? (
           <div className="h-full flex items-center justify-center text-[11px] text-white/30 italic">
             No messages yet. Say hi to your opponents.
@@ -275,8 +377,11 @@ export function LobbyChat({ matchId, userId, username, disabled }: Props) {
           })
         )}
       </div>
+      )}
 
+      {!collapsed && (
       <div className="p-2 border-t flex items-center gap-2" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+
         <input
           value={draft}
           onChange={(e) => setDraft(e.target.value.slice(0, MAX_LEN))}
@@ -302,6 +407,7 @@ export function LobbyChat({ matchId, userId, username, disabled }: Props) {
           <Send className="w-4 h-4" />
         </button>
       </div>
+      )}
     </div>
   );
 }
