@@ -37,9 +37,42 @@ export function LobbyChat({ matchId, userId, username, disabled }: Props) {
   const [pickerFor, setPickerFor] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+  const [unread, setUnread] = useState(0);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const seenJoin = useRef(false);
+  const atBottomRef = useRef(true);
+  const focusedRef = useRef(true);
+  const collapsedRef = useRef(false);
+  const selfIdRef = useRef<string | null>(userId);
+
+  // Keep refs in sync with reactive state / props.
+  useEffect(() => {
+    collapsedRef.current = collapsed;
+  }, [collapsed]);
+  useEffect(() => {
+    selfIdRef.current = userId;
+  }, [userId]);
+
+  // Track window/tab focus & visibility.
+  useEffect(() => {
+    const update = () => {
+      focusedRef.current = document.visibilityState === "visible" && document.hasFocus();
+      if (focusedRef.current && !collapsedRef.current && atBottomRef.current) {
+        setUnread(0);
+      }
+    };
+    update();
+    window.addEventListener("focus", update);
+    window.addEventListener("blur", update);
+    document.addEventListener("visibilitychange", update);
+    return () => {
+      window.removeEventListener("focus", update);
+      window.removeEventListener("blur", update);
+      document.removeEventListener("visibilitychange", update);
+    };
+  }, []);
 
   // Subscribe to chat channel for this match.
   useEffect(() => {
