@@ -138,12 +138,41 @@ export function LobbyChat({ matchId, userId, username, disabled }: Props) {
     };
   }, [matchId, userId, username]);
 
-  // Auto-scroll to bottom on new message.
+  // Auto-scroll to bottom when new messages arrive and user is at bottom.
   useEffect(() => {
     const el = scrollRef.current;
+    if (!el || collapsed) return;
+    if (atBottomRef.current) {
+      el.scrollTop = el.scrollHeight;
+    }
+  }, [messages.length, collapsed]);
+
+  // Track scroll position; clear unread when scrolled to bottom & focused.
+  const handleScroll = () => {
+    const el = scrollRef.current;
     if (!el) return;
-    el.scrollTop = el.scrollHeight;
-  }, [messages.length]);
+    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 24;
+    atBottomRef.current = nearBottom;
+    if (nearBottom && focusedRef.current && !collapsedRef.current) {
+      setUnread(0);
+    }
+  };
+
+  const toggleCollapsed = () => {
+    setCollapsed((c) => {
+      const next = !c;
+      if (!next) {
+        // expanding — clear unread and jump to bottom on next paint
+        setUnread(0);
+        requestAnimationFrame(() => {
+          const el = scrollRef.current;
+          if (el) el.scrollTop = el.scrollHeight;
+          atBottomRef.current = true;
+        });
+      }
+      return next;
+    });
+  };
 
   // Close picker on outside click.
   useEffect(() => {
