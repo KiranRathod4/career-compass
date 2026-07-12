@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MessageCircle, Send } from "lucide-react";
+import { MessageCircle, Send, SmilePlus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 type ChatMessage = {
@@ -11,6 +11,14 @@ type ChatMessage = {
   system?: boolean;
 };
 
+type ReactionEvent = {
+  msg_id: string;
+  user_id: string;
+  emoji: string;
+};
+
+type ReactionsMap = Record<string, Record<string, string[]>>; // msg_id -> emoji -> user_ids[]
+
 type Props = {
   matchId: string;
   userId: string | null;
@@ -21,9 +29,12 @@ type Props = {
 
 const MAX_MESSAGES = 60;
 const MAX_LEN = 160;
+const QUICK_EMOJIS = ["👍", "🔥", "😂", "🎯", "💀", "GG"] as const;
 
 export function LobbyChat({ matchId, userId, username, disabled }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [reactions, setReactions] = useState<ReactionsMap>({});
+  const [pickerFor, setPickerFor] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
@@ -45,6 +56,20 @@ export function LobbyChat({ matchId, userId, username, disabled }: Props) {
         const next = [...prev, m];
         if (next.length > MAX_MESSAGES) next.splice(0, next.length - MAX_MESSAGES);
         return next;
+      });
+    });
+
+    ch.on("broadcast", { event: "react" }, (payload) => {
+      const r = payload?.payload as ReactionEvent | undefined;
+      if (!r || !r.msg_id || !r.emoji || !r.user_id) return;
+      setReactions((prev) => {
+        const msg = { ...(prev[r.msg_id] ?? {}) };
+        const users = new Set(msg[r.emoji] ?? []);
+        if (users.has(r.user_id)) users.delete(r.user_id);
+        else users.add(r.user_id);
+        if (users.size === 0) delete msg[r.emoji];
+        else msg[r.emoji] = Array.from(users);
+        return { ...prev, [r.msg_id]: msg };
       });
     });
 
@@ -80,6 +105,14 @@ export function LobbyChat({ matchId, userId, username, disabled }: Props) {
     el.scrollTop = el.scrollHeight;
   }, [messages.length]);
 
+  // Close picker on outside click.
+  useEffect(() => {
+    if (!pickerFor) return;
+    const close = () => setPickerFor(null);
+    window.addEventListener("click", close);
+    return () => window.removeEventListener("click", close);
+  }, [pickerFor]);
+
   const canSend = useMemo(
     () => !!userId && !!username && !disabled && draft.trim().length > 0 && !sending,
     [userId, username, disabled, draft, sending]
@@ -105,6 +138,16 @@ export function LobbyChat({ matchId, userId, username, disabled }: Props) {
     } finally {
       setSending(false);
     }
+  };
+
+  const toggleReaction = async (msgId: string, emoji: string) => {
+    if (!userId || disabled) return;
+    await channelRef.current?.send({
+      type: "broadcast",
+      event: "react",
+      payload: { msg_id: msgId, user_id: userId, emoji } satisfies ReactionEvent,
+    });
+    setPickerFor(null);
   };
 
   return (
@@ -138,32 +181,95 @@ export function LobbyChat({ matchId, userId, username, disabled }: Props) {
                 </div>
               );
             }
+            const msgReactions = reactions[m.id] ?? {};
+            const reactionEntries = Object.entries(msgReactions);
+            const showPicker = pickerFor === m.id;
             return (
               <div
                 key={m.id}
-                className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}
+                className={`group flex flex-col ${isMe ? "items-end" : "items-start"}`}
               >
                 <div className="text-[10px] text-white/40 arena-mono mb-0.5 px-1">
                   {isMe ? "you" : m.username}
                 </div>
-                <div
-                  className="px-3 py-1.5 rounded-lg text-[13px] leading-snug max-w-[80%] break-words"
-                  style={
-                    isMe
-                      ? {
-                          background: "var(--neon-purple)",
-                          color: "white",
-                          boxShadow: "0 0 12px rgba(124,58,237,0.35)",
-                        }
-                      : {
-                          background: "rgba(255,255,255,0.05)",
-                          color: "rgba(255,255,255,0.9)",
-                          border: "1px solid rgba(255,255,255,0.08)",
-                        }
-                  }
-                >
-                  {m.text}
+                <div className={`relative flex items-center gap-1 max-w-[80%] ${isMe ? "flex-row-reverse" : ""}`}>
+                  <div
+                    className="px-3 py-1.5 rounded-lg text-[13px] leading-snug break-words"
+                    style={
+                      isMe
+                        ? {
+                            background: "var(--neon-purple)",
+                            color: "white",
+                            boxShadow: "0 0 12px rgba(124,58,237,0.35)",
+                          }
+                        : {
+                            background: "rgba(255,255,255,0.05)",
+                            color: "rgba(255,255,255,0.9)",
+                            border: "1px solid rgba(255,255,255,0.08)",
+                          }
+                    }
+                  >
+                    {m.text}
+                  </div>
+                  {userId && !disabled && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPickerFor(showPicker ? null : m.id);
+                      }}
+                      className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition p-1 rounded-full text-white/60 hover:text-white hover:bg-white/10"
+                      style={{ background: "rgba(255,255,255,0.03)" }}
+                      aria-label="Add reaction"
+                    >
+                      <SmilePlus className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                  {showPicker && (
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className={`absolute z-10 top-full mt-1 flex items-center gap-0.5 px-1.5 py-1 rounded-full ${isMe ? "right-0" : "left-0"}`}
+                      style={{
+                        background: "rgba(20,18,32,0.98)",
+                        border: "1px solid rgba(255,255,255,0.12)",
+                        boxShadow: "0 6px 20px rgba(0,0,0,0.45)",
+                      }}
+                    >
+                      {QUICK_EMOJIS.map((e) => (
+                        <button
+                          key={e}
+                          onClick={() => toggleReaction(m.id, e)}
+                          className="px-1.5 py-0.5 rounded-full text-[14px] hover:bg-white/10 transition arena-mono"
+                        >
+                          {e}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
+                {reactionEntries.length > 0 && (
+                  <div className={`flex flex-wrap gap-1 mt-1 ${isMe ? "justify-end" : "justify-start"}`}>
+                    {reactionEntries.map(([emoji, users]) => {
+                      const mine = !!userId && users.includes(userId);
+                      return (
+                        <button
+                          key={emoji}
+                          onClick={() => toggleReaction(m.id, emoji)}
+                          disabled={!userId || disabled}
+                          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[11px] leading-none transition disabled:cursor-not-allowed"
+                          style={{
+                            background: mine ? "rgba(124,58,237,0.25)" : "rgba(255,255,255,0.05)",
+                            border: `1px solid ${mine ? "rgba(124,58,237,0.6)" : "rgba(255,255,255,0.08)"}`,
+                            color: mine ? "#fff" : "rgba(255,255,255,0.85)",
+                          }}
+                          aria-label={`${emoji} ${users.length}`}
+                        >
+                          <span>{emoji}</span>
+                          <span className="arena-mono text-[10px] opacity-80">{users.length}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             );
           })
