@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MessageCircle, Send, SmilePlus } from "lucide-react";
+import { ChevronDown, ChevronUp, MessageCircle, Send, SmilePlus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 type ChatMessage = {
