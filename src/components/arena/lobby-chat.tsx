@@ -377,8 +377,11 @@ export function LobbyChat({ matchId, userId, username, disabled }: Props) {
           })
         )}
       </div>
+      )}
 
+      {!collapsed && (
       <div className="p-2 border-t flex items-center gap-2" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+
         <input
           value={draft}
           onChange={(e) => setDraft(e.target.value.slice(0, MAX_LEN))}
