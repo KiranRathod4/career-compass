@@ -8,7 +8,7 @@ import {
   Crown,
   Swords,
   Users,
-  Calendar,
+  Map as MapIcon,
   Map as MapIcon,
   Radio,
   Lock,
