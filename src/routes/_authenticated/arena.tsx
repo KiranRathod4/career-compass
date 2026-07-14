@@ -499,13 +499,16 @@ function ArenaLobby() {
                 disabled={matchmaking || !!locked}
               />
               <ModeCard
-                title="Daily Challenges"
-                sub="Three puzzles. Resets at midnight. Solo grind."
-                meta="0 / 3 today"
+                title="Solo Training"
+                sub="No opponents? Grind 10 questions vs the clock. Earn XP."
+                meta="1 player · self-paced"
                 accent="#3b82f6"
                 bg="linear-gradient(135deg, #0a0d1a, #050810)"
-                icon={<Calendar className="w-12 h-12" style={{ color: "#60a5fa" }} />}
+                icon={<Brain className="w-12 h-12" style={{ color: "#60a5fa" }} />}
+                onPlay={() => navigate({ to: "/arena/training" })}
+                disabled={!!locked}
               />
+
               <ModeCard
                 title="Zone War"
                 sub="Represent your state. Saturdays 7 PM."
