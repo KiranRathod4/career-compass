@@ -447,9 +447,28 @@ function ArenaWaitingRoom() {
                     {me.is_ready ? "Ready — tap to cancel" : "I'm Ready"}
                   </button>
                 )}
+
+                {/* Solo escape hatch: alone in the waiting room */}
+                {isMember && players.length === 1 && (
+                  <div className="mt-6 pt-5 border-t border-white/5">
+                    <div className="text-[11px] text-white/40 mb-2">Waiting alone? Practice while you wait.</div>
+                    <Link
+                      to="/arena/training"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-md text-[12px] font-semibold text-white/90 transition hover:brightness-110"
+                      style={{
+                        background: "linear-gradient(90deg, rgba(59,130,246,0.2), rgba(124,58,237,0.2))",
+                        border: "1px solid rgba(59,130,246,0.35)",
+                      }}
+                    >
+                      <Swords className="w-3.5 h-3.5" />
+                      Run Solo Training →
+                    </Link>
+                  </div>
+                )}
               </>
             )}
           </div>
+
 
           {/* Players grid */}
           <div className="w-full max-w-3xl">
