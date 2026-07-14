@@ -14,7 +14,8 @@ import {
   Lock,
   Settings,
   ChevronRight,
-} from "lucide-react";
+  Brain,
+
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { IndiaWarMap } from "@/components/arena/india-war-map";

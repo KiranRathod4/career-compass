@@ -49,6 +49,7 @@ import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
 import { Route as ApiPublicRazorpayWebhookRouteImport } from './routes/api/public/razorpay-webhook'
 import { Route as ApiCoachStreamRouteImport } from './routes/api/coach.stream'
+import { Route as AuthenticatedArenaTrainingRouteImport } from './routes/_authenticated/arena.training'
 import { Route as AuthenticatedArenaMatchMatchIdRouteImport } from './routes/_authenticated/arena.match.$matchId'
 
 const LoginRoute = LoginRouteImport.update({
@@ -254,6 +255,12 @@ const ApiCoachStreamRoute = ApiCoachStreamRouteImport.update({
   path: '/api/coach/stream',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedArenaTrainingRoute =
+  AuthenticatedArenaTrainingRouteImport.update({
+    id: '/training',
+    path: '/training',
+    getParentRoute: () => AuthenticatedArenaRoute,
+  } as any)
 const AuthenticatedArenaMatchMatchIdRoute =
   AuthenticatedArenaMatchMatchIdRouteImport.update({
     id: '/match/$matchId',
@@ -299,6 +306,7 @@ export interface FileRoutesByFullPath {
   '/timer': typeof AuthenticatedTimerRoute
   '/tracks': typeof AuthenticatedTracksRoute
   '/u/$username': typeof UUsernameRoute
+  '/arena/training': typeof AuthenticatedArenaTrainingRoute
   '/api/coach/stream': typeof ApiCoachStreamRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/arena/match/$matchId': typeof AuthenticatedArenaMatchMatchIdRoute
@@ -341,6 +349,7 @@ export interface FileRoutesByTo {
   '/timer': typeof AuthenticatedTimerRoute
   '/tracks': typeof AuthenticatedTracksRoute
   '/u/$username': typeof UUsernameRoute
+  '/arena/training': typeof AuthenticatedArenaTrainingRoute
   '/api/coach/stream': typeof ApiCoachStreamRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/arena/match/$matchId': typeof AuthenticatedArenaMatchMatchIdRoute
@@ -385,6 +394,7 @@ export interface FileRoutesById {
   '/_authenticated/timer': typeof AuthenticatedTimerRoute
   '/_authenticated/tracks': typeof AuthenticatedTracksRoute
   '/u/$username': typeof UUsernameRoute
+  '/_authenticated/arena/training': typeof AuthenticatedArenaTrainingRoute
   '/api/coach/stream': typeof ApiCoachStreamRoute
   '/api/public/razorpay-webhook': typeof ApiPublicRazorpayWebhookRoute
   '/_authenticated/arena/match/$matchId': typeof AuthenticatedArenaMatchMatchIdRoute
@@ -429,6 +439,7 @@ export interface FileRouteTypes {
     | '/timer'
     | '/tracks'
     | '/u/$username'
+    | '/arena/training'
     | '/api/coach/stream'
     | '/api/public/razorpay-webhook'
     | '/arena/match/$matchId'
@@ -471,6 +482,7 @@ export interface FileRouteTypes {
     | '/timer'
     | '/tracks'
     | '/u/$username'
+    | '/arena/training'
     | '/api/coach/stream'
     | '/api/public/razorpay-webhook'
     | '/arena/match/$matchId'
@@ -514,6 +526,7 @@ export interface FileRouteTypes {
     | '/_authenticated/timer'
     | '/_authenticated/tracks'
     | '/u/$username'
+    | '/_authenticated/arena/training'
     | '/api/coach/stream'
     | '/api/public/razorpay-webhook'
     | '/_authenticated/arena/match/$matchId'
@@ -810,6 +823,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCoachStreamRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/arena/training': {
+      id: '/_authenticated/arena/training'
+      path: '/training'
+      fullPath: '/arena/training'
+      preLoaderRoute: typeof AuthenticatedArenaTrainingRouteImport
+      parentRoute: typeof AuthenticatedArenaRoute
+    }
     '/_authenticated/arena/match/$matchId': {
       id: '/_authenticated/arena/match/$matchId'
       path: '/match/$matchId'
@@ -821,10 +841,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedArenaRouteChildren {
+  AuthenticatedArenaTrainingRoute: typeof AuthenticatedArenaTrainingRoute
   AuthenticatedArenaMatchMatchIdRoute: typeof AuthenticatedArenaMatchMatchIdRoute
 }
 
 const AuthenticatedArenaRouteChildren: AuthenticatedArenaRouteChildren = {
+  AuthenticatedArenaTrainingRoute: AuthenticatedArenaTrainingRoute,
   AuthenticatedArenaMatchMatchIdRoute: AuthenticatedArenaMatchMatchIdRoute,
 }
 
@@ -920,13 +942,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
