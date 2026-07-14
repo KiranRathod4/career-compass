@@ -9,7 +9,7 @@ import {
   Swords,
   Users,
   Map as MapIcon,
-  Map as MapIcon,
+
   Radio,
   Lock,
   Settings,
