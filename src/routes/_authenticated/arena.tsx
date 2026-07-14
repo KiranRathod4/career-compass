@@ -8,13 +8,16 @@ import {
   Crown,
   Swords,
   Users,
-  Calendar,
   Map as MapIcon,
+
   Radio,
   Lock,
   Settings,
   ChevronRight,
+  Brain,
 } from "lucide-react";
+
+
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { IndiaWarMap } from "@/components/arena/india-war-map";
@@ -453,8 +456,36 @@ function ArenaLobby() {
               })()}
             />
 
+            {/* Empty-lobby fallback: nudge to solo training when few players online */}
+            {online.length <= 1 && !locked && (
+              <button
+                type="button"
+                onClick={() => navigate({ to: "/arena/training" })}
+                className="w-full rounded-xl p-4 flex items-center gap-3 text-left hover:brightness-110 transition"
+                style={{
+                  background: "linear-gradient(90deg, rgba(59,130,246,0.15), rgba(124,58,237,0.15))",
+                  border: "1px solid rgba(59,130,246,0.35)",
+                }}
+              >
+                <div
+                  className="w-10 h-10 rounded-lg flex items-center justify-center"
+                  style={{ background: "rgba(59,130,246,0.2)", border: "1px solid rgba(59,130,246,0.4)" }}
+                >
+                  <Brain className="w-5 h-5 text-blue-300" />
+                </div>
+                <div className="flex-1">
+                  <div className="text-[14px] font-semibold text-white">Lobby is quiet — sharpen up solo</div>
+                  <div className="text-[12px] text-white/60">
+                    Run a 10-question training set against the clock. Earn XP while you wait for players.
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-white/60" />
+              </button>
+            )}
+
             {/* Mode cards grid */}
             <div className="grid grid-cols-2 gap-4">
+
               <ModeCard
                 title="Battle Sprint"
                 sub="Answer fast. Score more. First to 1000 wins."
@@ -496,13 +527,16 @@ function ArenaLobby() {
                 disabled={matchmaking || !!locked}
               />
               <ModeCard
-                title="Daily Challenges"
-                sub="Three puzzles. Resets at midnight. Solo grind."
-                meta="0 / 3 today"
+                title="Solo Training"
+                sub="No opponents? Grind 10 questions vs the clock. Earn XP."
+                meta="1 player · self-paced"
                 accent="#3b82f6"
                 bg="linear-gradient(135deg, #0a0d1a, #050810)"
-                icon={<Calendar className="w-12 h-12" style={{ color: "#60a5fa" }} />}
+                icon={<Brain className="w-12 h-12" style={{ color: "#60a5fa" }} />}
+                onPlay={() => navigate({ to: "/arena/training" })}
+                disabled={!!locked}
               />
+
               <ModeCard
                 title="Zone War"
                 sub="Represent your state. Saturdays 7 PM."
